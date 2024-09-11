@@ -3,57 +3,74 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from model.multimodal import Multimodal
 from model.gru import GRU
 from model.transformer import Transformer
 from model.tcn import TCN
 from model.sam import SAM
 from model.loss import max_sharpe, equal_risk_parity
 from train.utils import save_model, load_model
-
+from tqdm import tqdm
+import os
 
 class Trainer:
     def __init__(self, config):
         self.config = config
         self.device = "cuda" if self.config["USE_CUDA"] else "cpu"
-        model_name = self.config["MODEL"]
-        if model_name.lower() == "gru":
-            self.model = GRU(
-                self.config["N_LAYER"],
-                self.config["HIDDEN_DIM"],
-                self.config["N_FEAT"],
-                self.config["DROPOUT"],
-                self.config["BIDIRECTIONAL"],
-                self.config['LB'], self.config['UB']
+        self.model_name = self.config["MODEL"]
+        self.multimodal = self.config["MULTIMODAL"]
+        self.best_model_count = 0
+        
+        print(f"model_name: {self.model_name}, multimodal: {self.multimodal}")
+        
+        # 모델별 파라미터 설정
+        model_params = self._get_model_params()
+        
+        if self.multimodal:
+            self.model = Multimodal(
+                model_type=self.model_name,
+                model_params=model_params,
+                cnn_output_dim=self.config["CNN_OUTPUT_DIM"],
+                verbose=self.config.get("VERBOSE", False)
             ).to(self.device)
-        if model_name.lower() == "transformer":
-            self.model = Transformer(
-                self.config['TRANSFORMER']['n_feature'],
-                self.config['TRANSFORMER']['n_timestep'],
-                self.config['TRANSFORMER']["n_layer"],
-                self.config['TRANSFORMER']["n_head"],
-                self.config['TRANSFORMER']["n_dropout"],
-                self.config['TRANSFORMER']["n_output"],
-                self.config['LB'], self.config['UB']
-            ).to(self.device)
-        if model_name.lower() == "tcn":
-            hidden_size, level = 5, 3
-            num_channels = [hidden_size] * (level - 1) + [self.config['TCN']['n_timestep']]
-            self.model = TCN(
-                self.config['TCN']['n_feature'],
-                self.config['TCN']['n_output'],
-                num_channels,
-                self.config['TCN']["kernel_size"],
-                self.config['TCN']["n_dropout"],
-                self.config['TCN']["n_timestep"],
-                self.config['LB'], self.config['UB'],
-            ).to(self.device)
+        else:
+            self.model = self._create_model(model_params).to(self.device)
+        
         base_optimizer = torch.optim.SGD
         self.optimizer = SAM(
-            self.model.parameters(), base_optimizer, lr=self.config["LR"]
-            , momentum=self.config['MOMENTUM']
+            self.model.parameters(), base_optimizer, lr=self.config["LR"],
+            momentum=self.config['MOMENTUM']
         )
         self.criterion = max_sharpe
 
+    def _get_model_params(self):
+        common_params = {
+            'lb': self.config['LB'],
+            'ub': self.config['UB'],
+            'multimodal': self.multimodal,
+            'cnn_output_dim': self.config["CNN_OUTPUT_DIM"],
+            'verbose': self.config.get("VERBOSE", False),
+            'n_stocks': self.config['N_FEAT']
+        }
+        
+        if self.model_name.lower() == "gru":
+            return {**self.config["GRU"], **common_params}
+        elif self.model_name.lower() == "tcn":
+            return {**self.config["TCN"], **common_params}
+        elif self.model_name.lower() == "transformer":
+            return {**self.config["TRANSFORMER"], **common_params}
+        else:
+            raise ValueError(f"Unsupported model type: {self.model_name}")
+
+    def _create_model(self, model_params):
+        if self.model_name.lower() == "gru":
+            return GRU(**model_params)
+        elif self.model_name.lower() == "tcn":
+            return TCN(**model_params)
+        elif self.model_name.lower() == "transformer":
+            return Transformer(**model_params)
+        else:
+            raise ValueError(f"Unsupported model type: {self.model_name}")
 
     def _dataload(self):
         with open("data/dataset.pkl", "rb") as f:
@@ -66,8 +83,21 @@ class Trainer:
         self.test_x_raw = test_x_raw
         self.test_y_raw = test_y_raw
         self.test_date = test_date
+        
+    def _dataload_image(self, chart_dir="data/charts/"):
+        if not self.multimodal:
+            return
+        
+        self.all_images = {}
+        self.all_meta_data = {}
+        for file in os.listdir(chart_dir):
+            if file.endswith(".npz"):
+                ticker = file.split("_")[2]
+                data = np.load(os.path.join(chart_dir, file), allow_pickle=True)
+                self.all_images[ticker] = data['images']
+                self.all_meta_data[ticker] = data['meta_data']
 
-    def _scale_data(self, scale=21):
+    def _scale_data(self, scale=20):
         self.train_x = torch.from_numpy(self.train_x_raw.astype("float32") * scale)
         self.train_y = torch.from_numpy(self.train_y_raw.astype("float32") * scale)
         self.test_x = torch.from_numpy(self.test_x_raw.astype("float32") * scale)
@@ -87,6 +117,14 @@ class Trainer:
     def set_data(self):
         self._dataload()
         self._scale_data()
+        
+        # 데이터 확인
+        print("train_x_raw shape after alignment:", self.train_x_raw.shape)
+        print("train_y_raw shape after alignment:", self.train_y_raw.shape)
+        print("test_x_raw shape after alignment:", self.test_x_raw.shape)
+        print("test_y_raw shape after alignment:", self.test_y_raw.shape)
+        print("test_date type:", type(self.test_date))
+        print("test_date length:", len(self.test_date) if hasattr(self.test_date, '__len__') else "N/A")
         self._set_parameter()
         self._shuffle_data()
 
@@ -109,9 +147,7 @@ class Trainer:
         early_stop_count = 0
         early_stop_th = self.config["EARLY_STOP"]
 
-        for epoch in range(self.config["EPOCHS"]):
-            print("Epoch {}/{}".format(epoch + 1, self.config["EPOCHS"]))
-            print("-" * 10)
+        for epoch in tqdm(range(self.config["EPOCHS"]), desc="Epochs"):
             for phase in ["train", "valid"]:
                 if phase == "train":
                     self.model.train()
@@ -122,10 +158,11 @@ class Trainer:
 
                 running_loss = 0.0
 
-                for idx, data in enumerate(dataloader):
+                pbar = tqdm(dataloader, desc=f"{phase.capitalize()} Progress", leave=False)
+                for idx, data in enumerate(pbar):
                     x, y = data
-                    x = x.to("cuda")
-                    y = y.to("cuda")
+                    x = x.to(self.device)
+                    y = y.to(self.device)
                     self.optimizer.zero_grad()
                     with torch.set_grad_enabled(phase == "train"):
                         out = self.model(x)
@@ -137,33 +174,46 @@ class Trainer:
                             self.optimizer.second_step(zero_grad=True)
 
                     running_loss += loss.item() / len(dataloader)
+                    pbar.set_postfix({'loss': running_loss / (idx + 1)})
+
                 if phase == "train":
                     train_loss.append(running_loss)
                 else:
                     valid_loss.append(running_loss)
                     if running_loss <= min(valid_loss):
-                        save_model(self.model, "result", "hb")
-                        print(f"Improved! at {epoch + 1} epochs, with {running_loss}")
+                        self.best_model_count += 1
+                        save_model(self.model, "result", f"{self.config['MODEL']}_{self.best_model_count}")
+                        tqdm.write(f"Improved! at {epoch + 1} epochs, with {running_loss:.6f}")
                         early_stop_count = 0
                     else:
                         early_stop_count += 1
 
             if early_stop_count == early_stop_th:
+                tqdm.write(f"Early stopping at epoch {epoch + 1}")
                 break
 
         if visualize:
-            self._visualize_training(train_loss, valid_loss)
+            self._save_training_loss(train_loss, valid_loss)
 
         return self.model, train_loss, valid_loss
 
-    def _visualize_training(self, train_loss, valid_loss):
-        plt.plot(train_loss, label="train")
-        plt.plot(valid_loss, label="valid")
-        plt.legend()
-        plt.show()
+    def _save_training_loss(self, train_loss, valid_loss):
+        # 에폭 번호 생성
+        epochs = range(1, len(train_loss) + 1)
+        
+        # 데이터프레임 생성
+        df = pd.DataFrame({
+            'Epoch': epochs,
+            'Train Loss': train_loss,
+            'Validation Loss': valid_loss
+        })
+        
+        # CSV 파일로 저장
+        df.to_csv(f"result/training_loss_{self.config['MODEL']}_{self.config['MULTIMODAL']}.csv", index=False)
+        print(f"훈련 및 검증 손실이 result/training_loss_{self.config['MODEL']}_{self.config['MULTIMODAL']}.csv에 저장되었습니다.")
 
     def backtest(self, visualize=True):
-        self.model = load_model(self.model, "result/best_model_weight_hb.pt", use_cuda=True)
+        self.model = load_model(self.model, f"result/best_model_weight_{self.config['MODEL']}.pt", use_cuda=True)
 
         myPortfolio, equalPortfolio = [10000], [10000]
         EWPWeights = np.ones(self.N_STOCK) / self.N_STOCK
@@ -173,6 +223,12 @@ class Trainer:
             out = self.model(x.float().cuda())[0]
             myWeights.append(out.detach().cpu().numpy())
             m_rtn = np.sum(self.test_y_raw[i], axis=0)
+            
+            print(f"x 형태: {x.shape},\n"
+                  f"m_rtn 형태: {m_rtn.shape},\n"
+                  f"out 형태: {out.detach().cpu().numpy().shape},\n"
+                  f"내적 형태: {np.dot(out.detach().cpu().numpy(), m_rtn).shape}")
+            
             myPortfolio.append(
                 myPortfolio[-1] * np.exp(np.dot(out.detach().cpu().numpy(), m_rtn))
             )
@@ -228,8 +284,7 @@ class Trainer:
     def _visualize_backtest(self, performance):
         performance.plot(figsize=(14, 7), fontsize=10)
         plt.legend(fontsize=10)
-        plt.savefig("result/performance.png")
-        plt.show()
+        plt.savefig(f"result/performance_{self.config['MODEL']}.png")
 
     def _visualize_weights(self, performance, weights):
         weights = np.array(weights)
@@ -245,8 +300,7 @@ class Trainer:
             rotation="vertical",
         )
         plt.legend()
-        plt.savefig("result/weights.png")
-        plt.show()
+        plt.savefig(f"result/weights_{self.config['MODEL']}.png")
 
     def _get_mdd(self, x):
         arr_v = np.array(x)

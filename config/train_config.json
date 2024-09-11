@@ -1,5 +1,7 @@
 {
   "MODEL": "TCN",
+  "MULTIMODAL": false,
+  "CNN_OUTPUT_DIM": 50,
   "BATCH": 32,
   "SEED": 42,
   "EPOCHS": 500,
@@ -7,23 +9,28 @@
   "LR": 0.005,
   "MOMENTUM": 0.9,
   "USE_CUDA": true,
-  "N_LAYER": 1,
-  "HIDDEN_DIM": 128,
-  "N_FEAT": 50,
-  "DROPOUT": 0.3,
-  "BIDIRECTIONAL": false,
   "LB": 0,
   "UB": 0.2,
+  "N_FEAT": 50,
+
+  "GRU": {
+    "n_layers": 1,
+    "hidden_dim": 128,
+    "dropout_p": 0.3,
+    "bidirectional": false
+  },
+
   "TCN": {
-    "n_feature": 50,
     "n_output": 50,
     "kernel_size": 4,
     "n_dropout": 0.1,
-    "n_timestep": 63
+    "n_timestep": 60,
+    "hidden_size": 64,
+    "level": 3
   },
+
   "TRANSFORMER": {
-    "n_feature": 50,
-    "n_timestep": 63,
+    "n_timestep": 60,
     "n_layer": 6,
     "n_head": 5,
     "n_dropout": 0.1,

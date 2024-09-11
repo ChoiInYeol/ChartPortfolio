@@ -7,7 +7,6 @@ from torch.autograd import Variable
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
 def creatMask(batch, sequence_length):
     mask = torch.zeros(batch, sequence_length, sequence_length)
     for i in range(sequence_length):
@@ -201,27 +200,45 @@ class Encoder(nn.Module):
 
 
 class Transformer(nn.Module):
-    def __init__(self, n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub):
+    def __init__(self, n_stocks, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub, multimodal=False, cnn_output_dim=0, verbose=False):
         super().__init__()
-        self.encoder = Encoder(n_feature, n_timestep, n_layer, n_head, n_dropout)
-        self.out = nn.Linear(n_feature, n_output)
-        self.tempmaxpool = nn.MaxPool1d(n_timestep)
+        self.verbose = verbose
         self.lb = lb
         self.ub = ub
+        self.multimodal = multimodal
+
+        input_dim = n_stocks + n_stocks * cnn_output_dim if multimodal else n_stocks
+        self.encoder = Encoder(input_dim, n_timestep, n_layer, n_head, n_dropout)
+        self.out = nn.Linear(input_dim, n_output)
+        self.tempmaxpool = nn.MaxPool1d(n_timestep)
 
     def forward(self, src, returnWeights=False):
+        if self.verbose:
+            print(f"Transformer input shape: {src.shape}")
         mask = creatMask(src.shape[0], src.shape[1]).to(device)
-        # print(src.shape)
-        if (returnWeights):
-            e_outputs, weights, z = self.encoder(src, mask, returnWeights=returnWeights)
+        
+        if returnWeights:
+            e_outputs, weights = self.encoder(src, mask, returnWeights=returnWeights)
         else:
             e_outputs = self.encoder(src, mask)
-
+        
+        if self.verbose:
+            print(f"After Encoder shape: {e_outputs.shape}")
+        
         e_outputs = self.tempmaxpool(e_outputs.transpose(1, 2)).squeeze(-1)
+        if self.verbose:
+            print(f"After MaxPool shape: {e_outputs.shape}")
+        
         output = self.out(e_outputs)
+        if self.verbose:
+            print(f"After FC shape: {output.shape}")
+        
         output = F.softmax(output, dim=1)
         output = torch.stack([self.rebalance(batch, self.lb, self.ub) for batch in output])
-        if (returnWeights):
+        if self.verbose:
+            print(f"Final output shape: {output.shape}")
+        
+        if returnWeights:
             return output, weights
         else:
             return output

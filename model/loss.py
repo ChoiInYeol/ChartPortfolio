@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 
-
 def max_sharpe(y_return, weights):
     weights = torch.unsqueeze(weights, 1)
     meanReturn = torch.unsqueeze(torch.mean(y_return, axis=1), 2)
