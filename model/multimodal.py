@@ -9,38 +9,64 @@ class CNN(nn.Module):
     def __init__(self, output_dim, verbose=False):
         super(CNN, self).__init__()
         self.verbose = verbose
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
         
-        # 입력 이미지 크기에 맞게 계산된 값
-        self.fc1 = nn.Linear(64 * 16 * 29, 128)
-        self.fc2 = nn.Linear(128, output_dim)  # 여기서 output_dim을 50 이하로 설정
+        
+        # PRED_LEN에 따른 이미지 크기와 CNN 구조 설정
+        self.image_sizes = {
+            5: (32, 15),
+            20: (64, 60),
+            60: (96, 180),
+            120: (128, 360)
+        }
+        self.num_blocks = {5: 2, 20: 3, 60: 4, 120: 6}
+        
+        # CNN 레이어 동적 생성
+        self.layers = nn.ModuleList()
+        in_channels = 1
+        out_channels = 64
+        for _ in range(self.num_blocks[self.pred_len]):
+            self.layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=(5, 3), stride=1, padding=(2, 1)))
+            self.layers.append(nn.ReLU())
+            self.layers.append(nn.MaxPool2d(kernel_size=(2, 1), stride=(2, 1)))
+            in_channels = out_channels
+            out_channels = min(512, out_channels * 2)  # 최대 512 채널까지만 증가
+        
+        # FC 레이어 크기 계산
+        w, h = self.image_sizes[self.pred_len]
+        for _ in range(self.num_blocks[self.pred_len]):
+            w = (w - 1) // 2 + 1
+        fc_input_dim = in_channels * w * h  # 마지막 out_channels 값을 사용
+        
+        self.fc1 = nn.Linear(fc_input_dim, 128)
+        self.fc2 = nn.Linear(128, output_dim)
 
     def forward(self, x):
         if self.verbose:
             print(f"4. CNN input shape: {x.shape}")
-        x = self.pool(F.relu(self.conv1(x)))
-        if self.verbose:
-            print(f"5. After first conv and pool: {x.shape}")
-        x = self.pool(F.relu(self.conv2(x)))
-        if self.verbose:
-            print(f"6. After second conv and pool: {x.shape}")
+        
+        for i, layer in enumerate(self.layers):
+            x = layer(x)
+            if self.verbose and isinstance(layer, nn.MaxPool2d):
+                print(f"{i+5}. After conv and pool: {x.shape}")
+        
         x = x.view(x.size(0), -1)  # Flatten
         if self.verbose:
-            print(f"7. After flatten: {x.shape}")
+            print(f"{len(self.layers)+5}. After flatten: {x.shape}")
+        
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         if self.verbose:
-            print(f"8. CNN output shape: {x.shape}")
+            print(f"{len(self.layers)+6}. CNN output shape: {x.shape}")
+        
         return x
 
 class Multimodal(nn.Module):
     def __init__(self, model_type, model_params, cnn_output_dim, verbose=False):
         super().__init__()
-        self.cnn = CNN(cnn_output_dim, verbose)
+        self.cnn = CNN(model_params['pred_len'], cnn_output_dim, verbose)
         self.model_type = model_type
         self.verbose = verbose
+        
 
         if model_type.lower() == 'gru':
             self.model = GRU(**model_params)

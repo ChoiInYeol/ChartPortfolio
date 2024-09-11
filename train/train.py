@@ -20,8 +20,10 @@ class Trainer:
         self.model_name = self.config["MODEL"]
         self.multimodal = self.config["MULTIMODAL"]
         self.best_model_count = 0
+        self.train_len = self.config['TRAIN_LEN']
+        self.pred_len = self.config['PRED_LEN']
         
-        print(f"model_name: {self.model_name}, multimodal: {self.multimodal}")
+        print(f"model_name: {self.model_name}, multimodal: {self.multimodal}, pred_len: {self.pred_len}")
         
         # 모델별 파라미터 설정
         model_params = self._get_model_params()
@@ -31,6 +33,7 @@ class Trainer:
                 model_type=self.model_name,
                 model_params=model_params,
                 cnn_output_dim=self.config["CNN_OUTPUT_DIM"],
+                pred_len=self.pred_len,
                 verbose=self.config.get("VERBOSE", False)
             ).to(self.device)
         else:
@@ -50,7 +53,8 @@ class Trainer:
             'multimodal': self.multimodal,
             'cnn_output_dim': self.config["CNN_OUTPUT_DIM"],
             'verbose': self.config.get("VERBOSE", False),
-            'n_stocks': self.config['N_FEAT']
+            'n_stocks': self.config['N_FEAT'],
+            'pred_len': self.pred_len
         }
         
         if self.model_name.lower() == "gru":
