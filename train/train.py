@@ -39,59 +39,97 @@ class PortfolioDataset(Dataset):
 class Trainer:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        self.device = torch.device("cuda" if self.config["USE_CUDA"] and torch.cuda.is_available() else "cpu")
-        self.model_name = self.config["MODEL"]
-        self.multimodal = self.config["MULTIMODAL"]
-        self.LEN_TRAIN = self.config['TRAIN_LEN']
-        self.LEN_PRED = self.config['PRED_LEN']
-        self.N_STOCK = self.config['N_FEAT']
+        self.device = torch.device("cuda" if config["USE_CUDA"] and torch.cuda.is_available() else "cpu")
+        self.model_name = config["MODEL"].lower()
+        self.multimodal = config.get("MULTIMODAL", False)
+        self.len_train = config['TRAIN_LEN']
+        self.len_pred = config['PRED_LEN']
+        self.n_stock = config['N_FEAT']
+        self.lb = config['LB']
+        self.ub = config['UB']
         self.best_model_count = 0
         self.alpha = config.get("ALPHA", 0.5)
         
-        if self.multimodal:
-            self.criterion = combined_loss
-        else:
-            self.criterion = max_sharpe
+        self.criterion = combined_loss if self.multimodal else max_sharpe
         
-        logger.info(f"model_name: {self.model_name}, multimodal: {self.multimodal}, LEN_PRED: {self.LEN_PRED}")
+        logger.info(f"Model: {self.model_name}, Multimodal: {self.multimodal}, Prediction Length: {self.len_pred}")
         
         self.model = self._create_model()
         self.optimizer = self._create_optimizer()
 
     def _create_model(self) -> torch.nn.Module:
-        model_params = self._get_model_params()
+        common_params = {
+            'n_stocks': self.n_stock,
+            'lb': self.lb,
+            'ub': self.ub,
+            'multimodal': self.multimodal
+        }
         if self.multimodal:
+            img_height, img_width = self._get_image_dimensions()
             return Multimodal(
                 model_type=self.model_name,
-                model_params=model_params,
+                model_params={**self.config[self.model_name.upper()], **common_params},
+                img_height=img_height,
+                img_width=img_width,
+                lb=self.lb,
+                ub=self.ub
             ).to(self.device)
-        else:
-            if self.model_name.lower() == "gru":
-                return GRU(**model_params).to(self.device)
-            elif self.model_name.lower() == "tcn":
-                return TCN(**model_params).to(self.device)
-            elif self.model_name.lower() == "transformer":
-                return Transformer(**model_params).to(self.device)
-            else:
-                raise ValueError(f"Unsupported model type: {self.model_name}")
+        
+        if self.model_name == "gru":
+            gru_config = self.config['GRU']
+            return GRU(
+                n_layers=gru_config['n_layers'],
+                hidden_dim=gru_config['hidden_dim'],
+                dropout_p=gru_config['dropout_p'],
+                bidirectional=gru_config['bidirectional'],
+                **common_params
+            ).to(self.device)
+        
+        if self.model_name == "transformer":
+            transformer_config = self.config['TRANSFORMER']
+            return Transformer(
+                n_timestep=transformer_config['n_timestep'],
+                n_layer=transformer_config['n_layer'],
+                n_head=transformer_config['n_head'],
+                n_dropout=transformer_config['n_dropout'],
+                n_output=transformer_config['n_output'],
+                **common_params
+            ).to(self.device)
+        
+        if self.model_name == "tcn":
+            tcn_config = self.config['TCN']
+            return TCN(
+                n_output=tcn_config['n_output'],
+                kernel_size=tcn_config['kernel_size'],
+                n_dropout=tcn_config['n_dropout'],
+                n_timestep=tcn_config['n_timestep'],
+                hidden_size=tcn_config['hidden_size'],
+                level=tcn_config['level'],
+                **common_params
+            ).to(self.device)
+        
+        raise ValueError(f"지원되지 않는 모델 유형: {self.model_name}")
 
     def _create_optimizer(self) -> SAM:
         base_optimizer = torch.optim.SGD
         return SAM(
-            self.model.parameters(), base_optimizer, lr=self.config["LR"],
+            self.model.parameters(),
+            base_optimizer,
+            lr=self.config["LR"],
             momentum=self.config['MOMENTUM']
         )
 
-    def _get_model_params(self) -> Dict[str, Any]:
-        common_params = {
-            'lb': self.config['LB'],
-            'ub': self.config['UB'],
-            'multimodal': self.multimodal,
-            'n_stocks': self.config['N_FEAT'],
-        }
-        
-        model_specific_params = self.config.get(self.model_name.upper(), {})
-        return {**model_specific_params, **common_params}
+    def _get_image_dimensions(self) -> Tuple[int, int]:
+        if self.len_train == 5:
+            return 32, 15
+        elif self.len_train == 20:
+            return 64, 60
+        elif self.len_train == 60:
+            return 96, 180
+        elif self.len_train == 120:
+            return 128, 360
+        else:
+            raise ValueError(f"Unsupported TRAIN_LEN value: {self.len_train}")
 
     def _load_and_process_data(self) -> Tuple[PortfolioDataset, PortfolioDataset]:
         logger.info("Loading and processing data...")
@@ -122,7 +160,6 @@ class Trainer:
         self.LEN_PRED = train_y.shape[1]
         
         self.test_y_raw = test_y_raw
-        
 
         train_dataset = PortfolioDataset(train_x, train_y, train_img, train_labels, self.LEN_PRED)
         test_dataset = PortfolioDataset(test_x, test_y, test_img, test_labels, self.LEN_PRED)
@@ -132,64 +169,25 @@ class Trainer:
         train_dataset, test_dataset = self._load_and_process_data()
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True)
         test_loader = DataLoader(test_dataset, batch_size=self.config['BATCH'], shuffle=False)
-
+        
+        logger.debug(f"Train data shape: x={train_dataset.x_data.shape}, y={train_dataset.y_data.shape}")
+        logger.debug(f"Image data shape: {train_dataset.img_data.shape if self.multimodal else 'N/A'}")
+        logger.debug(f"Labels shape: {train_dataset.labels.shape if self.multimodal else 'N/A'}")
+        
         valid_loss = []
         train_loss = []
-
         early_stop_count = 0
         early_stop_th = self.config["EARLY_STOP"]
 
         for epoch in tqdm(range(self.config["EPOCHS"]), desc="Epochs"):
-            for phase in ["train", "valid"]:
-                if phase == "train":
-                    self.model.train()
-                    dataloader = train_loader
-                else:
-                    self.model.eval()
-                    dataloader = test_loader
+            train_loss.append(self._run_epoch(train_loader, is_training=True))
+            valid_loss.append(self._run_epoch(test_loader, is_training=False))
 
-                running_loss = 0.0
-
-                pbar = tqdm(dataloader, desc=f"{phase.capitalize()} Progress", leave=False)
-                for idx, data in enumerate(pbar):
-                    if self.multimodal:
-                        x, y, img, labels = [d.to(self.device) for d in data]
-                    else:
-                        x, y = [d.to(self.device) for d in data[:2]]
-                        img, labels = None, None
-
-                    self.optimizer.zero_grad()
-                    with torch.set_grad_enabled(phase == "train"):
-                        if self.multimodal:
-                            portfolio_weights, binary_pred, _ = self.model(x, img)
-                            loss = self.criterion(y, portfolio_weights, labels, binary_pred, self.alpha)
-                        else:
-                            portfolio_weights = self.model(x)
-                            loss = self.criterion(y, portfolio_weights)
-
-                        if phase == "train":
-                            loss.backward()
-                            self.optimizer.first_step(zero_grad=True)
-                            if self.multimodal:
-                                self.criterion(y, *self.model(x, img), self.alpha).backward()
-                            else:
-                                self.criterion(y, self.model(x)).backward()
-                            self.optimizer.second_step(zero_grad=True)
-
-                    running_loss += loss.item() / len(dataloader)
-                    pbar.set_postfix({'loss': running_loss / (idx + 1)})
-
-                if phase == "train":
-                    train_loss.append(running_loss)
-                else:
-                    valid_loss.append(running_loss)
-                    if running_loss <= min(valid_loss):
-                        self.best_model_count += 1
-                        save_model(self.model, "result", f"{self.config['MODEL']}_{self.best_model_count}_{running_loss:.6f}")
-                        logger.info(f"Improved! Epoch {epoch + 1}, Loss: {running_loss:.6f}")
-                        early_stop_count = 0
-                    else:
-                        early_stop_count += 1
+            if valid_loss[-1] <= min(valid_loss):
+                self._save_model(epoch, valid_loss[-1])
+                early_stop_count = 0
+            else:
+                early_stop_count += 1
 
             if early_stop_count == early_stop_th:
                 logger.info(f"Early stopping at epoch {epoch + 1}")
@@ -200,19 +198,76 @@ class Trainer:
 
         return self.model, train_loss, valid_loss
 
+    def _run_epoch(self, dataloader: DataLoader, is_training: bool) -> float:
+        self.model.train() if is_training else self.model.eval()
+        running_loss = 0.0
+
+        pbar = tqdm(dataloader, desc=f"{'Train' if is_training else 'Valid'} Progress", leave=False)
+        for idx, data in enumerate(pbar):
+            loss = self._compute_loss(data, is_training)
+            running_loss += loss.item() / len(dataloader)
+            pbar.set_postfix({'loss': running_loss / (idx + 1)})
+
+        return running_loss
+
+    def _compute_loss(self, data, is_training: bool) -> torch.Tensor:
+        if self.multimodal:
+            x, y, img, labels = [d.to(self.device) for d in data]
+        else:
+            x, y = [d.to(self.device) for d in data[:2]]
+            img, labels = None, None
+
+        self.optimizer.zero_grad()
+        with torch.set_grad_enabled(is_training):
+            if self.multimodal:
+                portfolio_weights, binary_pred = self.model(x, img)
+                loss = self.criterion(y, portfolio_weights, labels, binary_pred, self.alpha)
+            else:
+                portfolio_weights = self.model(x)
+                loss = self.criterion(y, portfolio_weights, None, None, self.alpha)
+
+            if is_training:
+                loss.backward()
+                self.optimizer.first_step(zero_grad=True)
+                self._compute_second_order_loss(x, y, img, labels)
+                self.optimizer.second_step(zero_grad=True)
+
+        return loss
+
+    def _compute_second_order_loss(self, x, y, img, labels):
+        if self.multimodal:
+            portfolio_weights, binary_pred = self.model(x, img)
+            self.criterion(y, portfolio_weights, labels, binary_pred, self.alpha).backward()
+        else:
+            portfolio_weights = self.model(x)
+            self.criterion(y, portfolio_weights, None, None, self.alpha).backward()
+
+    def _save_model(self, epoch: int, loss: float):
+        self.best_model_count += 1
+        save_model(self.model, "result", f"{self.config['MODEL']}_{self.best_model_count}_{loss:.6f}")
+        logger.info(f"Improved! Epoch {epoch + 1}, Loss: {loss:.6f}")
+
     def backtest(self, model_file: str = None, visualize: bool = True) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         if model_file is None:
             model_file = f"best_model_weight_{self.config['MODEL']}_{self.best_model_count}_{self.config['MULTIMODAL']}"
         self.model = load_model(self.model, f"{model_file}", use_cuda=True)
 
-        # 데이터 로드 및 처리
         _, test_dataset = self._load_and_process_data()
         
+        logger.debug(f"Test image data shape: {test_dataset.img_data.shape}")
+        
+        myPortfolio, equalPortfolio, myWeights = self._calculate_portfolio_performance(test_dataset)
+        
+        performance, stats, myWeights_df = self._create_performance_dataframe(myPortfolio, equalPortfolio, myWeights)
+
+        self._log_backtest_results(stats)
+
+        return performance, stats, myWeights_df
+
+    def _calculate_portfolio_performance(self, test_dataset):
         myPortfolio, equalPortfolio = [10000], [10000]
         EWPWeights = np.ones(self.N_STOCK) / self.N_STOCK
         myWeights = []
-        
-        print(test_dataset.img_data.shape)
         
         self.model.eval()
         with torch.no_grad():
@@ -226,20 +281,17 @@ class Trainer:
                 
                 myWeights.append(out.detach().cpu().numpy())
                 m_rtn = np.sum(self.test_y_raw[i], axis=0)
-                myPortfolio.append(
-                    myPortfolio[-1] * np.exp(np.dot(out.detach().cpu().numpy(), m_rtn))
-                )
-                equalPortfolio.append(
-                    equalPortfolio[-1] * np.exp(np.dot(EWPWeights, m_rtn))
-                )
-                
-        # performance DataFrame 생성 전에 길이 맞추기
+                myPortfolio.append(myPortfolio[-1] * np.exp(np.dot(out.detach().cpu().numpy(), m_rtn)))
+                equalPortfolio.append(equalPortfolio[-1] * np.exp(np.dot(EWPWeights, m_rtn)))
+        
+        return myPortfolio, equalPortfolio, myWeights
+
+    def _create_performance_dataframe(self, myPortfolio, equalPortfolio, myWeights):
         min_length = min(len(myPortfolio), len(equalPortfolio), len(self.test_date) // self.LEN_PRED)
         myPortfolio = myPortfolio[:min_length]
         equalPortfolio = equalPortfolio[:min_length]
         myWeights = myWeights[:min_length]
         
-        # self.test_date를 사용하여 실제 거래일 기준으로 날짜 인덱스 생성
         date_index = pd.to_datetime(self.test_date[::self.LEN_PRED][:min_length])
 
         performance = pd.DataFrame(
@@ -249,7 +301,7 @@ class Trainer:
 
         index_sp = pd.read_csv("data/snp500_index.csv", index_col="Date", parse_dates=True)["Adj Close"]
         index_sp = index_sp.loc[performance.index[0]:performance.index[-1]]
-        index_sp = index_sp.reindex(performance.index)  # 성능 데이터의 인덱스에 맞춰 리샘플링
+        index_sp = index_sp.reindex(performance.index)
 
         performance = performance.fillna(method='ffill')
         performance["index_sp"] = index_sp * (performance["MyPortfolio"].iloc[0] / index_sp.iloc[0])
@@ -262,7 +314,6 @@ class Trainer:
         result["Index_Return"] = result["index_sp"].pct_change()
         result = result.dropna()
 
-        # LEN_PRED에 따른 연율화 계수 계산
         annualization_factor = 252 / self.LEN_PRED
 
         expectedReturn = result[["EWP_Return", "My_Return", "Index_Return"]].mean() * annualization_factor
@@ -277,12 +328,6 @@ class Trainer:
             "Annualized Sharpe Ratio": sharpRatio,
             "MDD": mdd
         })
-
-        logger.info("Backtest Results:")
-        logger.info(f"\nAnnualized Return:\n{stats['Annualized Return']}")
-        logger.info(f"\nAnnualized Volatility:\n{stats['Annualized Volatility']}")
-        logger.info(f"\nAnnualized Sharpe Ratio:\n{stats['Annualized Sharpe Ratio']}")
-        logger.info(f"\nMDD:\n{stats['MDD']}")
 
         myWeights_df = pd.DataFrame(myWeights, index=performance.index[:len(myWeights)])
 
@@ -440,3 +485,4 @@ class Trainer:
         except Exception as e:
             logger.error(f"Error in experiment: {e}")
             raise
+        

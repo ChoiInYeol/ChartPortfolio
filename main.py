@@ -53,8 +53,9 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = False
     
     model, performance, stats, weights = work(config, 
-                                              train=args.train == 'False', 
+                                              train=args.train == 'True', 
                                               visualize=args.visualize == 'True',
-                                              model_file='result/best_model_weight_TCN_8_-0.614401.pt')
+                                              model_file=None,
+                                              )
     
     print("Experiment completed. Results saved.")

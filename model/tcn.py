@@ -11,7 +11,6 @@ class TCN(nn.Module):
         self.lb = lb
         self.ub = ub
         self.multimodal = multimodal
-
         input_dim = n_stocks
         num_channels = [hidden_size] * (level - 1) + [n_timestep]
         self.tcn = TemporalConvNet(input_dim, num_channels, kernel_size=kernel_size, dropout=n_dropout)
