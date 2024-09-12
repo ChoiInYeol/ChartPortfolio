@@ -5,36 +5,26 @@ import torch.nn.functional as F
 
 
 class TCN(nn.Module):
-    def __init__(self, n_stocks, n_output, kernel_size, n_dropout, n_timestep, hidden_size, level, lb, ub, multimodal=False, cnn_output_dim=0, verbose=False):
+    def __init__(self, n_stocks, n_output, kernel_size, n_dropout, n_timestep, hidden_size, level, lb, ub, multimodal=False):
         super(TCN, self).__init__()
-        self.verbose = verbose
         self.input_size = n_stocks
         self.lb = lb
         self.ub = ub
         self.multimodal = multimodal
 
-        input_dim = n_stocks + n_stocks * cnn_output_dim if multimodal else n_stocks
+        input_dim = n_stocks
         num_channels = [hidden_size] * (level - 1) + [n_timestep]
         self.tcn = TemporalConvNet(input_dim, num_channels, kernel_size=kernel_size, dropout=n_dropout)
         self.fc = nn.Linear(num_channels[-1], n_output)
         self.tempmaxpool = nn.MaxPool1d(n_timestep)
 
     def forward(self, x):
-        if self.verbose:
-            print(f"TCN input shape: {x.shape}")
         output = self.tcn(x.transpose(1, 2))
-        if self.verbose:
-            print(f"After TCN shape: {output.shape}")
         output = self.tempmaxpool(output).squeeze(-1)
-        if self.verbose:
-            print(f"After MaxPool shape: {output.shape}")
         out = self.fc(output)
-        if self.verbose:
-            print(f"After FC shape: {out.shape}")
         out = F.softmax(out, dim=1)
         out = torch.stack([self.rebalance(batch, self.lb, self.ub) for batch in out])
-        if self.verbose:
-            print(f"Final output shape: {out.shape}")
+
         return out
 
     def rebalance(self, weight, lb, ub):

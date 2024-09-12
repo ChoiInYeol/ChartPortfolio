@@ -16,12 +16,10 @@ TCN 모델 사용하기: python main.py --model TCN
 
     
 
-def work(config, train=True, visualize=False):
+def work(config, train=True, visualize=False, model_file=None):
     worker = Trainer(config)
-    worker.set_data()
-    if train:
-        worker.train(visualize)
-    worker.backtest(model_file='result/best_model_weight_TCN_18.pt', visualize=visualize)
+    model, performance, stats, weights = worker.run_experiment(train=train, visualize=visualize, model_file=model_file)
+    return model, performance, stats, weights
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Portfolio Optimization')
@@ -33,6 +31,8 @@ if __name__ == "__main__":
                         help='Model to use (GRU, TCN, or TRANSFORMER)')
     parser.add_argument('--multimodal', type=str, choices=['True', 'False'],
                         help='Whether to use multimodal approach')
+    parser.add_argument('--model_file', type=str, default=None,
+                        help='Path to the model file for backtesting (default: None)')
 
     args = parser.parse_args()
 
@@ -52,4 +52,9 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     
-    work(config, train=args.train == 'False', visualize=args.visualize == 'True')
+    model, performance, stats, weights = work(config, 
+                                              train=args.train == 'False', 
+                                              visualize=args.visualize == 'True',
+                                              model_file='result/best_model_weight_TCN_8_-0.614401.pt')
+    
+    print("Experiment completed. Results saved.")

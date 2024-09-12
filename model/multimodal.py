@@ -6,67 +6,66 @@ from model.tcn import TCN
 from model.transformer import Transformer
 
 class CNN(nn.Module):
-    def __init__(self, output_dim, verbose=False):
+    def __init__(self):
         super(CNN, self).__init__()
-        self.verbose = verbose
         
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
         
-        # PRED_LEN에 따른 이미지 크기와 CNN 구조 설정
-        self.image_sizes = {
-            5: (32, 15),
-            20: (64, 60),
-            60: (96, 180),
-            120: (128, 360)
-        }
-        self.num_blocks = {5: 2, 20: 3, 60: 4, 120: 6}
+        self.fc_input_dim = self._get_fc_input_dim() # 동적으로 FC 레이어 크기 계산
+    
+        self.fc1 = nn.Linear(self.fc_input_dim, 128)
+        self.fc2 = nn.Linear(128, 256)
         
-        # CNN 레이어 동적 생성
-        self.layers = nn.ModuleList()
-        in_channels = 1
-        out_channels = 64
-        for _ in range(self.num_blocks[self.pred_len]):
-            self.layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=(5, 3), stride=1, padding=(2, 1)))
-            self.layers.append(nn.ReLU())
-            self.layers.append(nn.MaxPool2d(kernel_size=(2, 1), stride=(2, 1)))
-            in_channels = out_channels
-            out_channels = min(512, out_channels * 2)  # 최대 512 채널까지만 증가
-        
-        # FC 레이어 크기 계산
-        w, h = self.image_sizes[self.pred_len]
-        for _ in range(self.num_blocks[self.pred_len]):
-            w = (w - 1) // 2 + 1
-        fc_input_dim = in_channels * w * h  # 마지막 out_channels 값을 사용
-        
-        self.fc1 = nn.Linear(fc_input_dim, 128)
-        self.fc2 = nn.Linear(128, output_dim)
+        self.fc_binary = nn.Linear(128, 1) # 이진 분류를 위한 추가 레이어
+
+    def _get_fc_input_dim(self):
+        # 예시 입력으로 계산
+        x = torch.randn(1, 1, 96, 180)
+        x = self.pool2(F.relu(self.conv2(self.pool1(F.relu(self.conv1(x))))))
+        return x.numel()
 
     def forward(self, x):
-        if self.verbose:
-            print(f"4. CNN input shape: {x.shape}")
-        
-        for i, layer in enumerate(self.layers):
-            x = layer(x)
-            if self.verbose and isinstance(layer, nn.MaxPool2d):
-                print(f"{i+5}. After conv and pool: {x.shape}")
-        
+        x = self.pool1(F.relu(self.conv1(x)))
+        x = self.pool2(F.relu(self.conv2(x)))
         x = x.view(x.size(0), -1)  # Flatten
-        if self.verbose:
-            print(f"{len(self.layers)+5}. After flatten: {x.shape}")
+        features = F.relu(self.fc1(x))
+        output = self.fc2(features)
         
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        if self.verbose:
-            print(f"{len(self.layers)+6}. CNN output shape: {x.shape}")
+        # 이진 분류 출력
+        binary_output = torch.sigmoid(self.fc_binary(features))
+        return output, binary_output, features
+    
+class Attention(nn.Module):
+    def __init__(self, feature_dim):
+        super(Attention, self).__init__()
+        self.attention = nn.Linear(feature_dim, 1)
+    
+    def forward(self, numerical_features, cnn_features):
+        # numerical_features: (batch_size, feature_dim)
+        # cnn_features: (batch_size, seq_len, feature_dim)
         
-        return x
-
+        # 유사도 점수 계산
+        scores = torch.bmm(cnn_features, numerical_features.unsqueeze(2)).squeeze(2)
+        
+        # 소프트맥스로 정규화
+        attention_weights = F.softmax(scores, dim=1)
+        
+        # 가중치 합 계산
+        attended_features = torch.bmm(attention_weights.unsqueeze(1), cnn_features).squeeze(1)
+        
+        return attended_features, attention_weights
+    
 class Multimodal(nn.Module):
-    def __init__(self, model_type, model_params, cnn_output_dim, verbose=False):
+    def __init__(self, model_type, model_params, lb, ub, verbose=False):
         super().__init__()
-        self.cnn = CNN(model_params['pred_len'], cnn_output_dim, verbose)
+        self.cnn = CNN()
         self.model_type = model_type
         self.verbose = verbose
-        
+        self.lb = lb
+        self.ub = ub
 
         if model_type.lower() == 'gru':
             self.model = GRU(**model_params)
@@ -77,32 +76,62 @@ class Multimodal(nn.Module):
         else:
             raise ValueError(f"Unsupported model type: {model_type}")
 
+        # CNN의 출력 차원을 동적으로 결정
+        self.cnn_output_dim = self.cnn.fc2.out_features
+        self.numerical_output_dim = model_params.get('hidden_dim', 64)  # 기본값 64로 설정
+
+        self.attention = Attention(self.cnn_output_dim)
+        self.fusion = nn.Linear(self.cnn_output_dim + self.numerical_output_dim, self.numerical_output_dim)
+        self.final_fc = nn.Linear(self.numerical_output_dim, model_params['n_stocks'])
+
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.to(self.device)
 
     def forward(self, x_num, x_img):
         if self.verbose:
-            print(f"1. Multimodal input shapes: x_num={x_num.shape}, x_img={x_img.shape}")
+            print(f"Multimodal input shapes: x_num={x_num.shape}, x_img={x_img.shape}")
+        
         batch_size, seq_len, n_stocks = x_num.shape
-
-        # CNN 입력을 batch_size * n_stocks로 reshape
+        
+        # 수치 데이터 처리
+        numerical_features = self.model(x_num)
+        
+        # 이미지 데이터 처리
         x_img_reshaped = x_img.view(batch_size * n_stocks, 1, x_img.shape[2], x_img.shape[3])
-        cnn_output = self.cnn(x_img_reshaped)
-
-        # CNN 출력의 크기를 다시 batch_size, n_stocks로 맞춤
-        cnn_output = cnn_output.view(batch_size, n_stocks, -1)  # CNN output shape (batch_size, n_stocks, cnn_output_dim)
+        cnn_output, binary_pred, cnn_features = self.cnn(x_img_reshaped)
+        cnn_features = cnn_features.view(batch_size, n_stocks, -1)
+        
+        # 어텐션 메커니즘 적용
+        attended_features, attention_weights = self.attention(numerical_features, cnn_features)
+        
+        # 특성 융합
+        fused_features = self.fusion(torch.cat([numerical_features, attended_features], dim=1))
+        
+        # 최종 포트폴리오 가중치 예측
+        portfolio_weights = F.softmax(self.final_fc(fused_features), dim=1)
+        
+        # 리밸런싱 적용
+        portfolio_weights = torch.stack([self.rebalance(batch, self.lb, self.ub) for batch in portfolio_weights])
+        
         if self.verbose:
-            print(f"2. CNN output shape: {cnn_output.shape}")
+            print(f"Portfolio weights shape: {portfolio_weights.shape}")
+            print(f"Binary prediction shape: {binary_pred.shape}")
+        
+        return portfolio_weights, binary_pred, attention_weights
 
-        # CNN 출력의 시계열 길이(seq_len)에 맞게 확장
-        cnn_output = cnn_output.unsqueeze(1).expand(-1, seq_len, -1, -1)  # Shape: (batch_size, seq_len, n_stocks, cnn_output_dim)
-        cnn_output = cnn_output.reshape(batch_size, seq_len, -1)  # Flatten to shape: (batch_size, seq_len, n_stocks * cnn_output_dim)
-        if self.verbose:
-            print(f"Adjusted CNN output shape: {cnn_output.shape}")
-
-        # x_num과 CNN 출력 결합
-        x_combined = torch.cat([x_num, cnn_output], dim=2)  # Concatenate along feature dimension
-        if self.verbose:
-            print(f"3. Combined input shape: {x_combined.shape}")
-
-        return self.model(x_combined)
+    def rebalance(self, weight, lb, ub):
+        old = weight
+        weight_clamped = torch.clamp(old, lb, ub)
+        while True:
+            leftover = (old - weight_clamped).sum().item()
+            nominees = weight_clamped[torch.where(weight_clamped != ub)[0]]
+            if nominees.numel() == 0:
+                break
+            gift = leftover * (nominees / nominees.sum())
+            weight_clamped[torch.where(weight_clamped != ub)[0]] += gift
+            old = weight_clamped
+            if len(torch.where(weight_clamped > ub)[0]) == 0:
+                break
+            else:
+                weight_clamped = torch.clamp(old, lb, ub)
+        return weight_clamped

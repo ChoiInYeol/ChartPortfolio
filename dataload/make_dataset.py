@@ -3,7 +3,6 @@ import pickle
 import numpy as np
 import pandas as pd
 
-
 def get_return_df(stock_dic, in_path="data/stocks/", out_path="data/"):
     for i, ticker in enumerate(stock_dic):
         stock = in_path + f"{ticker}.csv"
@@ -17,7 +16,6 @@ def get_return_df(stock_dic, in_path="data/stocks/", out_path="data/"):
     return_df.to_csv(out_path + "return_df.csv")
     return return_df
 
-
 def make_DL_dataset(data, data_len, n_stock):
     times = []
     dataset = np.array(data.iloc[:data_len, :]).reshape(1, -1, n_stock)
@@ -28,7 +26,6 @@ def make_DL_dataset(data, data_len, n_stock):
         dataset = np.concatenate((dataset, addition))
         times.append(data.iloc[i : data_len + i, :].index)
     return dataset, times
-
 
 def data_split(data, train_len, pred_len, tr_ratio, n_stock):
     return_train, times_train = make_DL_dataset(
@@ -65,6 +62,14 @@ if __name__ == "__main__":
         config["TRAIN_RATIO"],
         config["N_STOCK"],
     )
+    
+    print("데이터셋 검증:")
+    print(f"Train images shape: {x_tr.shape}")
+    print(f"Train labels shape: {y_tr.shape}")
+    print(f"Test images shape: {x_te.shape}")
+    print(f"Test labels shape: {y_te.shape}")
+    print(f"Train times length: {len(times_tr)}")
+    print(f"Test times length: {len(times_te)}")
 
     with open("data/date.pkl", "wb") as f:
         pickle.dump({'train': times_tr, 'test': times_te}, f)

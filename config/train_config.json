@@ -6,11 +6,11 @@
   "TRAIN_LEN": 60,
   "PRED_LEN": 20,
   "TRAIN_RATIO": 0.75,
+  "RESULT_DIR": "result",
 
   "MODEL": "TCN",
   "MULTIMODAL": false,
-  "CNN_OUTPUT_DIM": 50,
-  "BATCH": 32,
+  "BATCH": 96,
   "SEED": 42,
   "EPOCHS": 500,
   "EARLY_STOP": 20,

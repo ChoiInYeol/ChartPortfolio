@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import torch.nn.functional as F
 
 def max_sharpe(y_return, weights):
     weights = torch.unsqueeze(weights, 1)
@@ -31,6 +32,10 @@ def equal_risk_parity(y_return, weights):
     sum_risk_diffs_squared = torch.mean(torch.square(risk_diffs))
     return sum_risk_diffs_squared
 
+def combined_loss(self, y_true, y_pred, binary_true, binary_pred):
+    portfolio_loss = max_sharpe(y_true, y_pred)
+    binary_loss = F.binary_cross_entropy(binary_pred, binary_true)
+    return self.alpha * portfolio_loss + (1 - self.alpha) * binary_loss
 
 if __name__ == "__main__":
     pass
