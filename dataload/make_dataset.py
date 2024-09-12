@@ -66,8 +66,8 @@ if __name__ == "__main__":
         config["N_STOCK"],
     )
 
-    with open(path + "date.pkl", "wb") as f:
-        pickle.dump(times_te, f)
+    with open("data/date.pkl", "wb") as f:
+        pickle.dump({'train': times_tr, 'test': times_te}, f)
 
     with open(path + "dataset.pkl", "wb") as f:
         pickle.dump([x_tr, y_tr, x_te, y_te], f)

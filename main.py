@@ -19,11 +19,9 @@ TCN 모델 사용하기: python main.py --model TCN
 def work(config, train=True, visualize=False):
     worker = Trainer(config)
     worker.set_data()
-    
     if train:
         worker.train(visualize)
-
-    worker.backtest(visualize)
+    worker.backtest(model_file='result/best_model_weight_TCN_18.pt', visualize=visualize)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Portfolio Optimization')
@@ -54,4 +52,4 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     
-    work(config, train=args.train == 'True', visualize=args.visualize == 'True')
+    work(config, train=args.train == 'False', visualize=args.visualize == 'True')

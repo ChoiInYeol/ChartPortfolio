@@ -2,6 +2,8 @@ import pickle
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+import scienceplots
+plt.style.use(['science','ieee'])
 import pandas as pd
 from model.multimodal import Multimodal
 from model.gru import GRU
@@ -19,9 +21,9 @@ class Trainer:
         self.device = "cuda" if self.config["USE_CUDA"] else "cpu"
         self.model_name = self.config["MODEL"]
         self.multimodal = self.config["MULTIMODAL"]
-        self.best_model_count = 0
         self.train_len = self.config['TRAIN_LEN']
         self.pred_len = self.config['PRED_LEN']
+        self.best_model_count = 0
         
         print(f"model_name: {self.model_name}, multimodal: {self.multimodal}, pred_len: {self.pred_len}")
         
@@ -54,7 +56,6 @@ class Trainer:
             'cnn_output_dim': self.config["CNN_OUTPUT_DIM"],
             'verbose': self.config.get("VERBOSE", False),
             'n_stocks': self.config['N_FEAT'],
-            'pred_len': self.pred_len
         }
         
         if self.model_name.lower() == "gru":
@@ -81,25 +82,14 @@ class Trainer:
             train_x_raw, train_y_raw, test_x_raw, test_y_raw = pickle.load(f)
 
         with open("data/date.pkl", "rb") as f:
-            test_date = pickle.load(f)
+            date_info = pickle.load(f)
+            
         self.train_x_raw = train_x_raw
         self.train_y_raw = train_y_raw
         self.test_x_raw = test_x_raw
         self.test_y_raw = test_y_raw
-        self.test_date = test_date
-        
-    def _dataload_image(self, chart_dir="data/charts/"):
-        if not self.multimodal:
-            return
-        
-        self.all_images = {}
-        self.all_meta_data = {}
-        for file in os.listdir(chart_dir):
-            if file.endswith(".npz"):
-                ticker = file.split("_")[2]
-                data = np.load(os.path.join(chart_dir, file), allow_pickle=True)
-                self.all_images[ticker] = data['images']
-                self.all_meta_data[ticker] = data['meta_data']
+        self.train_date = date_info['train']
+        self.test_date = date_info['test']
 
     def _scale_data(self, scale=20):
         self.train_x = torch.from_numpy(self.train_x_raw.astype("float32") * scale)
@@ -121,14 +111,6 @@ class Trainer:
     def set_data(self):
         self._dataload()
         self._scale_data()
-        
-        # 데이터 확인
-        print("train_x_raw shape after alignment:", self.train_x_raw.shape)
-        print("train_y_raw shape after alignment:", self.train_y_raw.shape)
-        print("test_x_raw shape after alignment:", self.test_x_raw.shape)
-        print("test_y_raw shape after alignment:", self.test_y_raw.shape)
-        print("test_date type:", type(self.test_date))
-        print("test_date length:", len(self.test_date) if hasattr(self.test_date, '__len__') else "N/A")
         self._set_parameter()
         self._shuffle_data()
 
@@ -186,14 +168,14 @@ class Trainer:
                     valid_loss.append(running_loss)
                     if running_loss <= min(valid_loss):
                         self.best_model_count += 1
-                        save_model(self.model, "result", f"{self.config['MODEL']}_{self.best_model_count}")
-                        tqdm.write(f"Improved! at {epoch + 1} epochs, with {running_loss:.6f}")
+                        save_model(self.model, "result", f"{self.config['MODEL']}_{self.best_model_count}_{running_loss:.6f}")
+                        tqdm.write(f"개선됨! {epoch + 1} 에폭에서, 손실: {running_loss:.6f}")
                         early_stop_count = 0
                     else:
                         early_stop_count += 1
 
             if early_stop_count == early_stop_th:
-                tqdm.write(f"Early stopping at epoch {epoch + 1}")
+                tqdm.write(f"{epoch + 1} 에폭에서 조기 종료")
                 break
 
         if visualize:
@@ -207,17 +189,20 @@ class Trainer:
         
         # 데이터프레임 생성
         df = pd.DataFrame({
-            'Epoch': epochs,
-            'Train Loss': train_loss,
-            'Validation Loss': valid_loss
+            'epoch': epochs,
+            'train_loss': train_loss,
+            'valid_loss': valid_loss
         })
         
         # CSV 파일로 저장
-        df.to_csv(f"result/training_loss_{self.config['MODEL']}_{self.config['MULTIMODAL']}.csv", index=False)
-        print(f"훈련 및 검증 손실이 result/training_loss_{self.config['MODEL']}_{self.config['MULTIMODAL']}.csv에 저장되었습니다.")
+        final_loss = valid_loss[-1]
+        df.to_csv(f"result/training_loss_{self.config['MODEL']}_{self.config['MULTIMODAL']}_{final_loss:.6f}.csv", index=False)
+        print(f"훈련 및 검증 손실이 result/training_loss_{self.config['MODEL']}_{self.config['MULTIMODAL']}_{final_loss:.6f}.csv에 저장되었습니다.")
 
-    def backtest(self, visualize=True):
-        self.model = load_model(self.model, f"result/best_model_weight_{self.config['MODEL']}.pt", use_cuda=True)
+    def backtest(self, model_file=None, visualize=True):
+        if model_file is None:
+            model_file = f"result/best_model_weight_{self.config['MODEL']}_{self.best_model_count}_{self.config['MULTIMODAL']}.pt"
+        self.model = load_model(self.model, model_file, use_cuda=True)
 
         myPortfolio, equalPortfolio = [10000], [10000]
         EWPWeights = np.ones(self.N_STOCK) / self.N_STOCK
@@ -227,11 +212,6 @@ class Trainer:
             out = self.model(x.float().cuda())[0]
             myWeights.append(out.detach().cpu().numpy())
             m_rtn = np.sum(self.test_y_raw[i], axis=0)
-            
-            print(f"x 형태: {x.shape},\n"
-                  f"m_rtn 형태: {m_rtn.shape},\n"
-                  f"out 형태: {out.detach().cpu().numpy().shape},\n"
-                  f"내적 형태: {np.dot(out.detach().cpu().numpy(), m_rtn).shape}")
             
             myPortfolio.append(
                 myPortfolio[-1] * np.exp(np.dot(out.detach().cpu().numpy(), m_rtn))
@@ -252,7 +232,7 @@ class Trainer:
         performance["index_sp"] = index_sp["Adj Close"] * (
             myPortfolio[0] / index_sp["Adj Close"][0]
         )
-        performance.to_csv("result/backtest.csv")
+        performance.to_csv(f"result/backtest_{model_file}.csv")
 
         if visualize:
             self._visualize_backtest(performance)
@@ -284,6 +264,10 @@ class Trainer:
         print("MDD")
         mdd_df = result[["EWP", "MyPortfolio", "index_sp"]].apply(self._get_mdd)
         print(mdd_df)
+        
+        # myWeights를 pd.DataFrame으로 변환하여 csv로 저장
+        myWeights_df = pd.DataFrame(myWeights, index=self.test_date[::self.LEN_PRED])
+        myWeights_df.to_csv(f"result/myWeights_{model_file}.csv")
 
     def _visualize_backtest(self, performance):
         performance.plot(figsize=(14, 7), fontsize=10)
@@ -294,7 +278,7 @@ class Trainer:
         weights = np.array(weights)
         ticker = pd.read_csv("data/return_df.csv", index_col=0).columns
         n = self.N_STOCK
-        plt.figure(figsize=(15, 10))
+        plt.figure(figsize=(30, 20))
         for i in range(n):
             plt.plot(weights[:, i], label=ticker[i])
         plt.title("Weights")
