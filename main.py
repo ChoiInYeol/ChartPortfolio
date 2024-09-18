@@ -1,61 +1,65 @@
+# main.py
 import os
 import json
 import random
 import numpy as np
 import torch
 import argparse
-from train.train import Trainer
+from train import Trainer
+from backtest import Backtester
 
-"""
-훈련 없이 백테스트 하기: python main.py --train False
-시각화 없이 백테스트 하기: python main.py --visualize False
-TCN 모델 사용하기: python main.py --model TCN
-다중 모달 모델 사용하기: python main.py --multimodal True
-훈련 없이 백테스트 하고 시각화 없이 하기: python main.py --train False --visualize False
-"""
-
-    
-
-def work(config, train=True, visualize=False, model_file=None):
-    worker = Trainer(config)
-    model, performance, stats, weights = worker.run_experiment(train=train, visualize=visualize, model_file=model_file)
-    return model, performance, stats, weights
+def set_random_seed(seed: int):
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Portfolio Optimization')
     parser.add_argument('--train', type=str, choices=['True', 'False'], default='True',
-                        help='Whether to train the model (default: True)')
+                        help='Whether to train the models (default: True)')
     parser.add_argument('--visualize', type=str, choices=['True', 'False'], default='True',
                         help='Whether to visualize the results (default: True)')
-    parser.add_argument('--model', type=str, choices=['GRU', 'TCN', 'TRANSFORMER'], 
-                        help='Model to use (GRU, TCN, or TRANSFORMER)')
-    parser.add_argument('--multimodal', type=str, choices=['True', 'False'],
-                        help='Whether to use multimodal approach')
-    parser.add_argument('--model_file', type=str, default=None,
-                        help='Path to the model file for backtesting (default: None)')
 
     args = parser.parse_args()
+    train_flag = args.train == 'True'
+    visualize_flag = args.visualize == 'True'
 
-    config = json.load(open("config/train_config.json", "r"))
+    base_config = json.load(open("config/train_config.json", "r"))
+    set_random_seed(base_config["SEED"])
 
-    # Update config based on command line arguments
-    if args.model:
-        config["MODEL"] = args.model
-    if args.multimodal:
-        config["MULTIMODAL"] = args.multimodal == 'True'
+    # List of models and multimodal options to experiment with
+    models = ['GRU', 'TCN', 'TRANSFORMER']
+    multimodal_options = [True, False]
+    model_paths = {}
 
-    os.environ["PYTHONHASHSEED"] = str(config["SEED"])
-    random.seed(config["SEED"])
-    np.random.seed(config["SEED"])
-    torch.manual_seed(config["SEED"])
-    torch.cuda.manual_seed(config["SEED"])
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    
-    model, performance, stats, weights = work(config, 
-                                              train=args.train == 'True', 
-                                              visualize=args.visualize == 'True',
-                                              model_file=None,
-                                              )
-    
-    print("Experiment completed. Results saved.")
+    # Train all models and save their parameters
+    if train_flag:
+        for model_name in models:
+            for multimodal in multimodal_options:
+                config = base_config.copy()
+                config["MODEL"] = model_name
+                config["MULTIMODAL"] = multimodal
+                print(f"Training model {config['MODEL']}, multimodal={config['MULTIMODAL']}")
+                trainer = Trainer(config)
+                trainer.run()
+                model_paths[(model_name, multimodal)] = trainer.get_best_model_path()
+                print(f"Model {config['MODEL']} trained and saved.")
+
+    # Run backtests using the saved model parameters
+    for model_name in models:
+        for multimodal in multimodal_options:
+            config = base_config.copy()
+            config["MODEL"] = model_name
+            config["MULTIMODAL"] = multimodal
+            print(f"Backtesting model {config['MODEL']}, multimodal={config['MULTIMODAL']}")
+            backtester = Backtester(config)
+            model_path = model_paths.get((model_name, multimodal))
+            if model_path:
+                backtester.backtest(model_path, visualize=visualize_flag)
+                print(f"Backtest for model {config['MODEL']} completed.")
+            else:
+                print(f"No model found for {config['MODEL']} with multimodal={config['MULTIMODAL']}")

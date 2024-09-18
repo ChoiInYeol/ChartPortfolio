@@ -14,13 +14,33 @@ from model.loss import max_sharpe, equal_risk_parity, combined_loss
 from train.utils import save_model, load_model
 from tqdm import tqdm
 import os
-import logging
-from typing import Dict, Tuple, List, Any
+import logging 
+from typing import Dict, Tuple, List, Any, Optional
 import scienceplots
 plt.style.use('science')
+from torch.cuda.amp import autocast, GradScaler
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Add this import at the top of train.py
+from train.visualize import (
+    visualize_backtest,
+    visualize_weights,
+    visualize_returns_distribution,
+    visualize_drawdown,
+    visualize_rolling_sharpe,
+    visualize_binary_predictions
+)
+
+
+# Configure logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# Create handlers
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
 
 class PortfolioDataset(Dataset):
     def __init__(self, x_data: np.ndarray, y_data: np.ndarray, img_data: np.ndarray, labels: np.ndarray, len_pred: int):
@@ -48,11 +68,25 @@ class Trainer:
         self.lb = config['LB']
         self.ub = config['UB']
         self.best_model_count = 0
-        self.alpha = config.get("ALPHA", 0.5)
-        
-        self.criterion = combined_loss if self.multimodal else max_sharpe
+        self.beta = config.get("BETA", 0.5)  # 새로운 하이퍼파라미터 추가
+        self.criterion = combined_loss  # loss.py에서 정의한 combined_loss 사용
+        logger.info(f"Configuration: {self.config}")
         
         logger.info(f"Model: {self.model_name}, Multimodal: {self.multimodal}, Prediction Length: {self.len_pred}")
+        
+        # File handler with dynamic filename based on model and multimodal setting
+        log_filename = os.path.join(config['RESULT_DIR'], f"training_{config['MODEL']}_{config['MULTIMODAL']}.log")
+        file_handler = logging.FileHandler(log_filename)
+        file_handler.setLevel(logging.INFO)
+
+        # Create formatter and add it to handlers
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        console_handler.setFormatter(formatter)
+        file_handler.setFormatter(formatter)
+
+        # Add handlers to the logger
+        logger.addHandler(console_handler)
+        logger.addHandler(file_handler)
         
         self.model = self._create_model()
         self.optimizer = self._create_optimizer()
@@ -167,8 +201,8 @@ class Trainer:
 
     def train(self, visualize: bool = True) -> Tuple[torch.nn.Module, List[float], List[float]]:
         train_dataset, test_dataset = self._load_and_process_data()
-        train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True)
-        test_loader = DataLoader(test_dataset, batch_size=self.config['BATCH'], shuffle=False)
+        train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True, num_workers=4, pin_memory=True)
+        test_loader = DataLoader(test_dataset, batch_size=self.config['BATCH'], shuffle=False, num_workers=4, pin_memory=True)
         
         logger.debug(f"Train data shape: x={train_dataset.x_data.shape}, y={train_dataset.y_data.shape}")
         logger.debug(f"Image data shape: {train_dataset.img_data.shape if self.multimodal else 'N/A'}")
@@ -180,11 +214,16 @@ class Trainer:
         early_stop_th = self.config["EARLY_STOP"]
 
         for epoch in tqdm(range(self.config["EPOCHS"]), desc="Epochs"):
+            if train_loss and valid_loss:
+                logger.info(f"Epoch {epoch+1}/{self.config['EPOCHS']}, Training Loss: {train_loss[-1]:.6f}, Validation Loss: {valid_loss[-1]:.6f}")
+            else:
+                logger.info(f"Epoch {epoch+1}/{self.config['EPOCHS']}")
             train_loss.append(self._run_epoch(train_loader, is_training=True))
             valid_loss.append(self._run_epoch(test_loader, is_training=False))
 
             if valid_loss[-1] <= min(valid_loss):
-                self._save_model(epoch, valid_loss[-1])
+                if epoch % 5 == 0:
+                    self._save_model(epoch, valid_loss[-1])
                 early_stop_count = 0
             else:
                 early_stop_count += 1
@@ -192,9 +231,6 @@ class Trainer:
             if early_stop_count == early_stop_th:
                 logger.info(f"Early stopping at epoch {epoch + 1}")
                 break
-
-        if visualize:
-            self._save_training_loss(train_loss, valid_loss)
 
         return self.model, train_loss, valid_loss
 
@@ -204,43 +240,49 @@ class Trainer:
 
         pbar = tqdm(dataloader, desc=f"{'Train' if is_training else 'Valid'} Progress", leave=False)
         for idx, data in enumerate(pbar):
+            self.optimizer.zero_grad()
             loss = self._compute_loss(data, is_training)
-            running_loss += loss.item() / len(dataloader)
+            running_loss += loss.item()
+            
+            if is_training:
+                loss.backward()
+                self.optimizer.first_step(zero_grad=True)
+                
+                # 두 번째 순전파 및 역전파
+                if self.multimodal:
+                    x, y, img, labels = [d.to(self.device) for d in data]
+                else:
+                    x, y = [d.to(self.device) for d in data[:2]]
+                    img, labels = None, None
+                self._compute_second_order_loss(x, y, img, labels)
+                
+                self.optimizer.second_step(zero_grad=True)
+            
             pbar.set_postfix({'loss': running_loss / (idx + 1)})
 
-        return running_loss
+        return running_loss / len(dataloader)
 
     def _compute_loss(self, data, is_training: bool) -> torch.Tensor:
         if self.multimodal:
             x, y, img, labels = [d.to(self.device) for d in data]
+            portfolio_weights, binary_pred = self.model(x, img)
+            loss = self.criterion(y, portfolio_weights, labels, binary_pred, self.beta)
         else:
             x, y = [d.to(self.device) for d in data[:2]]
-            img, labels = None, None
-
-        self.optimizer.zero_grad()
-        with torch.set_grad_enabled(is_training):
-            if self.multimodal:
-                portfolio_weights, binary_pred = self.model(x, img)
-                loss = self.criterion(y, portfolio_weights, labels, binary_pred, self.alpha)
-            else:
-                portfolio_weights = self.model(x)
-                loss = self.criterion(y, portfolio_weights, None, None, self.alpha)
-
-            if is_training:
-                loss.backward()
-                self.optimizer.first_step(zero_grad=True)
-                self._compute_second_order_loss(x, y, img, labels)
-                self.optimizer.second_step(zero_grad=True)
-
+            portfolio_weights = self.model(x)
+            loss = self.criterion(y, portfolio_weights, None, None, self.beta)
         return loss
+
 
     def _compute_second_order_loss(self, x, y, img, labels):
         if self.multimodal:
             portfolio_weights, binary_pred = self.model(x, img)
-            self.criterion(y, portfolio_weights, labels, binary_pred, self.alpha).backward()
+            loss = self.criterion(y, portfolio_weights, labels, binary_pred, self.beta)
         else:
             portfolio_weights = self.model(x)
-            self.criterion(y, portfolio_weights, None, None, self.alpha).backward()
+            loss = self.criterion(y, portfolio_weights, None, None, self.beta)
+        
+        loss.backward()
 
     def _save_model(self, epoch: int, loss: float):
         self.best_model_count += 1
@@ -256,18 +298,23 @@ class Trainer:
         
         logger.debug(f"Test image data shape: {test_dataset.img_data.shape}")
         
-        myPortfolio, equalPortfolio, myWeights = self._calculate_portfolio_performance(test_dataset)
-        
-        performance, stats, myWeights_df = self._create_performance_dataframe(myPortfolio, equalPortfolio, myWeights)
+        if self.multimodal:
+            myPortfolio, equalPortfolio, myWeights, binary_preds = self._calculate_portfolio_performance(test_dataset)
+            performance, stats, myWeights_df, binary_preds_df = self._create_performance_dataframe(myPortfolio, equalPortfolio, myWeights, binary_preds)
+        else:
+            myPortfolio, equalPortfolio, myWeights = self._calculate_portfolio_performance(test_dataset)
+            performance, stats, myWeights_df = self._create_performance_dataframe(myPortfolio, equalPortfolio, myWeights)
 
-        self._log_backtest_results(stats)
-
-        return performance, stats, myWeights_df
+        if self.multimodal:
+            return performance, stats, myWeights_df, binary_preds_df
+        else:
+            return performance, stats, myWeights_df
 
     def _calculate_portfolio_performance(self, test_dataset):
         myPortfolio, equalPortfolio = [10000], [10000]
         EWPWeights = np.ones(self.N_STOCK) / self.N_STOCK
         myWeights = []
+        binary_preds = [] if self.multimodal else None
         
         self.model.eval()
         with torch.no_grad():
@@ -275,18 +322,22 @@ class Trainer:
                 x = test_dataset.x_data[i][np.newaxis, :, :].to(self.device)
                 if self.multimodal:
                     img = test_dataset.img_data[i][np.newaxis, :, :, :].to(self.device)
-                    out, _, _ = self.model(x, img)
+                    out, binary_pred = self.model(x, img)
+                    binary_preds.append(binary_pred.detach().cpu().numpy())
                 else:
-                    out = self.model(x.float().cuda())[0]
+                    out = self.model(x.float().cuda())
                 
                 myWeights.append(out.detach().cpu().numpy())
                 m_rtn = np.sum(self.test_y_raw[i], axis=0)
-                myPortfolio.append(myPortfolio[-1] * np.exp(np.dot(out.detach().cpu().numpy(), m_rtn)))
+                myPortfolio.append(myPortfolio[-1] * np.exp(np.dot(out.detach().cpu().numpy().squeeze(), m_rtn)))
                 equalPortfolio.append(equalPortfolio[-1] * np.exp(np.dot(EWPWeights, m_rtn)))
         
-        return myPortfolio, equalPortfolio, myWeights
+        if self.multimodal:
+            return myPortfolio, equalPortfolio, np.array(myWeights), np.array(binary_preds)
+        else:
+            return myPortfolio, equalPortfolio, np.array(myWeights)
 
-    def _create_performance_dataframe(self, myPortfolio, equalPortfolio, myWeights):
+    def _create_performance_dataframe(self, myPortfolio, equalPortfolio, myWeights, binary_preds=None):
         min_length = min(len(myPortfolio), len(equalPortfolio), len(self.test_date) // self.LEN_PRED)
         myPortfolio = myPortfolio[:min_length]
         equalPortfolio = equalPortfolio[:min_length]
@@ -329,9 +380,21 @@ class Trainer:
             "MDD": mdd
         })
 
-        myWeights_df = pd.DataFrame(myWeights, index=performance.index[:len(myWeights)])
-
-        return performance, stats, myWeights_df
+        if self.multimodal:
+            myWeights = np.squeeze(myWeights)  # (min_length, 1, 50) -> (min_length, 50)
+            binary_preds = np.squeeze(binary_preds)[:min_length]  # (min_length, 1, 50) -> (min_length, 50)
+            
+            # performance.index의 길이에 맞춰 자르기
+            myWeights = myWeights[:len(performance.index)]
+            binary_preds = binary_preds[:len(performance.index)]
+            
+            myWeights_df = pd.DataFrame(myWeights, index=performance.index)
+            binary_preds_df = pd.DataFrame(binary_preds, index=performance.index)
+            return performance, stats, myWeights_df, binary_preds_df
+        else:
+            myWeights = np.squeeze(myWeights)[:len(performance.index)]
+            myWeights_df = pd.DataFrame(myWeights, index=performance.index)
+            return performance, stats, myWeights_df
 
     def _visualize_backtest(self, performance):
         plt.figure(figsize=(14, 7))
@@ -350,16 +413,29 @@ class Trainer:
         plt.close()
 
     def _visualize_weights(self, performance, weights):
-        plt.figure(figsize=(14, 7))
-        weights_df = pd.DataFrame(weights, index=performance.index[:len(weights)])
+        weights = np.array(weights)
+        ticker = pd.read_csv("data/return_df.csv", index_col=0).columns
+        n = self.N_STOCK
         
-        for col in weights_df.columns:
-            plt.plot(weights_df.index, weights_df[col], label=f'Stock {col+1}')
+        plt.figure(figsize=(15, 10))
+        for i in range(n):
+            plt.plot(weights[:, i], label=ticker[i])
         
         plt.title("Portfolio Weights Over Time", fontsize=16)
         plt.xlabel("Date", fontsize=14)
         plt.ylabel("Weight", fontsize=14)
-        plt.legend(fontsize=10, bbox_to_anchor=(1.05, 1), loc='upper left')
+        
+        # x축 레이블 설정
+        plt.xticks(
+            np.arange(0, len(list(performance.index[1:]))),
+            list(performance.index[1:]),
+            rotation=45,
+            ha='right'
+        )
+        
+        # legend를 가로로 배치하고 그래프 아래에 위치시킵니다.
+        plt.legend(fontsize=10, bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=5)
+        
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.tight_layout()
         
@@ -433,22 +509,7 @@ class Trainer:
         peak_upper = np.argmax(arr_v[:peak_lower])
         return (arr_v[peak_lower] - arr_v[peak_upper]) / arr_v[peak_upper]
 
-    def save_results(self, model_name: str, training_loss: pd.DataFrame = None, performance: pd.DataFrame = None, stats: pd.DataFrame = None, weights: pd.DataFrame = None):
-        result_dir = self.config['RESULT_DIR']
-        os.makedirs(result_dir, exist_ok=True)
-        
-        if training_loss is not None:
-            training_loss.to_csv(os.path.join(result_dir, f"{model_name}_training_loss.csv"), index=False)
-        if performance is not None:
-            performance.to_csv(os.path.join(result_dir, f"{model_name}_backtest_performance.csv"))
-        if stats is not None:
-            stats.to_csv(os.path.join(result_dir, f"{model_name}_backtest_stats.csv"))
-        if weights is not None:
-            weights.to_csv(os.path.join(result_dir, f"{model_name}_portfolio_weights.csv"))
-        
-        logger.info(f"Results saved for model: {model_name}")
-
-    def run_experiment(self, train: bool = True, visualize: bool = True, model_file: str = None) -> Tuple[torch.nn.Module, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def run_experiment(self, train: bool = True, visualize: bool = True, model_file: str = None) -> Tuple[torch.nn.Module, pd.DataFrame, pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]:
         try:
             model = None
             training_loss_df = None
@@ -467,22 +528,63 @@ class Trainer:
                 logger.info("Skipping training as per configuration.")
 
             logger.info("Starting backtesting...")
-            performance, stats, weights = self.backtest(model_file=model_file, visualize=visualize)
+            if self.multimodal:
+                performance, stats, weights, binary_preds_df = self.backtest(model_file=model_file, visualize=visualize)
+            else:
+                performance, stats, weights = self.backtest(model_file=model_file, visualize=visualize)
             logger.info("Backtesting completed.")
             
             if visualize:
-                self._visualize_backtest(performance)
-                self._visualize_weights(performance, weights)
-                self._visualize_returns_distribution(performance)
-                self._visualize_drawdown(performance)
-                self._visualize_rolling_sharpe(performance)
+                visualize_backtest(performance, self.config)
+                visualize_weights(performance, weights, self.config)
+                visualize_returns_distribution(performance, self.config)
+                visualize_drawdown(performance, self.config)
+                visualize_rolling_sharpe(performance, self.config)
+                if self.multimodal:
+                    visualize_binary_predictions(binary_preds_df, self.config)
+
             
             model_name = f"{self.config['MODEL']}_{self.config['MULTIMODAL']}"
-            self.save_results(model_name, training_loss_df, performance, stats, weights)
+            if self.multimodal:
+                self.save_results(model_name, training_loss_df, performance, stats, weights, binary_preds_df)
+            else:
+                self.save_results(model_name, training_loss_df, performance, stats, weights)
             
             logger.info("Experiment results have been saved.")
-            return model, performance, stats, weights
+            if self.multimodal:
+                return model, performance, stats, weights, binary_preds_df
+            else:
+                return model, performance, stats, weights, None
         except Exception as e:
             logger.error(f"Error in experiment: {e}")
             raise
+
+    def save_results(self, model_name: str, training_loss: pd.DataFrame = None, performance: pd.DataFrame = None, stats: pd.DataFrame = None, weights: pd.DataFrame = None, binary_preds: pd.DataFrame = None):
+        result_dir = self.config['RESULT_DIR']
+        os.makedirs(result_dir, exist_ok=True)
+        
+        if training_loss is not None:
+            training_loss.to_csv(os.path.join(result_dir, f"{model_name}_training_loss.csv"), index=False)
+        if performance is not None:
+            performance.to_csv(os.path.join(result_dir, f"{model_name}_backtest_performance.csv"))
+        if stats is not None:
+            stats.to_csv(os.path.join(result_dir, f"{model_name}_backtest_stats.csv"))
+        if weights is not None:
+            weights.to_csv(os.path.join(result_dir, f"{model_name}_portfolio_weights.csv"))
+        if binary_preds is not None:
+            binary_preds.to_csv(os.path.join(result_dir, f"{model_name}_binary_predictions.csv"))
+        
+        logger.info(f"Results saved for model: {model_name}")
+
+    def _visualize_binary_predictions(self, binary_preds_df):
+        plt.figure(figsize=(14, 7))
+        sns.heatmap(binary_preds_df.T, cmap="YlOrRd", cbar_kws={'label': 'Prediction Probability'})
+        plt.title("Binary Predictions Heatmap", fontsize=16)
+        plt.xlabel("Date", fontsize=14)
+        plt.ylabel("Stock", fontsize=14)
+        plt.tight_layout()
+        
+        filename = os.path.join(self.config['RESULT_DIR'], f"binary_predictions_{self.config['MODEL']}.png")
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        plt.close()
         

@@ -9,7 +9,7 @@
   "RESULT_DIR": "result",
 
   "MODEL": "TCN",
-  "MULTIMODAL": "True",
+  "MULTIMODAL": "false",
   "BATCH": 32,
   "SEED": 42,
   "EPOCHS": 500,
@@ -20,7 +20,7 @@
   "LB": 0,
   "UB": 0.2,
   "N_FEAT": 50,
-  "ALPHA": 0.5,
+  "BETA": 0.5,
 
   "GRU": {
     "n_layers": 1,

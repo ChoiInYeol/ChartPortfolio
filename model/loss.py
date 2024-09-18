@@ -1,8 +1,11 @@
 import torch
 import numpy as np
 import torch.nn.functional as F
+import logging
 
-def max_sharpe(y_return, weights):
+logger = logging.getLogger(__name__)
+
+def max_sharpe(y_return, weights, labels, binary_pred, beta):
     weights = torch.unsqueeze(weights, 1)
     meanReturn = torch.unsqueeze(torch.mean(y_return, axis=1), 2)
     covmat = torch.Tensor([np.cov(batch.cpu().T, ddof=0) for batch in y_return]).to("cuda")
@@ -32,10 +35,25 @@ def equal_risk_parity(y_return, weights):
     sum_risk_diffs_squared = torch.mean(torch.square(risk_diffs))
     return sum_risk_diffs_squared
 
-def combined_loss(y_true, y_pred, binary_true, binary_pred, alpha):
-    portfolio_loss = max_sharpe(y_true, y_pred)
-    binary_loss = F.binary_cross_entropy(binary_pred, binary_true)
-    return alpha * portfolio_loss + (1 - alpha) * binary_loss
+def binary_prediction_loss(binary_true, binary_pred):
+    return F.binary_cross_entropy(binary_pred, binary_true)
+
+def combined_loss(y_true, y_pred, binary_true, binary_pred, beta=0.5, eps=1e-8):
+    portfolio_loss = max_sharpe(y_true, y_pred, binary_true, binary_pred, beta)
+    
+    binary_pred = torch.clamp(binary_pred, min=eps, max=1-eps)
+    binary_true = binary_true.float()
+    binary_loss = binary_prediction_loss(binary_true, binary_pred)
+    
+    total_loss = beta * portfolio_loss + (1 - beta) * (binary_loss)
+    
+    if torch.isnan(total_loss) or torch.isinf(total_loss):
+        logger.warning(f"Total loss is invalid: {total_loss}")
+        total_loss = torch.where(torch.isnan(total_loss) | torch.isinf(total_loss),
+                                 torch.tensor(1e6, device=total_loss.device, dtype=total_loss.dtype),
+                                 total_loss)
+    
+    return total_loss
 
 if __name__ == "__main__":
     pass
