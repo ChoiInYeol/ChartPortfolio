@@ -1,0 +1,57 @@
+# config.yaml
+
+# data
+START: '2001-01-01'
+END: '2024-09-01'
+N_STOCK: 50
+LEN_DATA: 5000
+TRAIN_LEN: 60
+PRED_LEN: 20
+TRAIN_RATIO: 0.70
+RESULT_DIR: 'result'
+
+# default
+MODELS: ['GRU', 'TCN', 'TRANSFORMER']
+MULTIMODAL_OPTIONS: [false]
+LOSS_FUNCTIONS: ['max_sharpe', 'equal_risk_parity', 'mean_variance']
+TRAIN_LEN_OPTIONS: [60]
+PRED_LEN_OPTIONS: [20]
+SEED: 42
+
+# learning
+BATCH: 32
+EPOCHS: 500
+EARLY_STOP: 20
+MIN_DELTA: 0.0001
+LR: 0.005
+MOMENTUM: 0.9
+USE_CUDA: true
+
+# portfolio optimization function (loss)
+LB: 0
+UB: 0.2
+N_FEAT: 50 # N_STO
+BETA: 0.2
+LOSS_FUNCTION: 'max_sharpe'
+
+# model parameter
+TCN:
+  n_output: 50 # N_STOCK
+  kernel_size: 4
+  n_dropout: 0.1
+  n_timestep: 60 # TRAIN_LEN
+  hidden_size: 64
+  level: 3
+
+GRU:
+  n_layers: 1
+  hidden_dim: 128
+  dropout_p: 0.3
+  bidirectional: false
+
+TRANSFORMER:
+  n_timestep: 60 # TRAIN_LEN
+  n_layer: 6
+  n_head: 5
+  n_dropout: 0.1
+  n_output: 50 # N_STOCK

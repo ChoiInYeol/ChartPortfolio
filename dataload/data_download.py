@@ -34,7 +34,7 @@ def get_stock_data(code, start, end):
 def stock_download(
     dic,
     start="2001-01-01",
-    end="2021-11-30",
+    end="2024-09-01",
     len_data=5000,
     n_stock=50,
     download_dir="data/stocks/",
@@ -66,13 +66,12 @@ def stock_download(
 
 if __name__ == "__main__":
     # Load configuration and symbols
-    config = json.load(open("config/data_config.json", "r", encoding="utf8"))
+    config = json.load(open("config/train_config.json", "r", encoding="utf8"))
     snp500 = pd.read_csv("data/snp500.csv")
     
     # Handle BRK.B symbol
     snp500.loc[snp500.Symbol == "BRK.B", "Symbol"] = "BRK-B"
     snp500 = {tup[2]: tup[1] for tup in snp500.values.tolist()}
-
     # Download stock data
     stock_pair = stock_download(
         snp500, len_data=config["LEN_DATA"], n_stock=config["N_STOCK"], download_dir="data/stocks/"

@@ -52,7 +52,7 @@ def data_split(data, train_len, pred_len, tr_ratio, n_stock):
 
 if __name__ == "__main__":
     path = "data/"
-    config = json.load(open("config/data_config.json", "r", encoding="utf8"))
+    config = json.load(open("config/train_config.json", "r", encoding="utf8"))
     stock_dict_sp = json.load(open(path + "stock.json", "r", encoding="UTF8"))
     return_df = get_return_df(stock_dict_sp)
     x_tr, y_tr, x_te, y_te, times_tr, times_te = data_split(

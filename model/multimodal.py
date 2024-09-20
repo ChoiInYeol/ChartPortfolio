@@ -44,7 +44,7 @@ class Multimodal(nn.Module):
             raise ValueError(f"지원되지 않는 모델 유형: {model_type}")
 
         self.cnn = CNN(img_height, img_width)
-        self.combine = nn.Parameter(torch.tensor([0.5, 0.5]))
+        self.combine = nn.Parameter(torch.tensor([0.8, 0.2]))
 
     def forward(self, x_num, x_img):
         batch_size, seq_len, n_stocks = x_num.shape
