@@ -275,12 +275,12 @@ class Trainer:
         if self.multimodal:
             x, y, img, labels = [d.to(self.device) for d in data]
             portfolio_weights, binary_pred = self.model(x, img)
-            loss = self.criterion(
-                y, portfolio_weights, labels, binary_pred, beta=self.beta
-            )
+            # Adjust dimensions if necessary
         else:
             x, y = [d.to(self.device) for d in data]
             portfolio_weights = self.model(x)
+            # y: [batch_size, time_steps, num_features]
+            # portfolio_weights: [batch_size, num_features]
             loss = self.criterion(
                 y, portfolio_weights
             )

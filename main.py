@@ -61,8 +61,8 @@ def main():
 
     # If no arguments are given, run all steps
     if not any([args.train, args.inference, args.backtest]):
-        args.train = False
-        args.inference = False
+        args.train = True
+        args.inference = True
         args.backtest = True
 
     base_config = load_config("config/config.yaml")

@@ -5,54 +5,87 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def batch_covariance(x):
-    x = x - x.mean(dim=1, keepdim=True)
-    cov = torch.bmm(x.transpose(1, 2), x) / (x.shape[1] - 1)
+def batch_covariance(y_return):
+    # y_return: [batch_size, time_steps, num_features]
+    y_return = y_return - y_return.mean(dim=1, keepdim=True)  # Centering
+    cov = torch.einsum('bti,btj->bij', y_return, y_return) / (y_return.shape[1] - 1)
+    # cov: [batch_size, num_features, num_features]
     return cov
 
 def max_sharpe(y_return, weights):
-    mean_return = y_return.mean(dim=1)
-    covmat = batch_covariance(y_return)
+    # y_return: [batch_size, time_steps, num_features]
+    # weights: [batch_size, num_features]
+    
+    mean_return = y_return.mean(dim=1)  # [batch_size, num_features]
+    covmat = batch_covariance(y_return)  # [batch_size, num_features, num_features]
 
-    port_return = (weights * mean_return).sum(dim=1)
-    weights_unsqueezed = weights.unsqueeze(1)
-    port_vol = torch.bmm(weights_unsqueezed, torch.bmm(covmat, weights_unsqueezed.transpose(1, 2))).squeeze()
+    # Portfolio return
+    port_return = (weights * mean_return).sum(dim=1)  # [batch_size]
 
-    risk_free_rate = 0.02
-    scale = 12
+    # Portfolio volatility
+    weights_unsqueezed = weights.unsqueeze(1)  # [batch_size, 1, num_features]
+    port_vol = torch.bmm(weights_unsqueezed, torch.bmm(covmat, weights_unsqueezed.transpose(1, 2))).squeeze()  # [batch_size]
+    port_vol = torch.sqrt(port_vol + 1e-8)  # [batch_size]
+
+    # Adjust for annualization if needed
+    scale = 12  # Assuming monthly returns
     port_return = port_return * scale
-    port_vol = torch.sqrt(port_vol * scale + 1e-8)
+    port_vol = port_vol * np.sqrt(scale)
 
-    sharpe_ratio = (port_return - risk_free_rate) / port_vol
-    return -sharpe_ratio.mean()
+    # Sharpe Ratio
+    risk_free_rate = 0.02
+    sharpe_ratio = (port_return - risk_free_rate) / port_vol  # [batch_size]
+
+    # Loss is negative Sharpe Ratio
+    loss = -sharpe_ratio.mean()
+    return loss
 
 def equal_risk_parity(y_return, weights):
-    covmat = batch_covariance(y_return)
-    weights_unsqueezed = weights.unsqueeze(1)
+    # y_return: [batch_size, time_steps, num_features]
+    # weights: [batch_size, num_features]
 
-    port_var = torch.bmm(weights_unsqueezed, torch.bmm(covmat, weights_unsqueezed.transpose(1, 2))).squeeze()
-    sigma_p = torch.sqrt(port_var + 1e-8)
+    covmat = batch_covariance(y_return)  # [batch_size, num_features, num_features]
+    weights_unsqueezed = weights.unsqueeze(1)  # [batch_size, 1, num_features]
 
-    sigma_w = torch.bmm(covmat, weights_unsqueezed.transpose(1, 2)).squeeze()
-    mrc = (1 / sigma_p.unsqueeze(1)) * sigma_w
+    # Portfolio variance
+    port_var = torch.bmm(weights_unsqueezed, torch.bmm(covmat, weights_unsqueezed.transpose(1, 2))).squeeze()  # [batch_size]
+    sigma_p = torch.sqrt(port_var + 1e-8)  # [batch_size]
 
-    rc = weights * mrc
-    rc = rc / rc.sum(dim=1, keepdim=True)
+    # Marginal Risk Contribution
+    sigma_w = torch.bmm(covmat, weights_unsqueezed.transpose(1, 2)).squeeze()  # [batch_size, num_features]
+    mrc = sigma_w / sigma_p.unsqueeze(1)  # [batch_size, num_features]
 
-    target_rc = torch.ones_like(rc) / rc.shape[1]
+    # Risk Contribution
+    rc = weights * mrc  # [batch_size, num_features]
+    rc = rc / rc.sum(dim=1, keepdim=True)  # Normalize
+
+    # Target Risk Contribution (equal weight)
+    target_rc = torch.full_like(rc, 1.0 / rc.shape[1])  # [batch_size, num_features]
+
+    # Loss is the mean squared difference between actual and target risk contributions
     loss = ((rc - target_rc) ** 2).sum(dim=1).mean()
     return loss
 
 def mean_variance(y_return, weights, risk_aversion=1.0):
-    mean_return = y_return.mean(dim=1)
-    covmat = batch_covariance(y_return)
+    # y_return: [batch_size, time_steps, num_features]
+    # weights: [batch_size, num_features]
 
-    port_return = (weights * mean_return).sum(dim=1)
-    weights_unsqueezed = weights.unsqueeze(1)
-    port_variance = torch.bmm(weights_unsqueezed, torch.bmm(covmat, weights_unsqueezed.transpose(1, 2))).squeeze()
+    mean_return = y_return.mean(dim=1)  # [batch_size, num_features]
+    covmat = batch_covariance(y_return)  # [batch_size, num_features, num_features]
 
-    objective = port_return - risk_aversion * port_variance
-    return -objective.mean()
+    # Portfolio return
+    port_return = (weights * mean_return).sum(dim=1)  # [batch_size]
+
+    # Portfolio variance
+    weights_unsqueezed = weights.unsqueeze(1)  # [batch_size, 1, num_features]
+    port_variance = torch.bmm(weights_unsqueezed, torch.bmm(covmat, weights_unsqueezed.transpose(1, 2))).squeeze()  # [batch_size]
+
+    # Objective function: maximize return - risk_aversion * variance
+    objective = port_return - risk_aversion * port_variance  # [batch_size]
+
+    # Loss is negative of the objective (since we minimize in training)
+    loss = -objective.mean()
+    return loss
 
 def l2_regularization(weights, lambda_reg=0.1):
     l2_loss = lambda_reg * (weights ** 2).sum(dim=1).mean()
