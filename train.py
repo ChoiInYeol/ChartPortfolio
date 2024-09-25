@@ -56,11 +56,12 @@ class Trainer:
             'max_sharpe': max_sharpe,
             'equal_risk_parity': equal_risk_parity,
             'mean_variance': mean_variance,
-            'combined': combined_loss
+            'combined': combined_loss,
         }
         if self.loss_fn not in self.loss_functions:
             raise ValueError(f"Unsupported loss function: {self.loss_fn}")
         self.criterion = self.loss_functions[self.loss_fn]
+        self.previous_weights = None
 
         # Initialize logging to file
         os.makedirs(config['RESULT_DIR'], exist_ok=True)
@@ -162,41 +163,40 @@ class Trainer:
         logger.info("Loading and processing data...")
 
         with open("data/dataset.pkl", "rb") as f:
-            train_x_raw, train_y_raw, test_x_raw, test_y_raw = pickle.load(f)
+            train_x_raw, train_y_raw, val_x_raw, val_y_raw, _, _ = pickle.load(f)
 
         with open("data/date.pkl", "rb") as f:
             date_info = pickle.load(f)
 
         if self.multimodal:
             with open("data/dataset_img.pkl", "rb") as f:
-                train_img_data, test_img_data, _, _ = pickle.load(f)
+                train_img_data, val_img_data, _, _ = pickle.load(f)
             train_img = train_img_data['images']
-            test_img = test_img_data['images']
+            val_img = val_img_data['images']
             train_labels = np.array(train_img_data['labels'])
-            test_labels = np.array(test_img_data['labels'])
+            val_labels = np.array(val_img_data['labels'])
         else:
-            train_img = test_img = train_labels = test_labels = None
+            train_img = val_img = train_labels = val_labels = None
 
-        scale = 20
+        scale = self.len_pred
         train_x = train_x_raw * scale
         train_y = train_y_raw * scale
-        test_x = test_x_raw * scale
-        test_y = test_y_raw * scale
+        val_x = val_x_raw * scale
+        val_y = val_y_raw * scale
 
         self.train_date = date_info['train']
-        self.test_date = date_info['test']
+        self.val_date = date_info['val']
         self.N_STOCK = self.config['N_FEAT']
         self.LEN_PRED = train_y.shape[1]
-        self.test_y_raw = test_y_raw
 
         train_dataset = PortfolioDataset(train_x, train_y, train_img, train_labels)
-        test_dataset = PortfolioDataset(test_x, test_y, test_img, test_labels)
-        return train_dataset, test_dataset
+        val_dataset = PortfolioDataset(val_x, val_y, val_img, val_labels)
+        return train_dataset, val_dataset
 
     def train(self) -> None:
-        train_dataset, test_dataset = self._load_and_process_data()
+        train_dataset, val_dataset = self._load_and_process_data()
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True, num_workers=4, pin_memory=True)
-        test_loader = DataLoader(test_dataset, batch_size=self.config['BATCH'], shuffle=False, num_workers=4, pin_memory=True)
+        val_loader = DataLoader(val_dataset, batch_size=self.config['BATCH'], shuffle=False, num_workers=4, pin_memory=True)
 
         valid_loss = []
         train_loss = []
@@ -224,7 +224,7 @@ class Trainer:
             train_loss.append(train_epoch_loss)
             logger.info(f"Epoch {epoch}/{self.config['EPOCHS']}, Training Loss: {train_epoch_loss:.6f}")
 
-            valid_epoch_loss = self._run_epoch(test_loader, is_training=False)
+            valid_epoch_loss = self._run_epoch(val_loader, is_training=False)
             valid_loss.append(valid_epoch_loss)
             logger.info(f"Epoch {epoch}/{self.config['EPOCHS']}, Validation Loss: {valid_epoch_loss:.6f}")
 
@@ -275,15 +275,23 @@ class Trainer:
         if self.multimodal:
             x, y, img, labels = [d.to(self.device) for d in data]
             portfolio_weights, binary_pred = self.model(x, img)
-            # Adjust dimensions if necessary
         else:
             x, y = [d.to(self.device) for d in data]
             portfolio_weights = self.model(x)
-            # y: [batch_size, time_steps, num_features]
-            # portfolio_weights: [batch_size, num_features]
+
+        if self.loss_fn == 'combined_with_turnover':
+            if self.previous_weights is None:
+                self.previous_weights = torch.zeros_like(portfolio_weights)
             loss = self.criterion(
-                y, portfolio_weights
+                y, portfolio_weights, portfolio_weights, self.previous_weights,
+                beta=self.config.get('LOSS_BETA', 0.5),
+                gamma=self.config.get('TURNOVER_GAMMA', 0.1),
+                transaction_cost=self.config.get('TRANSACTION_COST', 0.001)
             )
+            self.previous_weights = portfolio_weights.detach()
+        else:
+            loss = self.criterion(y, portfolio_weights)
+
         return loss
 
     def _save_model(self, epoch, best_loss, early_stop_count) -> None:

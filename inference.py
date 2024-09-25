@@ -114,16 +114,16 @@ class Inference:
         logger.info("Loading test data...")
 
         with open("data/dataset.pkl", "rb") as f:
-            _, _, test_x_raw, _ = pickle.load(f)
+            _, _, _, _, test_x_raw, _ = pickle.load(f)
 
         if self.multimodal:
             with open("data/dataset_img.pkl", "rb") as f:
-                _, test_img_data, _, _ = pickle.load(f)
+                _, _, test_img_data, _ = pickle.load(f)
             test_img = test_img_data['images']
         else:
             test_img = None
 
-        scale = 20
+        scale = self.len_pred
         test_x = test_x_raw * scale
 
         self.test_x = torch.from_numpy(test_x).float().to(self.device)
@@ -156,4 +156,3 @@ class Inference:
 
 def get_model_identifier(config):
     return f"{config['MODEL']}_{config['MULTIMODAL']}_{config['LOSS_FUNCTION']}_{config['TRAIN_LEN']}_{config['PRED_LEN']}"
-

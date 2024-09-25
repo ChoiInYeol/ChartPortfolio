@@ -1,8 +1,7 @@
 import os
-import json
+import yaml
 import pandas as pd
 import yfinance as yf
-
 
 def get_stock_data(code, start, end):
     try:
@@ -66,7 +65,8 @@ def stock_download(
 
 if __name__ == "__main__":
     # Load configuration and symbols
-    config = json.load(open("config/train_config.json", "r", encoding="utf8"))
+    with open("config/config.yaml", "r", encoding="utf8") as file:
+        config = yaml.safe_load(file)
     snp500 = pd.read_csv("data/snp500.csv")
     
     # Handle BRK.B symbol
@@ -81,5 +81,5 @@ if __name__ == "__main__":
     sp500 = yf.download("^GSPC", config["START"], config["END"])
     sp500.to_csv("data/snp500_index.csv")
 
-    # Save downloaded stock symbols to a JSON file
-    json.dump(stock_pair, open("data/stock.json", "w", encoding="UTF-8"))
+    # 다운로드된 주식 심볼을 YAML 파일로 저장
+    yaml.dump(stock_pair, open("data/stock.yaml", "w", encoding="UTF-8"))

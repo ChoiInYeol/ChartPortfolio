@@ -1,3 +1,4 @@
+# loss.py
 import torch
 import torch.nn.functional as F
 import numpy as np
@@ -87,14 +88,10 @@ def mean_variance(y_return, weights, risk_aversion=1.0):
     loss = -objective.mean()
     return loss
 
-def l2_regularization(weights, lambda_reg=0.1):
-    l2_loss = lambda_reg * (weights ** 2).sum(dim=1).mean()
-    return l2_loss
-
 def binary_prediction_loss(binary_true, binary_pred):
     return F.binary_cross_entropy(binary_pred, binary_true)
 
-def combined_loss(y_true, y_pred, binary_true=None, binary_pred=None, beta=0.5, eps=1e-8):
+def combined_loss(y_true, y_pred, binary_true=None, binary_pred=None, beta=0.2, eps=1e-8):
     portfolio_loss = max_sharpe(y_true, y_pred)
 
     if binary_true is not None and binary_pred is not None:

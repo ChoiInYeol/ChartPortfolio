@@ -4,7 +4,7 @@ import pandas as pd
 from PIL import Image, ImageDraw
 from typing import List, Tuple, Dict
 from tqdm import tqdm
-import json
+import yaml
 import pickle
 import multiprocessing as mp
 
@@ -53,13 +53,20 @@ def make_image_dataset(data, train_len, pred_len, n_stock, tickers, has_ma=False
 
     return np.array(images), np.array(labels), times
 
-def data_split_images(data, train_len, pred_len, tr_ratio, n_stock, tickers, has_ma=False, has_volume=False, ma_period=5):
-    split_index = int(len(data) * tr_ratio)
-    train_data = data.iloc[:split_index]
-    test_data = data.iloc[split_index:]
+def data_split_images(data, train_len, pred_len, train_ratio, val_ratio, n_stock, tickers, has_ma=False, has_volume=False, ma_period=5):
+    total_len = len(data)
+    train_end = int(total_len * train_ratio)
+    val_end = int(total_len * (train_ratio + val_ratio))
+
+    train_data = data.iloc[:train_end]
+    val_data = data.iloc[train_end:val_end]
+    test_data = data.iloc[val_end:]
 
     train_images, train_labels, train_times = make_image_dataset(
         train_data, train_len, pred_len, n_stock, tickers, has_ma, has_volume, ma_period
+    )
+    val_images, val_labels, val_times = make_image_dataset(
+        val_data, train_len, pred_len, n_stock, tickers, has_ma, has_volume, ma_period
     )
     test_images, test_labels, test_times = make_image_dataset(
         test_data, train_len, pred_len, n_stock, tickers, has_ma, has_volume, ma_period
@@ -67,13 +74,16 @@ def data_split_images(data, train_len, pred_len, tr_ratio, n_stock, tickers, has
 
     x_tr = train_images.reshape(-1, n_stock, *train_images.shape[1:])
     y_tr = train_labels.reshape(-1, n_stock)
+    x_val = val_images.reshape(-1, n_stock, *val_images.shape[1:])
+    y_val = val_labels.reshape(-1, n_stock)
     x_te = test_images.reshape(-1, n_stock, *test_images.shape[1:])
     y_te = test_labels.reshape(-1, n_stock)
 
     times_tr = np.unique(train_times).tolist()
+    times_val = np.unique(val_times).tolist()
     times_te = np.unique(test_times).tolist()
 
-    return x_tr, y_tr, x_te, y_te, times_tr, times_te
+    return x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te
 
 def generate_single_candlestick_chart(
     df: pd.DataFrame,
@@ -149,8 +159,10 @@ def generate_single_candlestick_chart(
                     draw.line([center, vol_y_top, center, image_height - 1], fill=255)
 
     return image
+
 if __name__ == "__main__":
-    config = json.load(open("config/train_config.json", "r", encoding="utf8"))
+    with open("config/config.yaml", "r", encoding="utf8") as file:
+        config = yaml.safe_load(file)
     stock_data_dir = "./data/stocks/"
     save_dir = "./data/charts"
     os.makedirs(save_dir, exist_ok=True)
@@ -159,11 +171,12 @@ if __name__ == "__main__":
     return_df = pd.read_csv("data/return_df.csv", index_col="Date", parse_dates=True)
     tickers = return_df.columns.tolist()
 
-    x_tr, y_tr, x_te, y_te, times_tr, times_te = data_split_images(
+    x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te = data_split_images(
         return_df,
         config["TRAIN_LEN"],
         config["PRED_LEN"],
         config["TRAIN_RATIO"],
+        config["VAL_RATIO"],
         len(tickers),
         tickers,
         has_ma=True,
@@ -172,23 +185,28 @@ if __name__ == "__main__":
     )
 
     train_npz_data = {'images': x_tr, 'labels': y_tr}
+    val_npz_data = {'images': x_val, 'labels': y_val}
     test_npz_data = {'images': x_te, 'labels': y_te}
 
     np.savez_compressed(f"{save_dir}/train_candlestick_data.npz", **train_npz_data)
+    np.savez_compressed(f"{save_dir}/val_candlestick_data.npz", **val_npz_data)
     np.savez_compressed(f"{save_dir}/test_candlestick_data.npz", **test_npz_data)
 
     with open("data/date.pkl", "wb") as f:
-        pickle.dump({'train': times_tr, 'test': times_te}, f)
+        pickle.dump({'train': times_tr, 'val': times_val, 'test': times_te}, f)
 
     print("데이터셋 검증:")
     print(f"Train images shape: {x_tr.shape}")
     print(f"Train labels shape: {y_tr.shape}")
+    print(f"Validation images shape: {x_val.shape}")
+    print(f"Validation labels shape: {y_val.shape}")
     print(f"Test images shape: {x_te.shape}")
     print(f"Test labels shape: {y_te.shape}")
     print(f"Train times length: {len(times_tr)}")
+    print(f"Validation times length: {len(times_val)}")
     print(f"Test times length: {len(times_te)}")
     
     # result를 저장
-    result = (train_npz_data, test_npz_data, times_tr, times_te)
+    result = (train_npz_data, val_npz_data, test_npz_data, times_tr, times_val, times_te)
     with open("data/dataset_img.pkl", "wb") as f:
         pickle.dump(result, f)

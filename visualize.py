@@ -59,8 +59,14 @@ def visualize_drawdown(performance, config):
     plt.savefig(filename, dpi=300, bbox_inches='tight')
     plt.close()
 
+from matplotlib import cm
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+from matplotlib import cm
+
 def visualize_weights_over_time(weights_over_time, date_index, config):
-    n_models = len(weights_over_time)
     n_stocks = list(weights_over_time.values())[0].shape[1]
     tickers = pd.read_csv("data/return_df.csv", index_col=0).columns[:n_stocks]
 
@@ -68,35 +74,31 @@ def visualize_weights_over_time(weights_over_time, date_index, config):
     min_length = min(len(date_index), list(weights_over_time.values())[0].shape[0])
     date_index = date_index[:min_length]
 
-    # Create a color map with enough distinct colors
-    color_map = plt.get_cmap('tab20')  # You can also use 'tab20b', 'tab20c', or other colormaps
-    colors = [color_map(i % 20) for i in range(n_stocks)]  # Handle more than 20 by repeating
-
-    # Create subplots
-    fig, axes = plt.subplots(nrows=n_models, ncols=1, figsize=(14, 4 * n_models), sharex=True)
-    if n_models == 1:
-        axes = [axes]  # Ensure axes is iterable
-
-    for ax, (identifier, weights) in zip(axes, weights_over_time.items()):
+    for identifier, weights in weights_over_time.items():
         # Truncate weights to match date_index length
         weights = weights[:min_length]
 
-        # Create the DataFrame and plot with the custom color palette
+        # Create the DataFrame
         weights_df = pd.DataFrame(weights, columns=tickers, index=date_index)
-        weights_df.plot(ax=ax, legend=False, color=colors)
-        ax.set_title(f"Weights Over Time - {identifier}", fontsize=14)
-        ax.set_ylabel("Weight", fontsize=12)
-        ax.grid(True, linestyle='--', alpha=0.7)
 
-    # Add a single legend for all tickers at the bottom
-    handles, labels = ax.get_legend_handles_labels()
-    fig.legend(
-        handles, labels, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5, fontsize=10, frameon=False
-    )
+        # Create a new figure for each model
+        plt.figure(figsize=(12, 6))
 
-    plt.xlabel("Date", fontsize=12)
-    plt.tight_layout()
-    filename = os.path.join(config['RESULT_DIR'], f"weights_over_time.png")
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
-    plt.close()
+        # Plot area chart
+        ax = weights_df.plot.area(stacked=True, legend=True)
+        
+        plt.title(f"Weights Over Time - {identifier}", fontsize=14)
+        plt.ylabel("Weight", fontsize=12)
+        plt.xlabel("Date", fontsize=12)
+        plt.ylim(0, 1)
+        plt.grid(True, linestyle='--', alpha=0.7)
+        
+        # Adjust legend
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Stocks")
+
+        filename = os.path.join(config['RESULT_DIR'], f"weights_over_time_{identifier}.png")
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        plt.close()
+
+    print(f"생성된 그래프: {len(weights_over_time)}개")
 

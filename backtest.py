@@ -30,7 +30,7 @@ class Backtester:
         logger.info("Loading test data...")
 
         with open("data/dataset.pkl", "rb") as f:
-            _, test_y_raw = pickle.load(f)[2:]
+            _, _, _, _, _, test_y_raw = pickle.load(f)
 
         with open("data/date.pkl", "rb") as f:
             date_info = pickle.load(f)
@@ -49,6 +49,7 @@ class Backtester:
                 logger.info(f"Loaded weights for model: {identifier}")
             else:
                 logger.warning(f"Weights not found for model: {identifier} at path: {weights_path}")
+
         return weights_dict
 
     def backtest(self, model_identifiers: list, visualize: bool = True) -> None:
@@ -105,4 +106,3 @@ class Backtester:
             visualize_drawdown(performance_df, self.config)
             visualize_returns_distribution(performance_df, self.config)
             visualize_weights_over_time(weights_over_time, date_index, self.config)
-
