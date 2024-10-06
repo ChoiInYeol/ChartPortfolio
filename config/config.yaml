@@ -3,8 +3,23 @@
 # data
 START: '2001-01-01'
 END: '2024-09-01'
-N_STOCK: 50
-LEN_DATA: 5000
+LEN_DATA: 6000
+
+# make_image
+window_size: 60
+volume_bar: true
+ma_lags: [5, 20, 60]
+chart_type: "bar"
+year: 2024
+freq: "month"
+SIZE_DICT:
+  5: [32, 15]
+  20: [64, 60]
+  60: [96, 180]
+  120: [128, 360]
+
+# model parameter
+N_STOCK: 500
 TRAIN_LEN: 60
 PRED_LEN: 20
 TRAIN_RATIO: 0.60
@@ -12,15 +27,15 @@ VAL_RATIO: 0.20
 TEST_RATIO: 0.20
 RESULT_DIR: 'result'
 
-# default
+# model parameter
 MODELS: ['GRU', 'TCN', 'TRANSFORMER']
 MULTIMODAL_OPTIONS: [false]
-LOSS_FUNCTIONS: ['max_sharpe', 'equal_risk_parity', 'mean_variance']
+LOSS_FUNCTIONS: ['max_sharpe']
 TRAIN_LEN_OPTIONS: [60]
 PRED_LEN_OPTIONS: [20]
 SEED: 42
 
-# learning
+# learning parameter
 BATCH: 32
 EPOCHS: 500
 EARLY_STOP: 20
@@ -32,16 +47,16 @@ USE_CUDA: true
 # portfolio optimization function (loss)
 LB: 0
 UB: 0.2
-N_FEAT: 50 # N_STO
+N_FEAT: 50 # Best 50 in N_STOCK
 BETA: 0.2
 LOSS_FUNCTION: 'max_sharpe'
 
 # model parameter
 TCN:
-  n_output: 50 # N_STOCK
+  n_timestep: 60 # TRAIN_LEN
+  n_output: 50 # Best 50 in N_STOCK
   kernel_size: 4
   n_dropout: 0.1
-  n_timestep: 60 # TRAIN_LEN
   hidden_size: 64
   level: 3
 
@@ -53,7 +68,9 @@ GRU:
 
 TRANSFORMER:
   n_timestep: 60 # TRAIN_LEN
+  n_output: 50 # Best 50 in N_STOCK
+
   n_layer: 6
   n_head: 5
   n_dropout: 0.1
-  n_output: 50 # N_STOCK
+  

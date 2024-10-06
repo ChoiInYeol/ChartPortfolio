@@ -59,12 +59,6 @@ def visualize_drawdown(performance, config):
     plt.savefig(filename, dpi=300, bbox_inches='tight')
     plt.close()
 
-from matplotlib import cm
-
-import matplotlib.pyplot as plt
-import pandas as pd
-import os
-from matplotlib import cm
 
 def visualize_weights_over_time(weights_over_time, date_index, config):
     n_stocks = list(weights_over_time.values())[0].shape[1]
@@ -81,11 +75,15 @@ def visualize_weights_over_time(weights_over_time, date_index, config):
         # Create the DataFrame
         weights_df = pd.DataFrame(weights, columns=tickers, index=date_index)
 
+        # Calculate figure size based on number of stocks
+        fig_width = max(12, n_stocks * 0.5)  # Increase width based on number of stocks
+        fig_height = 8  # Fixed height
+
         # Create a new figure for each model
-        plt.figure(figsize=(12, 6))
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
         # Plot area chart
-        ax = weights_df.plot.area(stacked=True, legend=True)
+        weights_df.plot.area(stacked=True, ax=ax)
         
         plt.title(f"Weights Over Time - {identifier}", fontsize=14)
         plt.ylabel("Weight", fontsize=12)
@@ -94,7 +92,13 @@ def visualize_weights_over_time(weights_over_time, date_index, config):
         plt.grid(True, linestyle='--', alpha=0.7)
         
         # Adjust legend
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Stocks")
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                         box.width, box.height * 0.9])
+
+        # Put a legend below current axis
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+                  fancybox=True, shadow=True, ncol=5)  # Adjust ncol as needed
 
         filename = os.path.join(config['RESULT_DIR'], f"weights_over_time_{identifier}.png")
         plt.savefig(filename, dpi=300, bbox_inches='tight')

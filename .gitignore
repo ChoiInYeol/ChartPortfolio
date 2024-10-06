@@ -12,3 +12,15 @@
 *.pt
 *.pth
 *.pyc
+*.feather
+*.pkl
+*.npz
+*.csv
+*.xlsx
+*.pkl
+*.npz
+*.png
+*.pt
+*.pth
+*.pyc
+*.dat
