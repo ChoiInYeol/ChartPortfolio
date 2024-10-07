@@ -25,3 +25,15 @@
 2024-09-26 08:30:03,692 - INFO - Found 472 CSV files in data/stocks/
 2024-09-26 08:30:59,164 - INFO - Found 472 CSV files in data/stocks/
 2024-09-26 08:32:00,758 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 19:45:04,238 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 19:45:47,466 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 19:46:29,934 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 19:57:30,953 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 19:57:34,969 - INFO - Processed data for year 2024 saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/processed_data/us_stock_data_2024.feather
+2024-10-06 20:12:13,829 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 20:14:08,655 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 20:16:02,163 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 20:16:09,885 - INFO - Processed data from 2001-01-01 00:00:00 to 2024-09-01 00:00:00 saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/processed_data/us_stock_data_2001-01-01_2024-09-01.feather
+2024-10-06 20:20:12,352 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 20:20:25,646 - INFO - Found 472 CSV files in data/stocks/
+2024-10-06 20:20:34,190 - INFO - Processed data from 2001-01-01 00:00:00 to 2024-09-01 00:00:00 saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/processed_data/us_stock_data_2001-01-01_2024-09-01.feather

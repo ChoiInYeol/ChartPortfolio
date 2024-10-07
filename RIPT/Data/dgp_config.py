@@ -11,12 +11,12 @@ def get_dir(path):
 
 WORK_DIR = os.getcwd()
 DATA_DIR = op.join(WORK_DIR, "data")
-PROCESSED_DATA_DIR = op.join(DATA_DIR, "processed_data")
-STOCKS_SAVEPATH = op.join(DATA_DIR, "stocks_dataset")
+PROCESSED_DATA_DIR = op.join(WORK_DIR, "processed_data")
+STOCKS_SAVEPATH = op.join(WORK_DIR, "stocks_dataset")
 RAW_DATA_DIR = op.join(STOCKS_SAVEPATH, "raw_data")
-CACHE_DIR = op.join(DATA_DIR, "cache")
+CACHE_DIR = op.join(WORK_DIR, "cache")
 
-for dir_path in [DATA_DIR, PROCESSED_DATA_DIR, STOCKS_SAVEPATH, RAW_DATA_DIR, CACHE_DIR]:
+for dir_path in [PROCESSED_DATA_DIR, STOCKS_SAVEPATH, RAW_DATA_DIR, CACHE_DIR]:
     get_dir(dir_path)
 
 BAR_WIDTH = 3

@@ -7,7 +7,7 @@ if __name__ == "__main__":
     # 차트 타입 설정 (bar, pixel, centered_pixel 중 선택)
     chart_type = "bar"
     
-    # 윈도우 크기 설정 (60일)
+    # 윈도우 크기 설정 (5일, 20일, 60일)
     ws = 60
     
     # 데이터 빈도 설정 (week, month, quarter 중 선택)

@@ -1,4 +1,7 @@
+# equity_data.py
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pandas as pd
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -105,14 +108,57 @@ def get_spy_freq_rets(freq):
         return spy.resample('ME').last()['Return']
     else:  # quarter
         return spy.resample('QE').last()['Return']
+    
+def process_all_years(start_date, end_date, stock_dir="data/stocks/"):
+    all_data = []
+    stock_files = [f for f in os.listdir(stock_dir) if f.endswith('.csv')]
+    logging.info(f"Found {len(stock_files)} CSV files in {stock_dir}")
+    
+    for file in tqdm(stock_files, desc="Processing stocks"):
+        file_path = os.path.join(stock_dir, file)
+        df = pd.read_csv(file_path, parse_dates=['Date'])
+        df['StockID'] = os.path.splitext(file)[0]
+        all_data.append(df)
+    
+    if not all_data:
+        logging.error("No stock data processed successfully")
+        raise ValueError("No stock data processed successfully")
+    
+    df = pd.concat(all_data)
+    df.set_index(['Date', 'StockID'], inplace=True)
+    df.sort_index(inplace=True)
+    
+    df = df[(df.index.get_level_values("Date") >= start_date) & 
+            (df.index.get_level_values("Date") <= end_date)]
+    
+    df['log_ret'] = np.log1p(df['Adj Close'].groupby(level='StockID').pct_change())
+    df['cum_log_ret'] = df.groupby(level='StockID')['log_ret'].cumsum()
+    df['EWMA_vol'] = df.groupby(level='StockID')['Ret'].transform(lambda x: x.ewm(span=20).std())
+    
+    for freq in ["week", "month", "quarter", "year"]:
+        period_end_dates = get_period_end_dates(freq)
+        freq_df = df[df.index.get_level_values("Date").isin(period_end_dates)].copy()
+        freq_df[f"Ret_{freq}"] = freq_df.groupby("StockID")["cum_log_ret"].transform(
+            lambda x: np.exp(x.shift(-1) - x) - 1
+        )
+        df[f"Ret_{freq}"] = freq_df[f"Ret_{freq}"]
+    
+    for i in [5, 20, 60, 65, 180, 250, 260]:
+        df[f"Ret_{i}d"] = df.groupby("StockID")["cum_log_ret"].transform(
+            lambda x: np.exp(x.shift(-i) - x) - 1
+        )
+    
+    return df
 
 if __name__ == "__main__":
     with open("config/config.yaml", "r", encoding="utf8") as f:
         config = yaml.safe_load(f)
     
-    year = config.get('YEAR', 2024)
-    df = get_processed_US_data_by_year(year)
+    START = pd.to_datetime(config.get('START'))
+    END = pd.to_datetime(config.get('END'))
     
-    output_path = os.path.join(dcf.PROCESSED_DATA_DIR, f"us_stock_data_{year}.feather")
+    df = process_all_years(START, END)
+    
+    output_path = os.path.join(dcf.PROCESSED_DATA_DIR, f"us_stock_data_{START.year}_{END.year}.feather")
     df.reset_index().to_feather(output_path)
-    logging.info(f"Processed data for year {year} saved to {output_path}")
+    logging.info(f"Processed data from {START} to {END} saved to {output_path}")
