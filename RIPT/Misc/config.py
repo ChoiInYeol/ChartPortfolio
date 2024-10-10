@@ -6,7 +6,7 @@ def get_dir(dir):
         os.makedirs(dir, exist_ok=True)
     return dir
 
-WORK_DIR = get_dir("../WORK_SPACE")
+WORK_DIR = get_dir("RIPT_WORK_SPACE")
 
 EXP_DIR = get_dir(os.path.join(WORK_DIR, "new_model_res"))
 PORTFOLIO_DIR = get_dir(os.path.join(EXP_DIR, "portfolio"))
@@ -50,7 +50,7 @@ START_YEAR_DICT = {
     "Ireland": 1999,
     "Sweden": 1999,
 }
-IS_YEARS = list(range(2007, 2018))
+IS_YEARS = list(range(2001, 2018))
 OOS_YEARS = list(range(2018, 2024))
 
 BENCHMARK_MODEL_NAME_DICT = {

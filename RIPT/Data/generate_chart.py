@@ -14,43 +14,10 @@ from Misc import utilities as ut
 
 
 class ChartGenerationError(Exception):
-    """차트 생성 중 발생하는 예외를 처리하기 위한 사용자 정의 예외 클래스"""
     pass
 
 
 class GenerateStockData(object):
-    """
-    주식 데이터를 생성하고 처리하는 클래스
-
-    이 클래스는 주어진 매개변수에 따라 주식 차트 데이터를 생성하고 처리합니다.
-
-    Attributes:
-        country (str): 국가 코드
-        year (int): 데이터 연도
-        window_size (int): 윈도우 크기
-        freq (str): 데이터 빈도
-        chart_freq (int): 차트 빈도
-        chart_len (int): 차트 길이
-        ma_lags (list): 이동평균 지연 기간 리스트
-        volume_bar (bool): 거래량 바 포함 여부
-        need_adjust_price (bool): 가격 조정 필요 여부
-        allow_tqdm (bool): tqdm 진행 표시줄 사용 여부
-        chart_type (str): 차트 유형
-        ret_len_list (list): 수익률 계산 기간 리스트
-        bar_width (int): 바 너비
-        image_width (dict): 차트 길이별 이미지 너비
-        image_height (dict): 차트 길이별 이미지 높이
-        width (int): 현재 설정된 이미지 너비
-        height (int): 현재 설정된 이미지 높이
-        df (pandas.DataFrame): 주식 데이터
-        stock_id_list (list): 주식 ID 리스트
-        save_dir (str): 데이터 저장 디렉토리
-        image_save_dir (str): 이미지 저장 디렉토리
-        file_name (str): 파일 이름
-        log_file_name (str): 로그 파일 이름
-        labels_filename (str): 레이블 파일 이름
-        images_filename (str): 이미지 파일 이름
-    """
     def __init__(
         self,
         country,
@@ -64,21 +31,6 @@ class GenerateStockData(object):
         allow_tqdm=True,
         chart_type="bar",
     ):
-        """
-        GenerateStockData 클래스의 생성자
-
-        Args:
-            country (str): 국가 코드
-            year (int): 데이터 연도
-            window_size (int): 윈도우 크기
-            freq (str): 데이터 빈도
-            chart_freq (int, optional): 차트 빈도. 기본값은 1
-            ma_lags (list, optional): 이동평균 지연 기간 리스트. 기본값은 None
-            volume_bar (bool, optional): 거래량 바 포함 여부. 기본값은 False
-            need_adjust_price (bool, optional): 가격 조정 필요 여부. 기본값은 True
-            allow_tqdm (bool, optional): tqdm 진행 표시줄 사용 여부. 기본값은 True
-            chart_type (str, optional): 차트 유형. 기본값은 "bar"
-        """
         self.country = country
         self.year = year
         self.window_size = window_size
@@ -128,20 +80,6 @@ class GenerateStockData(object):
 
     @staticmethod
     def adjust_price(df):
-        """
-        주가를 조정합니다.
-
-        이 메서드는 주어진 데이터프레임의 주가를 조정하여 첫 날의 종가를 1로 만듭니다.
-
-        Args:
-            df (pandas.DataFrame): 조정할 주가 데이터
-
-        Returns:
-            pandas.DataFrame: 조정된 주가 데이터
-
-        Raises:
-            ChartGenerationError: 데이터프레임이 비어있거나, 날짜가 고유하지 않거나, 첫 날 종가가 0 또는 NaN인 경우
-        """
         if len(df) == 0:
             raise ChartGenerationError("adjust_price: Empty Dataframe")
         if len(df.Date.unique()) != len(df):
@@ -180,16 +118,6 @@ class GenerateStockData(object):
         return res_df
 
     def load_adjusted_daily_prices(self, stock_df, date):
-        """
-        조정된 일일 주가를 로드합니다.
-
-        Args:
-            stock_df (pandas.DataFrame): 주식 데이터
-            date (datetime): 기준 날짜
-
-        Returns:
-            int or pandas.DataFrame: 오류 코드 또는 조정된 주가 데이터
-        """
         if date not in set(stock_df.Date):
             return 0
         date_index = stock_df[stock_df.Date == date].index[0]
@@ -301,6 +229,7 @@ class GenerateStockData(object):
                 "Ret_month",
                 "Ret_quarter",
                 "Ret_year",
+                "MarketCap",
             ]
             + [f"Ret_{i}d" for i in self.ret_len_list]
             + [f"Ret_{i}d_tstat" for i in self.ret_len_list]
@@ -331,11 +260,6 @@ class GenerateStockData(object):
         return dtype_dict, feature_list
 
     def save_annual_data(self):
-        """
-        연간 시계열 데이터를 저장합니다.
-
-        이 메서드는 생성된 시계열 데이터를 파일로 저장합니다.
-        """
         if (
             op.isfile(self.log_file_name)
             and op.isfile(self.labels_filename)
@@ -344,6 +268,7 @@ class GenerateStockData(object):
             print("Found pregenerated file {}".format(self.file_name))
             return
         print(f"Generating {self.file_name}")
+        
         self.df = eqd.get_processed_US_data_by_year(self.year)
         self.stock_id_list = np.unique(self.df.index.get_level_values("StockID"))
         dtype_dict, feature_list = self._get_feature_and_dtype_list()
@@ -356,7 +281,8 @@ class GenerateStockData(object):
             [len(self.stock_id_list) * 60, self.width * self.height],
             dtype=dtype_dict["image"],
         )
-        # data_dict["image"].fill(np.nan)
+        data_dict["image"] = data_dict["image"].astype(float)
+        data_dict["image"].fill(np.nan)
 
         sample_num = 0
         iterator = (
@@ -431,19 +357,6 @@ class GenerateStockData(object):
         print(f"Save log file to {self.log_file_name}")
 
     def generate_daily_ts_features(self, stock_df, date):
-        """
-        일일 시계열 특성을 생성합니다.
-
-        Args:
-            data (pandas.DataFrame): 주식 데이터
-            date (datetime): 기준 날짜
-
-        Returns:
-            dict: 생성된 특성 딕셔너리
-
-        Raises:
-            ChartGenerationError: 차트 생성 중 오류 발생 시
-        """
         if date not in set(stock_df.Date):
             return 0
 
@@ -509,6 +422,7 @@ class GenerateStockData(object):
             "Ret_week",
             "Ret_month",
             "Ret_quarter",
+            "MarketCap",
         ]
         feature_dict = {feature: last_day[feature] for feature in feature_list}
 
@@ -527,14 +441,6 @@ class GenerateStockData(object):
         return feature_dict
 
     def get_ts_feature_and_dtype_list(self):
-        """
-        시계열 특성과 데이터 타입 리스트를 반환합니다.
-
-        Returns:
-            tuple: (dtype_dict, feature_list)
-                dtype_dict (dict): 특성별 데이터 타입 딕셔너리
-                feature_list (list): 특성 리스트
-        """
         float32_features = [
             "EWMA_vol",
             "Ret",
@@ -548,6 +454,7 @@ class GenerateStockData(object):
             "Ret_5d_tstat",
             "Ret_20d_tstat",
             "Ret_60d_tstat",
+            "MarketCap",
             "predictor",
         ]
         int8_features = [
@@ -569,8 +476,12 @@ class GenerateStockData(object):
         dtype_dict = {**float32_dict, **int8_dict, **object_dict, **datetime_dict}
         return dtype_dict, feature_list
 
-    def save_annual_ts_data(self):
+    def save_annual_ts_data(self):        
+        self.df = eqd.get_processed_US_data_by_year(self.year)
+        self.stock_id_list = np.unique(self.df.index.get_level_values("StockID"))    
+        
         dtype_dict, feature_list = self.get_ts_feature_and_dtype_list()
+        
         file_name = "{}d_{}_{}_vb_{}_ma_{}_ts".format(
             self.window_size,
             self.freq,
@@ -578,12 +489,14 @@ class GenerateStockData(object):
             str(self.ma_lags),
             self.year,
         )
+        
         log_file_name = os.path.join(self.save_dir, "{}.txt".format(file_name))
         data_filename = os.path.join(self.save_dir, "{}_data_new.npz".format(file_name))
         if os.path.isfile(log_file_name) and os.path.isfile(data_filename):
             print("Found pregenerated file {}".format(file_name))
             return
-
+        
+        print(f"Generating {self.file_name}")
         data_miss = np.zeros(6)
         data_dict = {
             feature: np.empty(len(self.stock_id_list) * 60, dtype=dtype_dict[feature])
@@ -601,13 +514,14 @@ class GenerateStockData(object):
             else self.stock_id_list
         )
         for i, stock_id in enumerate(iterator):
-            df = self.df[self.df.StockID == stock_id]
-            df = df.reset_index(drop=True)
-            dates = df[~pd.isna(df["Ret_{}".format(self.freq)])].Date
+            stock_df = self.df.xs(stock_id, level=1).copy()
+            stock_df = stock_df.reset_index()
+            stock_df['StockID'] = stock_id  # StockID 칼럼 추가
+            dates = stock_df[~pd.isna(stock_df["Ret_{}".format(self.freq)])].Date
             dates = dates[dates.dt.year == self.year]
             for j, date in enumerate(dates):
                 try:
-                    predictor_label_data = self.generate_daily_ts_features(df, date)
+                    predictor_label_data = self.generate_daily_ts_features(stock_df, date)
                     if type(predictor_label_data) is dict:
                         for feature in feature_list:
                             data_dict[feature][sample_num] = predictor_label_data[

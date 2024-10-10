@@ -11,44 +11,6 @@ from Misc import utilities as ut
 
 
 class EquityDataset(Dataset):
-    """
-    주식 데이터셋을 위한 클래스입니다.
-    
-    이 클래스는 주식 차트 이미지와 관련 레이블을 로드하고 처리합니다.
-    PyTorch의 Dataset 클래스를 상속받아 구현되었습니다.
-
-    Attributes:
-        ws (int): 윈도우 크기
-        pw (int): 예측 윈도우 크기
-        freq (str): 데이터 빈도 ('week', 'month', 'quarter', 'year' 중 하나)
-        year (int): 데이터 연도
-        ohlc_len (int): OHLC(Open, High, Low, Close) 데이터 길이
-        data_freq (str): 실제 데이터 빈도
-        country (str): 국가 코드
-        has_vb (bool): 거래량 바 포함 여부
-        has_ma (bool): 이동평균선 포함 여부
-        chart_type (str): 차트 유형 ('bar', 'pixel', 'centered_pixel' 중 하나)
-        regression_label (str): 회귀 레이블 유형 ('raw_ret', 'vol_adjust_ret' 또는 None)
-        save_dir (str): 데이터 저장 디렉토리
-        images (numpy.ndarray): 차트 이미지 데이터
-        label_dict (dict): 레이블 데이터 딕셔너리
-        demean (list): 정규화를 위한 평균과 표준편차
-        ret_val_name (str): 수익률 값 이름
-        label (numpy.ndarray): 레이블 데이터
-
-    Methods:
-        filter_data: 데이터 필터링
-        get_label_value: 레이블 값 계산
-        _get_insample_mean_std: 인샘플 평균과 표준편차 계산
-        __get_stock_dataset_name: 주식 데이터셋 이름 생성
-        get_image_label_save_path: 이미지와 레이블 저장 경로 반환
-        rebuild_image: 이미지 재구성
-        load_image_np_data: 이미지 데이터 로드
-        load_annual_data_by_country: 국가별 연간 데이터 로드
-        load_images_and_labels_by_country: 국가별 이미지와 레이블 로드
-        __len__: 데이터셋 길이 반환
-        __getitem__: 인덱스에 해당하는 샘플 반환
-    """
     def __init__(
         self,
         window_size,
@@ -67,26 +29,6 @@ class EquityDataset(Dataset):
         regression_label=None,
         delayed_ret=0,
     ):
-        """
-        EquityDataset 클래스의 생성자입니다.
-
-        Args:
-            window_size (int): 윈도우 크기
-            predict_window (int): 예측 윈도우 크기
-            freq (str): 데이터 빈도
-            year (int): 데이터 연도
-            country (str, optional): 국가 코드. 기본값은 "USA"
-            has_volume_bar (bool, optional): 거래량 바 포함 여부. 기본값은 True
-            has_ma (bool, optional): 이동평균선 포함 여부. 기본값은 True
-            chart_type (str, optional): 차트 유형. 기본값은 "bar"
-            annual_stocks_num (str, optional): 연간 주식 수. 기본값은 "all"
-            tstat_threshold (int, optional): t-통계량 임계값. 기본값은 0
-            stockid_filter (list, optional): 주식 ID 필터. 기본값은 None
-            remove_tail (bool, optional): 꼬리 제거 여부. 기본값은 False
-            ohlc_len (int, optional): OHLC 데이터 길이. 기본값은 None
-            regression_label (str, optional): 회귀 레이블 유형. 기본값은 None
-            delayed_ret (int, optional): 지연된 수익률. 기본값은 0
-        """
         self.ws = window_size
         self.pw = predict_window
         self.freq = freq
@@ -124,19 +66,9 @@ class EquityDataset(Dataset):
             annual_stocks_num, stockid_filter, tstat_threshold, remove_tail
         )
 
-    def filter_data(self, annual_stocks_num, stockid_filter, tstat_threshold, remove_tail):
-        """
-        데이터를 필터링합니다.
-
-        Args:
-            annual_stocks_num (str): 연간 주식 수
-            stockid_filter (list): 주식 ID 필터
-            tstat_threshold (int): t-통계량 임계값
-            remove_tail (bool): 꼬리 제거 여부
-
-        Returns:
-            None
-        """
+    def filter_data(
+        self, annual_stocks_num, stockid_filter, tstat_threshold, remove_tail
+    ):
         df = pd.DataFrame(
             {
                 "StockID": self.label_dict["StockID"],
@@ -229,12 +161,6 @@ class EquityDataset(Dataset):
             assert len(self.images) == len(self.label_dict[k])
 
     def get_label_value(self):
-        """
-        레이블 값을 계산합니다.
-
-        Returns:
-            numpy.ndarray: 계산된 레이블 값
-        """
         print(f"Using {self.ret_val_name} as label")
         ret = self.label_dict[self.ret_val_name]
 
@@ -252,12 +178,6 @@ class EquityDataset(Dataset):
         return label
 
     def _get_insample_mean_std(self):
-        """
-        인샘플 평균과 표준편차를 계산합니다.
-
-        Returns:
-            list: [평균, 표준편차]
-        """
         ohlc_len_srt = f"_{self.ohlc_len}ohlc" if self.ohlc_len != self.ws else ""
         chart_str = f"_{self.chart_type}" if self.chart_type != "bar" else ""
         fname = f"mean_std_{self.ws}d{self.data_freq}_vb{self.has_vb}_ma{self.has_ma}_{self.year}{ohlc_len_srt}{chart_str}.npz"
@@ -303,34 +223,12 @@ class EquityDataset(Dataset):
 
     @staticmethod
     def rebuild_image(image, image_name, par_save_dir, image_mode="L"):
-        """
-        이미지를 재구성하고 저장합니다.
-
-        Args:
-            image (numpy.ndarray): 재구성할 이미지 데이터
-            image_name (str): 저장할 이미지 이름
-            par_save_dir (str): 상위 저장 디렉토리
-            image_mode (str, optional): 이미지 모드. 기본값은 "L"
-
-        Returns:
-            None
-        """
         img = Image.fromarray(image, image_mode)
         save_dir = ut.get_dir(op.join(par_save_dir, "images_rebuilt_from_dataset/"))
         img.save(op.join(save_dir, "{}.png".format(image_name)))
 
     @staticmethod
     def load_image_np_data(img_save_path, ohlc_len):
-        """
-        이미지 데이터를 numpy 배열로 로드합니다.
-
-        Args:
-            img_save_path (str): 이미지 데이터 저장 경로
-            ohlc_len (int): OHLC 데이터 길이
-
-        Returns:
-            numpy.ndarray: 로드된 이미지 데이터
-        """
         images = np.memmap(img_save_path, dtype=np.uint8, mode="r")
         images = images.reshape(
             (-1, 1, dcf.IMAGE_HEIGHT[ohlc_len], dcf.IMAGE_WIDTH[ohlc_len])
@@ -338,15 +236,6 @@ class EquityDataset(Dataset):
         return images
 
     def load_annual_data_by_country(self, country):
-        """
-        국가별 연간 데이터를 로드합니다.
-
-        Args:
-            country (str): 국가 코드
-
-        Returns:
-            tuple: (이미지 데이터, 레이블 딕셔너리)
-        """
         img_save_path, label_path = self.get_image_label_save_path(country)
 
         print(f"loading images from {img_save_path}")
@@ -364,37 +253,13 @@ class EquityDataset(Dataset):
         return images, label_dict
 
     def load_images_and_labels_by_country(self, country):
-        """
-        국가별 이미지와 레이블을 로드합니다.
-
-        Args:
-            country (str): 국가 코드
-
-        Returns:
-            tuple: (이미지 데이터, 레이블 딕셔너리)
-        """
         images, label_dict = self.load_annual_data_by_country(country)
         return images, label_dict
 
     def __len__(self):
-        """
-        데이터셋의 길이를 반환합니다.
-
-        Returns:
-            int: 데이터셋의 길이
-        """
         return len(self.label)
 
     def __getitem__(self, idx):
-        """
-        주어진 인덱스에 해당하는 샘플을 반환합니다.
-
-        Args:
-            idx (int): 샘플 인덱스
-
-        Returns:
-            dict: 샘플 데이터 (이미지, 레이블, 수익률 값, 종료 날짜, 주식 ID, 시가총액)
-        """
         image = (self.images[idx] / 255.0 - self.demean[0]) / self.demean[1]
 
         sample = {
@@ -409,16 +274,6 @@ class EquityDataset(Dataset):
 
 
 def load_ts1d_np_data(ts1d_save_path, ohlc_len):
-    """
-    1차원 시계열 데이터를 numpy 배열로 로드합니다.
-
-    Args:
-        ts1d_save_path (str): 1차원 시계열 데이터 저장 경로
-        ohlc_len (int): OHLC 데이터 길이
-
-    Returns:
-        numpy.ndarray: 로드된 1차원 시계열 데이터
-    """
     images = np.memmap(ts1d_save_path, dtype=np.uint8, mode="r")
     images = images.reshape(
         (-1, 6, dcf.IMAGE_HEIGHT[ohlc_len], dcf.IMAGE_WIDTH[ohlc_len])
@@ -427,40 +282,6 @@ def load_ts1d_np_data(ts1d_save_path, ohlc_len):
 
 
 class TS1DDataset(Dataset):
-    """
-    1차원 시계열 데이터셋을 위한 클래스입니다.
-    
-    이 클래스는 1차원 시계열 주식 데이터와 관련 레이블을 로드하고 처리합니다.
-    PyTorch의 Dataset 클래스를 상속받아 구현되었습니다.
-
-    Attributes:
-        ws (int): 윈도우 크기
-        pw (int): 예측 윈도우 크기
-        freq (str): 데이터 빈도
-        year (int): 데이터 연도
-        ohlc_len (int): OHLC 데이터 길이
-        data_freq (str): 실제 데이터 빈도
-        country (str): 국가 코드
-        remove_tail (bool): 꼬리 제거 여부
-        ts_scale (str): 시계열 스케일링 방법
-        regression_label (str): 회귀 레이블 유형
-        ret_val_name (str): 수익률 값 이름
-        images (numpy.ndarray): 시계열 이미지 데이터
-        label_dict (dict): 레이블 데이터 딕셔너리
-        label (numpy.ndarray): 레이블 데이터
-        demean (list): 정규화를 위한 평균과 표준편차
-
-    Methods:
-        load_ts1d_data: 1차원 시계열 데이터 로드
-        get_label_value: 레이블 값 계산
-        filter_data: 데이터 필터링
-        __get_stock_dataset_name: 주식 데이터셋 이름 생성
-        _get_1d_mean_std: 1차원 데이터의 평균과 표준편차 계산
-        _minmax_scale_ts1d: 1차원 시계열 데이터 Min-Max 스케일링
-        _vol_scale_ts1d: 1차원 시계열 데이터 변동성 스케일링
-        __len__: 데이터셋 길이 반환
-        __getitem__: 인덱스에 해당하는 샘플 반환
-    """
     def __init__(
         self,
         window_size,
@@ -473,20 +294,6 @@ class TS1DDataset(Dataset):
         ts_scale="image_scale",
         regression_label=None,
     ):
-        """
-        TS1DDataset 클래스의 생성자입니다.
-
-        Args:
-            window_size (int): 윈도우 크기
-            predict_window (int): 예측 윈도우 크기
-            freq (str): 데이터 빈도
-            year (int): 데이터 연도
-            country (str, optional): 국가 코드. 기본값은 "USA"
-            remove_tail (bool, optional): 꼬리 제거 여부. 기본값은 False
-            ohlc_len (int, optional): OHLC 데이터 길이. 기본값은 None
-            ts_scale (str, optional): 시계열 스케일링 방법. 기본값은 "image_scale"
-            regression_label (str, optional): 회귀 레이블 유형. 기본값은 None
-        """
         self.ws = window_size
         self.pw = predict_window
         self.freq = freq
@@ -506,12 +313,6 @@ class TS1DDataset(Dataset):
         self.filter_data(self.remove_tail)
 
     def load_ts1d_data(self):
-        """
-        1차원 시계열 데이터를 로드합니다.
-
-        Returns:
-            tuple: (이미지 데이터, 레이블 딕셔너리)
-        """
         dataset_name = self.__get_stock_dataset_name()
         filename = op.join(
             dcf.STOCKS_SAVEPATH,
@@ -527,12 +328,6 @@ class TS1DDataset(Dataset):
         return images, label_dict
 
     def get_label_value(self):
-        """
-        레이블 값을 계산합니다.
-
-        Returns:
-            numpy.ndarray: 계산된 레이블 값
-        """
         print(f"Using {self.ret_val_name} as label")
         ret = self.label_dict[self.ret_val_name]
 
@@ -549,15 +344,6 @@ class TS1DDataset(Dataset):
         return label
 
     def filter_data(self, remove_tail):
-        """
-        데이터를 필터링합니다.
-
-        Args:
-            remove_tail (bool): 꼬리 제거 여부
-
-        Returns:
-            None
-        """
         idx = pd.Series(self.label != -99) & pd.Series(
             self.label_dict["EWMA_vol"] != 0.0
         )
@@ -596,12 +382,6 @@ class TS1DDataset(Dataset):
             assert len(self.images) == len(self.label_dict[k])
 
     def __get_stock_dataset_name(self):
-        """
-        주식 데이터셋 이름을 생성합니다.
-
-        Returns:
-            str: 생성된 데이터셋 이름
-        """
         str_list = [
             f"{self.ws}d",
             self.data_freq,

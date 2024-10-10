@@ -16,8 +16,8 @@ class PortfolioManager(object):
         signal_df: pd.DataFrame,
         freq: str,
         portfolio_dir: str,
-        start_year=2001,
-        end_year=2019,
+        start_year=2015,
+        end_year=2024,
         country="USA",
         delay_list=None,
         load_signal=True,
@@ -40,7 +40,7 @@ class PortfolioManager(object):
 
     def __add_period_ret_to_us_res_df_w_delays(self, signal_df):
         period_ret = eqd.get_period_ret(self.freq, country=self.country)
-        columns = ["MarketCap"] + [
+        columns = [
             f"next_{self.freq}_ret_{dl}delay" for dl in self.delay_list
         ]
         if self.custom_ret is not None:
@@ -48,7 +48,7 @@ class PortfolioManager(object):
         signal_df = signal_df.copy()
         signal_df[columns] = period_ret[columns]
         signal_df[self.no_delay_ret_name] = signal_df[f"next_{self.freq}_ret_0delay"]
-        signal_df.dropna(inplace=True)
+        signal_df.fillna(0, inplace=True) # 의심
         for dl in self.delay_list:
             dl_ret_name = f"next_{self.freq}_ret_{dl}delay"
             print(
@@ -97,13 +97,13 @@ class PortfolioManager(object):
                 stock_num = len(_decile_df)
                 _decile_df["weight"] = (
                     pd.Series(
-                        np.ones(stock_num), dtype=np.float, index=_decile_df.index
+                        np.ones(stock_num), dtype=np.float64, index=_decile_df.index
                     )
                     / stock_num
                 )
             else:
                 value = _decile_df.MarketCap
-                _decile_df["weight"] = pd.Series(value, dtype=np.float) / np.sum(value)
+                _decile_df["weight"] = pd.Series(value, dtype=np.float64) / np.sum(value)
             _decile_df["inv_ret"] = _decile_df["weight"] * _decile_df[ret_name]
             return _decile_df
 
@@ -197,6 +197,7 @@ class PortfolioManager(object):
         print(
             f"Pearson Corr between Prob and Top/Bottom deciles Return is {np.nanmean(prob_inv_ret_pearson_corr):.4f}"
         )
+        
         return portfolio_ret, np.mean(turnover)
 
     @staticmethod
@@ -205,32 +206,41 @@ class PortfolioManager(object):
         return log_rets.cumsum()
 
     def make_portfolio_plot(
-        self, portfolio_ret, cut, weight_type, save_path, plot_title
+        self, portfolio_ret, cut=None, weight_type=None, save_path=None, plot_title=None
     ):
-        ret_name = "nxt_freq_ewret" if weight_type == "ew" else "nxt_freq_vwret"
-        df = portfolio_ret.copy()
-        df.columns = ["Low(L)"] + [str(i) for i in range(2, cut)] + ["High(H)", "H-L"]
-        spy = eqd.get_spy_freq_rets(self.freq)
-        df["SPY"] = spy[ret_name]
-        df.dropna(inplace=True)
-        top_col_name, bottom_col_name = ("High(H)", "Low(L)")
-        log_ret_df = pd.DataFrame(index=df.index)
-        for column in df.columns:
-            log_ret_df[column] = self._ret_to_cum_log_ret(df[column])
-        plt.figure()
-        log_ret_df = log_ret_df[[top_col_name, bottom_col_name, "H-L", "SPY"]]
-        prev_year = pd.to_datetime(log_ret_df.index[0]).year - 1
-        prev_day = pd.to_datetime("{}-12-31".format(prev_year))
-        log_ret_df.loc[prev_day] = [0, 0, 0, 0]
-        plot = log_ret_df.plot(
-            style={"SPY": "y", top_col_name: "b", bottom_col_name: "r", "H-L": "k"},
-            lw=1,
-            title=plot_title,
-        )
-        plot.legend(loc=2)
-        plt.grid()
-        plt.savefig(save_path)
-        plt.close()
+        for weight_type in ["ew", "vw"]:
+            pf_name = self.get_portfolio_name(weight_type, delay=0, cut=10)
+            print(f"Calculating {pf_name}")
+            portfolio_ret, turnover = self.calculate_portfolio_rets(weight_type, cut=10, delay=0)
+        
+            save_path = f"./{self.freq}_{weight_type}.png"
+            plot_title = f'{self.freq} "Re(-)Imag(in)ing Price Trend" {weight_type} {cut}'
+            ret_name = "nxt_freq_ewret" if weight_type == "ew" else "nxt_freq_vwretx"
+            df = portfolio_ret.copy()
+            df.columns = ["Low(L)"] + [str(i) for i in range(2, cut)] + ["High(H)", "H-L"]
+            # bench = eqd.get_bench_freq_rets(self.freq)
+            spy = eqd.get_spy_freq_rets(self.freq)
+            df["SPY"] = spy[ret_name]
+            # df["Benchmark"] = bench[ret_name]
+            df.dropna(inplace=True)
+            top_col_name, bottom_col_name = ("High(H)", "Low(L)")
+            log_ret_df = pd.DataFrame(index=df.index)
+            for column in df.columns:
+                log_ret_df[column] = self._ret_to_cum_log_ret(df[column])
+            plt.figure()
+            log_ret_df = log_ret_df[[top_col_name, bottom_col_name, "H-L", "SPY"]]
+            prev_year = pd.to_datetime(log_ret_df.index[0]).year - 1
+            prev_day = pd.to_datetime("{}-12-31".format(prev_year))
+            log_ret_df.loc[prev_day] = [0, 0, 0, 0]
+            plot = log_ret_df.plot(
+                style={"SPY": "y", "Benchmark": "g", top_col_name: "b", bottom_col_name: "r", "H-L": "k"},
+                lw=1,
+                title=plot_title,
+            )
+            plot.legend(loc=2)
+            plt.grid()
+            plt.savefig(save_path)
+            plt.close()
 
     def portfolio_res_summary(self, portfolio_ret, turnover, cut=10):
         avg = portfolio_ret.mean().to_numpy()

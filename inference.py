@@ -29,6 +29,8 @@ class Inference:
         self.n_stock = config['N_FEAT']
         self.lb = config['LB']
         self.ub = config['UB']
+        self.use_top_m_assets = config.get('USE_TOP_M_ASSETS', False)
+        self.top_m = config.get('TOP_M', 0)
 
         # Initialize logging to file
         model_identifier = f"{self.model_name}_{self.multimodal}_{self.config['LOSS_FUNCTION']}_{self.len_train}_{self.len_pred}"

@@ -33,9 +33,6 @@ def get_stock_data(symbol, start_date, end_date):
         stock['cum_log_ret'] = stock['log_ret'].cumsum()
         stock['EWMA_vol'] = stock['Return'].ewm(span=20).std()
         
-        # 거래량이 너무 낮은 행 제거
-        stock = stock.drop(stock[stock.Volume < 10].index)
-        
         return stock
     except Exception as e:
         logging.error(f"{symbol} 다운로드 중 오류 발생: {e}")
@@ -57,7 +54,7 @@ def preprocess_stock_data(stock_dir="data/stocks/"):
             file_path = os.path.join(stock_dir, file)
             df = pd.read_csv(file_path, index_col=0, parse_dates=True)
             df = df.reindex(date_range)
-            df.fillna(-2, inplace=True)  # 결측치를 -2로 채움
+            # 결측치를 NaN으로 유지
             df.index.name = 'Date'  # 인덱스 이름을 'Date'로 설정
             
             # 칼럼 이름 변경
@@ -104,28 +101,56 @@ def download_stock_data(symbols, start_date, end_date, download_dir="data/stocks
     
     return stock_dict
 
+def recover_stock_data(stock_dir="data/stocks/"):
+    for file in tqdm(os.listdir(stock_dir), desc="데이터 복구 중"):
+        if file.endswith('.csv'):
+            file_path = os.path.join(stock_dir, file)
+            df = pd.read_csv(file_path, index_col=0, parse_dates=True)
+            
+            # -2를 NaN으로 변경
+            df = df.replace(-2, np.nan)
+            
+            # 필요한 경우 추가 전처리 수행
+            if 'Ret' in df.columns:
+                df['Ret'] = df['Adj Close'].pct_change()
+            
+            if 'log_ret' in df.columns:
+                df['log_ret'] = np.log(1 + df['Ret'])
+            
+            if 'cum_log_ret' in df.columns:
+                df['cum_log_ret'] = df['log_ret'].cumsum()
+            
+            if 'EWMA_vol' in df.columns:
+                df['EWMA_vol'] = df['Ret'].ewm(span=20).std()
+            
+            df.to_csv(file_path)
+    
+    logging.info("데이터 복구 완료")
+
 if __name__ == "__main__":
     # YAML 설정 파일 로드
     with open("config/config.yaml", "r", encoding="utf8") as f:
         config = yaml.safe_load(f)
     
+    recover_stock_data()
+    
     # S&P 500 구성 종목 로드
-    snp500 = pd.read_csv("data/snp500.csv")
-    snp500.loc[snp500.Symbol == "BRK.B", "Symbol"] = "BRK-B"
-    symbols = snp500['Symbol'].tolist()
+    # snp500 = pd.read_csv("data/snp500.csv")
+    # snp500.loc[snp500.Symbol == "BRK.B", "Symbol"] = "BRK-B"
+    # symbols = snp500['Symbol'].tolist()
     
-    # 주식 데이터 다운로드
-    stock_dict = download_stock_data(symbols, config['START'], config['END'])
+    # # 주식 데이터 다운로드
+    # stock_dict = download_stock_data(symbols, config['START'], config['END'])
     
-    # S&P 500 지수 데이터 다운로드
-    sp500 = yf.download("^GSPC", config['START'], config['END'])
-    sp500.to_csv("data/snp500_index.csv")
+    # # S&P 500 지수 데이터 다운로드
+    # sp500 = yf.download("^GSPC", config['START'], config['END'])
+    # sp500.to_csv("data/snp500_index.csv")
     
-    # 다운로드된 주식 심볼을 YAML 파일로 저장
-    with open("data/stock.yaml", "w", encoding="UTF-8") as f:
-        yaml.dump(stock_dict, f)
+    # # 다운로드된 주식 심볼을 YAML 파일로 저장
+    # with open("data/stock.yaml", "w", encoding="UTF-8") as f:
+    #     yaml.dump(stock_dict, f)
     
-    # 다운로드된 데이터 전처리
-    preprocess_stock_data()
+    # # 다운로드된 데이터 전처리
+    # preprocess_stock_data()
     
     logging.info("주식 데이터 다운로드 및 전처리 프로세스 완료.")

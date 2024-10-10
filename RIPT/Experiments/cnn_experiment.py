@@ -22,7 +22,6 @@ from Misc import utilities as ut
 from Data.chart_dataset import EquityDataset, TS1DDataset
 from Data import equity_data as eqd
 
-
 class Experiment(object):
     def __init__(
         self,
@@ -81,7 +80,7 @@ class Experiment(object):
         elif (
             self.country in cf.START_YEAR_DICT.keys()
         ):
-            self.oos_years = list(range(cf.START_YEAR_DICT[self.country] + 8, 2020))
+            self.oos_years = list(range(cf.START_YEAR_DICT[self.country] + 8, 2024))
         self.oos_start_year = self.oos_years[0]
         assert transfer_learning in [None, "ft", "usa", "scaleDT"]
         self.tl = transfer_learning
@@ -281,7 +280,7 @@ class Experiment(object):
 
     def get_df_from_dataloader(self, dataloader):
         df_columns = ["StockID", "ending_date", "label", "ret_val", "MarketCap"]
-        df_dtypes = [object, "datetime64[ns]", np.int, np.float, np.float]
+        df_dtypes = [object, "datetime64[ns]", np.int, np.float64, np.float64]
         df_list = []
         for batch in dataloader:
             batch_df = ut.df_empty(df_columns, df_dtypes)
@@ -323,7 +322,7 @@ class Experiment(object):
                     continue
                 val_df.loc[model_num, column] = validate_metrics[column]
 
-        val_df = val_df.astype(np.float).round(3)
+        val_df = val_df.astype(np.float64).round(3)
         val_df.loc["Mean"] = val_df.mean()
         val_df.to_csv(
             os.path.join(
@@ -467,6 +466,8 @@ class Experiment(object):
         return loss
 
     def train_single_model(self, dataloaders_dict, model_save_path, model_num=None):
+        
+        
         if self.country != "USA" and self.tl is not None:
             us_model_save_path = model_save_path.replace(
                 f"-{self.country}-{self.tl}", ""
@@ -503,33 +504,33 @@ class Experiment(object):
         print("Training on device {} under {}".format(self.device, model_save_path))
         print(model)
         cudnn.benchmark = True
+
         since = time.time()
-        best_validate_metrics = {"loss": 10.0, "accy": 0.0, "MCC": 0.0, "epoch": 0}
+        best_validate_metrics = {"loss": 10.0, "accy": 0.0, "MCC": 0.0, "epoch": 0, "diff": 0.0}
         best_model = copy.deepcopy(model.state_dict())
         train_metrics = {"prev_loss": 10.0, "pattern_accy": -1}
         prev_weight_dict = {}
         for name, param in model.named_parameters():
             if param.requires_grad and name[-8:] == "0.weight":
                 prev_weight_dict[name] = param.data.clone()
+                
         for epoch in range(self.max_epoch):
             for phase in ["train", "validate"]:
                 if phase == "train":
                     model.train()
                 else:
                     model.eval()
-
                 if "tqdm" in sys.modules and self.enable_tqdm:
                     data_iterator = tqdm(
                         dataloaders_dict[phase],
                         leave=True,
                         unit="batch",
-                        postfix={
-                            "epoch": -1,
-                            "loss": 10.0,
-                            "accy": 0.0,
-                            "MCC": 0.0,
-                            "diff": 0,
-                        },
+                        postfix={"epoch": epoch,
+                                "loss": "{:.4f}".format(best_validate_metrics["loss"]),
+                                "accy": "{:.2f}".format(best_validate_metrics["accy"]),
+                                "MCC": "{:.4f}".format(best_validate_metrics["MCC"]),
+                                "diff": "{:.4f}".format(best_validate_metrics["diff"])
+                                                        },  
                     )
                     data_iterator.set_description("Epoch {}: {}".format(epoch, phase))
                 else:
@@ -556,19 +557,24 @@ class Experiment(object):
                             optimizer.step()
                     self._update_running_metrics(loss, labels, preds, running_metrics)
                     del inputs, labels
+                    
                 num_samples = len(dataloaders_dict[phase].dataset)
                 epoch_stat = self._generate_epoch_stat(
                     epoch, self.lr, num_samples, running_metrics
                 )
-                if "tqdm" in sys.modules and self.enable_tqdm:
-                    data_iterator.set_postfix(epoch_stat)
-                    data_iterator.update()
+                
                 print(epoch_stat)
+                
+                # if "tqdm" in sys.modules and self.enable_tqdm:
+                #     data_iterator.set_postfix(postfix_for_tqdm)
+                #     data_iterator.update()
+                    
                 if phase == "validate":
                     if epoch_stat["loss"] < best_validate_metrics["loss"]:
                         for metric in ["loss", "accy", "MCC", "epoch", "diff"]:
                             best_validate_metrics[metric] = epoch_stat[metric]
                         best_model = copy.deepcopy(model.state_dict())
+
 
             for name, param in model.named_parameters():
                 if param.requires_grad:
@@ -579,9 +585,10 @@ class Experiment(object):
                         print("{} pct chg: {:.4f}".format(name, pct_chg))
                         prev_weight_dict[name] = param.data.clone()
 
-            if self.early_stop and (epoch - best_validate_metrics["epoch"]) >= 2:
+            if self.early_stop and (epoch - best_validate_metrics["epoch"]) >= 5:
                 break
             print()
+            
         time_elapsed = time.time() - since
         print(
             "Training complete in {:.0f}m {:.0f}s".format(
@@ -601,6 +608,7 @@ class Experiment(object):
         ]
         train_metrics["epoch"] = best_validate_metrics["epoch"]
         self.release_dataloader_memory(dataloaders_dict, model)
+        
         del best_validate_metrics["model_state_dict"]
         return train_metrics, best_validate_metrics, model
 
@@ -633,7 +641,7 @@ class Experiment(object):
             )
         )
         df_columns = ["StockID", "ending_date", "up_prob", "ret_val", "MarketCap"]
-        df_dtypes = [object, "datetime64[ns]", np.float, np.float, np.float]
+        df_dtypes = [object, "datetime64[ns]", np.float64, np.float64, np.float64]
         df_list = []
         for batch in dataloader:
             image = batch["image"].to(self.device, dtype=torch.float)
@@ -766,7 +774,7 @@ class Experiment(object):
         pf_obj = self.load_portfolio_obj(delay_list)
         for delay in delay_list:
             pf_obj.generate_portfolio(delay=delay, cut=cut)
-
+        pf_obj.make_portfolio_plot(cut=cut, portfolio_ret=None)
     def load_portfolio_obj(
         self, delay_list=[0], load_signal=True, custom_ret=None, transaction_cost=False
     ):
@@ -926,8 +934,8 @@ class Experiment(object):
         return df.loc["Mean"]
 
     def summarize_true_up_label(self):
-        tv_df = self._df_true_up_label(list(range(1993, 2001)), "In Sample")
-        test_df = self._df_true_up_label(list(range(2001, 2020)), "OOS")
+        tv_df = self._df_true_up_label(list(range(2007, 2018)), "In Sample")
+        test_df = self._df_true_up_label(list(range(2018, 2024)), "OOS")
         df = pd.concat([tv_df, test_df])
         df.to_csv(
             os.path.join(
