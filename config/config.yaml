@@ -26,6 +26,8 @@ TRAIN_RATIO: 0.60
 VAL_RATIO: 0.20
 TEST_RATIO: 0.20
 RESULT_DIR: 'result'
+USE_TOP_M_ASSETS: true
+TOP_M: 20
 
 # model parameter
 MODELS: ['GRU', 'TCN', 'TRANSFORMER']
