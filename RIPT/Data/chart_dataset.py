@@ -306,7 +306,7 @@ class TS1DDataset(Dataset):
         assert self.ts_scale in ["image_scale", "ret_scale", "vol_scale"]
         self.regression_label = regression_label
         assert self.regression_label in [None, "raw_ret", "vol_adjust_ret"]
-        self.ret_val_name = f"Retx_{dcf.FREQ_DICT[self.pw]}"
+        self.ret_val_name = f"Ret_{dcf.FREQ_DICT[self.pw]}"
         self.images, self.label_dict = self.load_ts1d_data()
         self.label = self.get_label_value()
         self.demean = self._get_1d_mean_std()

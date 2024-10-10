@@ -67,6 +67,10 @@ class GenerateStockData(object):
         self.save_dir = ut.get_dir(
             op.join(dcf.STOCKS_SAVEPATH, f"stocks_{self.country}/dataset_all")
         )
+        self.save_dir_ts = ut.get_dir(
+            op.join(dcf.STOCKS_SAVEPATH, f"stocks_{self.country}_ts/dataset_all")
+        )
+        
         self.image_save_dir = ut.get_dir(op.join(dcf.STOCKS_SAVEPATH, "sample_images"))
         vb_str = "has_vb" if self.volume_bar else "no_vb"
         ohlc_len_str = "" if self.chart_freq == 1 else f"_{self.chart_len}ohlc"
@@ -490,13 +494,13 @@ class GenerateStockData(object):
             self.year,
         )
         
-        log_file_name = os.path.join(self.save_dir, "{}.txt".format(file_name))
-        data_filename = os.path.join(self.save_dir, "{}_data_new.npz".format(file_name))
+        log_file_name = os.path.join(self.save_dir_ts, "{}.txt".format(file_name))
+        data_filename = os.path.join(self.save_dir_ts, "{}_data_new.npz".format(file_name))
         if os.path.isfile(log_file_name) and os.path.isfile(data_filename):
             print("Found pregenerated file {}".format(file_name))
             return
         
-        print(f"Generating {self.file_name}")
+        print(f"Generating {file_name}")
         data_miss = np.zeros(6)
         data_dict = {
             feature: np.empty(len(self.stock_id_list) * 60, dtype=dtype_dict[feature])

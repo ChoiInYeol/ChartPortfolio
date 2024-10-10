@@ -308,7 +308,7 @@ class Experiment(object):
             model_save_path = self.get_model_checkpoint_path(model_num)
             if os.path.exists(model_save_path) and pretrained:
                 print("Found pretrained model {}".format(model_save_path))
-                validate_metrics = torch.load(model_save_path)
+                validate_metrics = torch.load(model_save_path, weights_only=True)
             else:
                 dataloaders_dict = self.get_train_validate_dataloaders_dict()
                 train_metrics, validate_metrics, _ = self.train_single_model(
@@ -775,6 +775,7 @@ class Experiment(object):
         for delay in delay_list:
             pf_obj.generate_portfolio(delay=delay, cut=cut)
         pf_obj.make_portfolio_plot(cut=cut, portfolio_ret=None)
+        
     def load_portfolio_obj(
         self, delay_list=[0], load_signal=True, custom_ret=None, transaction_cost=False
     ):

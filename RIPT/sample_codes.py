@@ -44,9 +44,9 @@ if __name__ == "__main__":
             chart_type=chart_type,
         )
         # generate CNN2D Data
-        dgp_obj.save_annual_data()
+        #dgp_obj.save_annual_data()
         # generate CNN1D Data
-        dgp_obj.save_annual_ts_data()
+        #dgp_obj.save_annual_ts_data()
 
     # Train CNN Models for US
     # CNN2D
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     )
     
     # CNN2D 모델의 포트폴리오 플롯 생성
-    # generate_and_plot_portfolio("CNN2D_60_20", "month", 2019, 2024)
+    # generate_and_plot_portfolio("CNN2D_60_20", "month", 2018, 2024)
     
     # train_us_model(
     #     [20],

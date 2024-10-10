@@ -24,20 +24,20 @@ def create_spy_returns():
         else:  # year
             returns = spy['Return'].resample('YE').apply(lambda x: (1 + x).prod() - 1)
         
+        returns = pd.DataFrame(returns, columns=['Return'])
+        returns['nxt_freq_ewret'] = returns['Return'].shift(-1)  # 다음 기간의 수익률 추가
+        
         output_path = os.path.join(dcf.CACHE_DIR, f"spy_{freq}_ret.csv")
         returns.to_csv(output_path, index=True)
         print(f"Saved spy_{freq}_ret.csv")
 
 def create_benchmark_returns():
-    # filtered_stock.csv 파일 읽기
     path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
     df = pd.read_csv(path, parse_dates=['date'])
     df.set_index('date', inplace=True)
     
-    # 각 종목의 일별 수익률 계산
     df['Return'] = df.groupby('PERMNO')['PRC'].pct_change()
     
-    # 일별 1/N 벤치마크 수익률 계산
     daily_benchmark = df.groupby(df.index)['Return'].mean()
     daily_benchmark = pd.DataFrame(daily_benchmark, columns=['Return'])
 
@@ -45,22 +45,18 @@ def create_benchmark_returns():
         if freq == 'week':
             returns = daily_benchmark['Return'].resample('W').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
         elif freq == 'month':
-            returns = daily_benchmark['Return'].resample('M').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
+            returns = daily_benchmark['Return'].resample('ME').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
         elif freq == 'quarter':
-            returns = daily_benchmark['Return'].resample('Q').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
+            returns = daily_benchmark['Return'].resample('QE').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
         else:  # year
-            returns = daily_benchmark['Return'].resample('Y').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
+            returns = daily_benchmark['Return'].resample('YE').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
         
         returns = pd.DataFrame(returns, columns=['Return'])
+        returns['nxt_freq_ewret'] = returns['Return'].shift(-1)  # 다음 기간의 수익률 추가
         
         output_path = os.path.join(dcf.CACHE_DIR, f"benchmark_{freq}_ret.csv")
         returns.to_csv(output_path, index=True)
         print(f"{freq} 벤치마크 수익률이 {output_path}에 저장되었습니다.")
-
-def create_return_files():
-    os.makedirs(dcf.CACHE_DIR, exist_ok=True)
-    create_spy_returns()
-    create_benchmark_returns()
 
 def get_spy_freq_rets(freq):
     assert freq in ["week", "month", "quarter", 'year'], f"Invalid freq: {freq}"
@@ -81,6 +77,11 @@ def get_bench_freq_rets(freq):
     
     bench = pd.read_csv(file_path, parse_dates=['Date'], index_col='Date')
     return bench
+
+def create_return_files():
+    os.makedirs(dcf.CACHE_DIR, exist_ok=True)
+    create_spy_returns()
+    create_benchmark_returns()
 
 def get_period_end_dates(period):
     assert period in ["week", "month", "quarter", "year"]
@@ -216,5 +217,59 @@ def get_period_ret(period, country="USA"):
     period_ret.sort_index(inplace=True)
     return period_ret
 
+def calculate_next_ret(df, freq):
+    freq_map = {'day': 1, 'week': 5, 'month': 20, 'quarter': 60, 'year': 250}
+    if freq not in freq_map:
+        raise ValueError('Invalid frequency')
+    shift_value = freq_map[freq]
+    df[f'next_{freq}_ret'] = df.groupby('StockID')['Ret'].shift(-shift_value)
+    return df
+
+def calculate_next_ret_delay(df, freq, d):
+    freq_map = {'day': 1, 'week': 5, 'month': 20, 'quarter': 60, 'year': 250}
+    if freq not in freq_map:
+        raise ValueError('Invalid frequency')
+    shift_value = freq_map[freq] + d
+    df[f'next_{freq}_ret_{d}delay'] = df.groupby('StockID')['Ret'].shift(-shift_value)
+    return df
+
+def calculate_ret(df, start, end):
+    df[f'Ret_{start}-{end}d'] = df.groupby('StockID')['Ret'].rolling(end - start + 1).sum().reset_index(0, drop=True)
+    return df
+
+def create_period_ret_file(freq):
+    stock_path = op.join(dcf.PROCESSED_DATA_DIR, "us_ret.feather")
+    if not op.exists(stock_path):
+        processed_US_data()  # 필요한 경우 데이터 생성
+    
+    stock = pd.read_feather(stock_path)
+    stock = stock[['Date', 'StockID', 'MarketCap', 'Close', 'Ret']]
+    
+    us_freq_ret = stock.copy()
+    us_freq_ret = calculate_next_ret(us_freq_ret, freq)
+    us_freq_ret = calculate_next_ret_delay(us_freq_ret, freq, 0)
+    us_freq_ret = calculate_ret(us_freq_ret, 6, 20)
+    us_freq_ret = calculate_ret(us_freq_ret, 6, 60)
+    
+    period_ret_path = op.join(dcf.CACHE_DIR, f"us_{freq}_ret.pq")
+    us_freq_ret.to_parquet(period_ret_path)
+    print(f"Created {period_ret_path}")
+
+def get_period_ret(period, country="USA"):
+    assert country == "USA"
+    assert period in ["week", "month", "quarter"]
+    period_ret_path = op.join(dcf.CACHE_DIR, f"us_{period}_ret.pq")
+    
+    if not op.exists(period_ret_path):
+        print(f"{period_ret_path} not found. Creating it now.")
+        create_period_ret_file(period)
+    
+    period_ret = pd.read_parquet(period_ret_path)
+    period_ret.set_index(["Date", "StockID"], inplace=True)
+    period_ret.sort_index(inplace=True)
+    return period_ret
+
 if __name__ == "__main__":
     create_return_files()
+    for freq in ["week", "month", "quarter"]:
+        create_period_ret_file(freq)
