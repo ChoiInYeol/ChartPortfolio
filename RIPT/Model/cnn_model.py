@@ -3,7 +3,8 @@ import torch.nn as nn
 import numpy as np
 
 from torchsummary import summary
-
+import yaml
+import os
 from Misc import config as cf
 
 
@@ -473,55 +474,39 @@ def get_full_model_name(
     conv_layer_chanls=None,
     regression_label=None,
 ):
-    fs_st_str = ""
-    if ts1d_model:
-        for i in range(layer_number):
-            fs, st, mp, dl = (
-                filter_size_list[i],
-                stride_list[i],
-                max_pooling_list[i],
-                dilation_list[i],
-            )
-            fs_st_str += f"F{fs}S{st}D{dl}MP{mp}"
-            if conv_layer_chanls is not None:
-                fs_st_str += f"C{conv_layer_chanls[i]}"
-        arch_name = f"TSD{ws}L{layer_number}{fs_st_str}"
-    else:
-        for i in range(layer_number):
-            fs, st, dl, mp = (
-                filter_size_list[i],
-                stride_list[i],
-                dilation_list[i],
-                max_pooling_list[i],
-            )
-            fs_st_str += (
-                f"F{fs[0]}{fs[1]}S{st[0]}{st[1]}D{dl[0]}{dl[1]}MP{mp[0]}{mp[1]}"
-            )
-            if conv_layer_chanls is not None:
-                fs_st_str += f"C{conv_layer_chanls[i]}"
-        arch_name = f"D{ws}L{layer_number}{fs_st_str}"
-    if conv_layer_chanls is None:
-        arch_name += f"C{inplanes}"
-
-    if layer_number >= 12:
-        arch_name = arch_name.replace("S11D11MP11", "")
-
-    name_list = [arch_name]
-    if not ts1d_model:
-        if drop_prob != 0.5:
-            name_list.append(f"DROPOUT{drop_prob:.2f}")
-        if not batch_norm:
-            name_list.append("NoBN")
-        if not xavier:
-            name_list.append("NoXavier")
-        if not lrelu:
-            name_list.append("ReLU")
-        if bn_loc != "bn_bf_relu":
-            name_list.append(bn_loc)
-        if regression_label is not None:
-            name_list.append("reg_" + regression_label)
-    arch_name = "-".join(name_list)
-    return arch_name
+    model_type = "TS" if ts1d_model else "CNN"
+    model_name = f"{model_type}{ws}"
+    
+    # 모델 세부 정보를 딕셔너리로 저장
+    model_details = {
+        "model_type": model_type,
+        "window_size": ws,
+        "layer_number": layer_number,
+        "inplanes": inplanes,
+        "filter_size_list": filter_size_list,
+        "max_pooling_list": max_pooling_list,
+        "stride_list": stride_list,
+        "dilation_list": dilation_list,
+        "drop_prob": drop_prob,
+        "batch_norm": batch_norm,
+        "xavier": xavier,
+        "lrelu": lrelu,
+        "bn_loc": bn_loc,
+        "conv_layer_chanls": conv_layer_chanls,
+        "regression_label": regression_label
+    }
+    
+    # YAML 파일로 저장
+    yaml_dir = os.path.join(cf.EXP_DIR, model_name)
+    os.makedirs(yaml_dir, exist_ok=True)
+    yaml_path = os.path.join(yaml_dir, "model_details.yaml")
+    
+    with open(yaml_path, 'w') as yaml_file:
+        yaml.dump(model_details, yaml_file, default_flow_style=False)
+    
+    print(f"모델 세부 정보가 {yaml_path}에 저장되었습니다.")
+    
+    return model_name
 
 
 def all_layers(model):

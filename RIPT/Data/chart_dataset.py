@@ -66,32 +66,52 @@ class EquityDataset(Dataset):
             annual_stocks_num, stockid_filter, tstat_threshold, remove_tail
         )
 
-    def filter_data(
-        self, annual_stocks_num, stockid_filter, tstat_threshold, remove_tail
-    ):
-        df = pd.DataFrame(
-            {
-                "StockID": self.label_dict["StockID"],
-                "MarketCap": abs(self.label_dict["MarketCap"]),
-                "Date": pd.to_datetime([str(t) for t in self.label_dict["Date"]]),
-            }
-        )
+    def filter_data(self, annual_stocks_num, stockid_filter, tstat_threshold, remove_tail):
+        """
+        데이터를 필터링하여 분석에 사용할 주식 데이터를 선별합니다.
+
+        Args:
+            annual_stocks_num (str or int): 연간 선택할 주식 수. "all"이면 모든 주식 선택, 
+                                            숫자면 시가총액 기준 상위 n개 주식 선택
+            stockid_filter (list or None): 특정 주식 ID만 선택하고 싶을 때 사용
+            tstat_threshold (float): t-통계량 기준으로 필터링할 하위 백분위 값
+            remove_tail (bool): 연도 말미의 데이터를 제거할지 여부
+
+        이 함수는 여러 단계를 거쳐 데이터를 필터링합니다:
+        1. 연간 주식 선택
+        2. t-통계량 기반 필터링
+        3. 연도 말미 데이터 제거
+        4. 주기에 따른 데이터 선택
+        """
+
+        # 기본 데이터프레임 생성
+        df = pd.DataFrame({
+            "StockID": self.label_dict["StockID"],
+            "MarketCap": abs(self.label_dict["MarketCap"]),
+            "Date": pd.to_datetime([str(t) for t in self.label_dict["Date"]]),
+        })
+
+        # 1. 연간 주식 선택
         if annual_stocks_num != "all":
             num_stockid = len(np.unique(df.StockID))
             new_df = df
             period_end_dates = eqd.get_period_end_dates(self.freq)
+            
+            # 해당 연도의 6월 데이터를 찾음 (없으면 이전 달의 데이터 사용)
             for i in range(15):
                 date = period_end_dates[
                     (period_end_dates.year == self.year) & (period_end_dates.month == 6)
-                ][
-                    -i
-                ]
+                ][-i]
                 print(date)
                 new_df = df[df.Date == date]
                 if len(np.unique(new_df.StockID)) > num_stockid / 2:
                     break
+            
+            # stockid_filter가 제공된 경우 해당 주식만 선택
             if stockid_filter is not None:
                 new_df = new_df[new_df.StockID.isin(stockid_filter)]
+            
+            # 시가총액 기준으로 정렬하고 상위 n개 선택
             new_df = new_df.sort_values(by=["MarketCap"], ascending=False)
             if len(new_df) > int(annual_stocks_num):
                 stockids = new_df.iloc[: int(annual_stocks_num)]["StockID"]
@@ -101,17 +121,19 @@ class EquityDataset(Dataset):
                 f"Year {self.year}: select top {annual_stocks_num} stocks ({len(stockids)}/{num_stockid}) stocks for training"
             )
         else:
-            stockids = (
-                stockid_filter if stockid_filter is not None else np.unique(df.StockID)
-            )
+            stockids = stockid_filter if stockid_filter is not None else np.unique(df.StockID)
+        
+        # 선택된 주식 ID에 해당하는 데이터만 필터링
         stockid_idx = pd.Series(df.StockID).isin(stockids)
 
+        # 기본 필터링 조건 적용
         idx = (
             stockid_idx
             & pd.Series(self.label != -99)
             & pd.Series(self.label_dict["EWMA_vol"] != 0.0)
         )
 
+        # 2. t-통계량 기반 필터링
         if tstat_threshold != 0:
             tstats = np.divide(
                 self.label_dict[self.ret_val_name], np.sqrt(self.label_dict["EWMA_vol"])
@@ -127,6 +149,7 @@ class EquityDataset(Dataset):
                 f"After filtering bottom {tstat_threshold}% tstats, sample size:{np.sum(idx)}"
             )
 
+        # 3. 연도 말미 데이터 제거
         if remove_tail:
             print(
                 f"I{self.ws}R{self.pw}: removing tail for year {self.year} ({np.sum(idx)} samples)"
@@ -137,6 +160,7 @@ class EquityDataset(Dataset):
                 pd.to_datetime([str(t) for t in self.label_dict["Date"]]) < last_day
             )
 
+        # 4. 주기에 따른 데이터 선택
         if self.freq != self.data_freq and self.ohlc_len != self.ws:
             assert self.freq in ["quarter", "year"] and self.data_freq == "month"
             print(f"Selecting data of freq {self.freq}")
@@ -148,6 +172,7 @@ class EquityDataset(Dataset):
             )
             idx = idx & date_idx
 
+        # 최종 필터링 적용
         self.label = self.label[idx]
         print(f"Year {self.year}: samples size: {len(self.label)}")
         for k in self.label_dict.keys():
@@ -156,6 +181,7 @@ class EquityDataset(Dataset):
         self.label_dict["StockID"] = self.label_dict["StockID"].astype(str)
         self.label_dict["Date"] = self.label_dict["Date"].astype(str)
 
+        # 데이터 정합성 검증
         assert len(self.label) == len(self.images)
         for k in self.label_dict.keys():
             assert len(self.images) == len(self.label_dict[k])
@@ -306,7 +332,7 @@ class TS1DDataset(Dataset):
         assert self.ts_scale in ["image_scale", "ret_scale", "vol_scale"]
         self.regression_label = regression_label
         assert self.regression_label in [None, "raw_ret", "vol_adjust_ret"]
-        self.ret_val_name = f"Retx_{dcf.FREQ_DICT[self.pw]}"
+        self.ret_val_name = f"Ret_{dcf.FREQ_DICT[self.pw]}"
         self.images, self.label_dict = self.load_ts1d_data()
         self.label = self.get_label_value()
         self.demean = self._get_1d_mean_std()

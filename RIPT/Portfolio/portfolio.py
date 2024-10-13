@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from Misc import utilities as ut
 from Data import equity_data as eqd
+from Data import dgp_config as dcf
 
 
 class PortfolioManager(object):
@@ -16,13 +17,14 @@ class PortfolioManager(object):
         signal_df: pd.DataFrame,
         freq: str,
         portfolio_dir: str,
-        start_year=2015,
+        start_year=2009,
         end_year=2024,
         country="USA",
         delay_list=None,
         load_signal=True,
         custom_ret=None,
         transaction_cost=False,
+        model_name=None
     ):
         assert freq in ["week", "month", "quarter"]
         self.freq = freq
@@ -34,6 +36,9 @@ class PortfolioManager(object):
         self.custom_ret = custom_ret
         self.delay_list = [0] if delay_list is None else delay_list
         self.transaction_cost = transaction_cost
+        self.result_dir = os.path.join(dcf.WORK_DIR, f"portfolio_results_{self.country}")
+        self.model_name = model_name
+        os.makedirs(self.result_dir, exist_ok=True)
         if load_signal:
             assert "up_prob" in signal_df.columns
             self.signal_df = self.get_up_prob_with_period_ret(signal_df)
@@ -71,7 +76,7 @@ class PortfolioManager(object):
         return signal_df
 
     def calculate_portfolio_rets(self, weight_type, cut=10, delay=0):
-        assert weight_type in ["ew", "vw"]
+        assert weight_type in ["ew"]
         assert delay in self.delay_list
         if self.custom_ret:
             print(f"Calculating portfolio using {self.custom_ret}")
@@ -206,41 +211,59 @@ class PortfolioManager(object):
         return log_rets.cumsum()
 
     def make_portfolio_plot(
-        self, portfolio_ret, cut=None, weight_type=None, save_path=None, plot_title=None
-    ):
-        for weight_type in ["ew", "vw"]:
+            self, portfolio_ret, cut=None, weight_type=None, save_path=None, plot_title=None
+        ):
+        for weight_type in ["ew"]:
             pf_name = self.get_portfolio_name(weight_type, delay=0, cut=10)
             print(f"Calculating {pf_name}")
             portfolio_ret, turnover = self.calculate_portfolio_rets(weight_type, cut=10, delay=0)
         
-            save_path = f"./{self.freq}_{weight_type}.png"
-            plot_title = f'{self.freq} "Re(-)Imag(in)ing Price Trend" {weight_type} {cut}'
-            ret_name = "nxt_freq_ewret" if weight_type == "ew" else "nxt_freq_vwretx"
+            model_prefix = self.model_name if self.model_name else ""
+            file_name = f"{model_prefix}_{self.country}_{self.freq}_{weight_type}_cut{cut}_{self.start_year}-{self.end_year}.png"
+            save_path = os.path.join(self.result_dir, file_name)
+            plot_title = f'{model_prefix} {self.freq} "Re(-)Imag(in)ing Price Trend" {self.country} {weight_type} cut{cut} {self.start_year}-{self.end_year}'
+            
+            ret_name = "nxt_freq_ewret"
             df = portfolio_ret.copy()
             df.columns = ["Low(L)"] + [str(i) for i in range(2, cut)] + ["High(H)", "H-L"]
-            # bench = eqd.get_bench_freq_rets(self.freq)
+            
+            # SPY와 Benchmark 데이터 가져오기
+            bench = eqd.get_bench_freq_rets(self.freq)
             spy = eqd.get_spy_freq_rets(self.freq)
+            
+            # 포트폴리오 데이터의 시작과 끝 날짜로 SPY와 Benchmark 데이터 자르기
+            start_date = df.index[0]
+            end_date = df.index[-1]
+            bench = bench.loc[start_date:end_date]
+            spy = spy.loc[start_date:end_date]
+            
             df["SPY"] = spy[ret_name]
-            # df["Benchmark"] = bench[ret_name]
+            df["Benchmark"] = bench[ret_name]
             df.dropna(inplace=True)
-            top_col_name, bottom_col_name = ("High(H)", "Low(L)")
+            
+            # 누적 로그 수익률 계산
             log_ret_df = pd.DataFrame(index=df.index)
             for column in df.columns:
                 log_ret_df[column] = self._ret_to_cum_log_ret(df[column])
-            plt.figure()
-            log_ret_df = log_ret_df[[top_col_name, bottom_col_name, "H-L", "SPY"]]
+            
+            # 모든 시리즈가 0부터 시작하도록 조정
             prev_year = pd.to_datetime(log_ret_df.index[0]).year - 1
-            prev_day = pd.to_datetime("{}-12-31".format(prev_year))
-            log_ret_df.loc[prev_day] = [0, 0, 0, 0]
-            plot = log_ret_df.plot(
-                style={"SPY": "y", "Benchmark": "g", top_col_name: "b", bottom_col_name: "r", "H-L": "k"},
+            prev_day = pd.to_datetime(f"{prev_year}-12-31")
+            log_ret_df.loc[prev_day] = 0
+            log_ret_df = log_ret_df.sort_index()
+            
+            columns_to_plot = ["High(H)", "Low(L)", "H-L", "SPY", "Benchmark"]
+            plot = log_ret_df[columns_to_plot].plot(
+                style={"SPY": "y", "Benchmark": "g", "High(H)": "b", "Low(L)": "r", "H-L": "k"},
                 lw=1,
                 title=plot_title,
             )
-            plot.legend(loc=2)
-            plt.grid()
-            plt.savefig(save_path)
+            plot.legend(loc='best')
+            plt.grid(True, alpha=0.3)
+            plt.tight_layout()
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
             plt.close()
+            print(f"Portfolio plot saved to {save_path}")
 
     def portfolio_res_summary(self, portfolio_ret, turnover, cut=10):
         avg = portfolio_ret.mean().to_numpy()
@@ -269,7 +292,7 @@ class PortfolioManager(object):
 
     def generate_portfolio(self, cut=10, delay=0):
         assert delay in self.delay_list
-        for weight_type in ["ew", "vw"]:
+        for weight_type in ["ew"]:
             pf_name = self.get_portfolio_name(weight_type, delay, cut)
             print(f"Calculating {pf_name}")
             portfolio_ret, turnover = self.calculate_portfolio_rets(
@@ -287,7 +310,7 @@ class PortfolioManager(object):
                 file.write(ut.to_latex_w_turnover(summary_df, cut=cut))
 
     def get_portfolio_name(self, weight_type, delay, cut):
-        assert weight_type.lower() in ["ew", "vw"]
+        assert weight_type.lower() in ["ew"]
         delay_prefix = "" if delay == 0 else f"{delay}d_delay_"
         cut_surfix = "" if cut == 10 else f"_{cut}cut"
         custom_ret_surfix = "" if self.custom_ret is None else self.custom_ret
