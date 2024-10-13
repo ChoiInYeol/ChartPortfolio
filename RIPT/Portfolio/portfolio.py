@@ -17,13 +17,14 @@ class PortfolioManager(object):
         signal_df: pd.DataFrame,
         freq: str,
         portfolio_dir: str,
-        start_year=2018,
+        start_year=2009,
         end_year=2024,
         country="USA",
         delay_list=None,
         load_signal=True,
         custom_ret=None,
         transaction_cost=False,
+        model_name=None
     ):
         assert freq in ["week", "month", "quarter"]
         self.freq = freq
@@ -35,7 +36,8 @@ class PortfolioManager(object):
         self.custom_ret = custom_ret
         self.delay_list = [0] if delay_list is None else delay_list
         self.transaction_cost = transaction_cost
-        self.result_dir = os.path.join(dcf.RESULT_DIR, f"portfolio_results_{self.country}")
+        self.result_dir = os.path.join(dcf.WORK_DIR, f"portfolio_results_{self.country}")
+        self.model_name = model_name
         os.makedirs(self.result_dir, exist_ok=True)
         if load_signal:
             assert "up_prob" in signal_df.columns
@@ -216,29 +218,43 @@ class PortfolioManager(object):
             print(f"Calculating {pf_name}")
             portfolio_ret, turnover = self.calculate_portfolio_rets(weight_type, cut=10, delay=0)
         
-            file_name = f"{self.country}_{self.freq}_{weight_type}_cut{cut}_{self.year}.png"
+            model_prefix = self.model_name if self.model_name else ""
+            file_name = f"{model_prefix}_{self.country}_{self.freq}_{weight_type}_cut{cut}_{self.start_year}-{self.end_year}.png"
             save_path = os.path.join(self.result_dir, file_name)
-            plot_title = f'{self.freq} "Re(-)Imag(in)ing Price Trend" {self.country} {weight_type} cut{cut} {self.year}'
-            if weight_type == "ew":
-                ret_name = "nxt_freq_ewret"  # 'nxt_freq_ewret' 대신 'next_freq_ret' 사용
+            plot_title = f'{model_prefix} {self.freq} "Re(-)Imag(in)ing Price Trend" {self.country} {weight_type} cut{cut} {self.start_year}-{self.end_year}'
+            
+            ret_name = "nxt_freq_ewret"
             df = portfolio_ret.copy()
             df.columns = ["Low(L)"] + [str(i) for i in range(2, cut)] + ["High(H)", "H-L"]
+            
+            # SPY와 Benchmark 데이터 가져오기
             bench = eqd.get_bench_freq_rets(self.freq)
             spy = eqd.get_spy_freq_rets(self.freq)
+            
+            # 포트폴리오 데이터의 시작과 끝 날짜로 SPY와 Benchmark 데이터 자르기
+            start_date = df.index[0]
+            end_date = df.index[-1]
+            bench = bench.loc[start_date:end_date]
+            spy = spy.loc[start_date:end_date]
+            
             df["SPY"] = spy[ret_name]
             df["Benchmark"] = bench[ret_name]
             df.dropna(inplace=True)
-            top_col_name, bottom_col_name = ("High(H)", "Low(L)")
+            
+            # 누적 로그 수익률 계산
             log_ret_df = pd.DataFrame(index=df.index)
             for column in df.columns:
                 log_ret_df[column] = self._ret_to_cum_log_ret(df[column])
-            plt.figure(figsize=(12, 8))  # 그래프 크기 조정
-            log_ret_df = log_ret_df[[top_col_name, bottom_col_name, "H-L", "SPY", "Benchmark"]]
+            
+            # 모든 시리즈가 0부터 시작하도록 조정
             prev_year = pd.to_datetime(log_ret_df.index[0]).year - 1
-            prev_day = pd.to_datetime("{}-12-31".format(prev_year))
-            log_ret_df.loc[prev_day] = [0, 0, 0, 0, 0]
-            plot = log_ret_df.plot(
-                style={"SPY": "y", "Benchmark": "g", top_col_name: "b", bottom_col_name: "r", "H-L": "k"},
+            prev_day = pd.to_datetime(f"{prev_year}-12-31")
+            log_ret_df.loc[prev_day] = 0
+            log_ret_df = log_ret_df.sort_index()
+            
+            columns_to_plot = ["High(H)", "Low(L)", "H-L", "SPY", "Benchmark"]
+            plot = log_ret_df[columns_to_plot].plot(
+                style={"SPY": "y", "Benchmark": "g", "High(H)": "b", "Low(L)": "r", "H-L": "k"},
                 lw=1,
                 title=plot_title,
             )

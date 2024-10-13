@@ -1,5 +1,5 @@
 import copy
-
+import yaml
 from tqdm import tqdm
 import itertools
 import math
@@ -106,14 +106,12 @@ class Experiment(object):
         self.delayed_ret = delayed_ret
         assert self.delayed_ret in [0, 1, 2, 3, 4, 5]
 
-        model_name = (
-            self.model_obj.name
-            if self.model_obj is not None
-            else cf.BENCHMARK_MODEL_NAME_DICT[ws]
-        )
-        self.exp_name = self.get_exp_name()
+        self.exp_name = f"{self.ws}D{self.pw}P"
         self.pf_dir = self.get_portfolio_dir()
-        self.model_dir = ut.get_dir(os.path.join(cf.EXP_DIR, model_name, self.exp_name))
+        
+        self.model_dir = os.path.join(cf.EXP_DIR, self.model_obj.name, self.exp_name)
+        os.makedirs(self.model_dir, exist_ok=True)
+        
         self.ensem_res_dir = ut.get_dir(os.path.join(self.model_dir, "ensem_res"))
         self.tb_dir = ut.get_dir(os.path.join(self.model_dir, "tensorboard_res"))
         self.oos_metrics_path = os.path.join(
@@ -146,70 +144,65 @@ class Experiment(object):
 
     def load_model_state_dict_from_save_path(self, model_save_path):
         print(f"Loading model state dict from {model_save_path}")
-        model_state_dict = torch.load(model_save_path, map_location=self.device)[
+        model_state_dict = torch.load(model_save_path, map_location=self.device, weights_only=True)[
             "model_state_dict"
         ]
         return model_state_dict
 
-    def get_exp_name(self):
-        exp_setting_list = [
-            f"{self.ws}d{self.pw}p-lr{self.lr:.0E}-dp{self.drop_prob:.2f}",
-            f"ma{self.has_ma}-vb{self.has_volume_bar}-{self.train_freq}lyTrained",
-        ]
-        if self.delayed_ret == 0:
-            exp_setting_list.append("noDelayedReturn")
-        else:
-            exp_setting_list.append(f"{self.delayed_ret}DelayedReturn")
-        if not self.model_obj.batch_norm:
-            exp_setting_list.append("noBN")
-        if not self.model_obj.xavier:
-            exp_setting_list.append("noXavier")
-        if not self.model_obj.lrelu:
-            exp_setting_list.append("noLRelu")
-        if self.weight_decay != 0:
-            exp_setting_list.append(f"WD{self.weight_decay:.0E}")
-        if self.loss_name != "cross_entropy":
-            exp_setting_list.append(self.loss_name)
-            if self.loss_name == "multimarginloss":
-                exp_setting_list.append(f"margin{self.margin:.0E}")
-
-        if self.annual_stocks_num != "all":
-            exp_setting_list.append(f"top{self.annual_stocks_num}AnnualStock")
-        if self.tstat_threshold != 0:
-            exp_setting_list.append(f"{self.tstat_threshold}tstat")
-        if self.ohlc_len != self.ws:
-            exp_setting_list.append(f"{self.ohlc_len}ohlc")
-        if self.train_size_ratio != 0.7:
-            exp_setting_list.append(f"tv_ratio{self.train_size_ratio:.1f}")
-        if self.model_obj.regression_label is not None:
-            exp_setting_list.append(self.model_obj.regression_label)
-        if self.ts_scale != "image_scale":
-            ts_name = "raw_ts1d" if self.ts_scale == "ret_scale" else "vol_scale"
-            exp_setting_list.append(ts_name)
-        if self.chart_type != "bar":
-            exp_setting_list.append(self.chart_type)
-        if self.country != "USA":
-            exp_setting_list.append(str(self.country))
-        if self.tl is not None:
-            exp_setting_list.append(str(self.tl))
-        exp_name = "-".join(exp_setting_list)
-        return exp_name
+    def save_exp_params_to_yaml(self):
+        params = {
+            "window_size": self.ws,
+            "prediction_window": self.pw,
+            "learning_rate": self.lr,
+            "dropout_prob": self.drop_prob,
+            "has_moving_average": self.has_ma,
+            "has_volume_bar": self.has_volume_bar,
+            "train_freq": self.train_freq,
+            "delayed_ret": self.delayed_ret,
+            "batch_norm": self.model_obj.batch_norm,
+            "xavier_init": self.model_obj.xavier,
+            "leaky_relu": self.model_obj.lrelu,
+            "weight_decay": self.weight_decay,
+            "loss_function": self.loss_name,
+            "annual_stocks_num": self.annual_stocks_num,
+            "tstat_threshold": self.tstat_threshold,
+            "ohlc_len": self.ohlc_len,
+            "train_size_ratio": self.train_size_ratio,
+            "regression_label": self.model_obj.regression_label,
+            "ts_scale": self.ts_scale,
+            "chart_type": self.chart_type,
+            "country": self.country,
+            "transfer_learning": self.tl
+        }
+        
+        if self.loss_name == "multimarginloss":
+            params["margin"] = self.margin
+        
+        yaml_path = os.path.join(self.model_dir, "exp_params.yaml")
+        with open(yaml_path, 'w') as yaml_file:
+            yaml.dump(params, yaml_file, default_flow_style=False)
+        
+        print(f"실험 파라미터가 {yaml_path}에 저장되었습니다.")
 
     def get_portfolio_dir(self):
-        name_list = [self.country]
+        name_parts = [self.country]
+        
         if self.model_obj.name not in cf.BENCHMARK_MODEL_NAME_DICT.values():
-            name_list.append(self.model_obj.name)
-        name_list.append(self.exp_name)
-        name_list.append(f"ensem{self.ensem}")
-        if (self.oos_years[0] != 2001) or (self.oos_years[-1] != 2019):
-            name_list.append("{}-{}".format(self.oos_years[0], self.oos_years[-1]))
+            name_parts.append(self.model_obj.name)
+        
+        name_parts.extend([
+            f"{self.ws}d{self.pw}p",
+            f"e{self.ensem}",
+            f"{self.oos_years[0]}-{self.oos_years[-1]}"
+        ])
+        
         if self.pf_freq != dcf.FREQ_DICT[self.pw]:
-            name_list.append(f"{self.pf_freq}ly")
-        if self.delayed_ret == 0:
-            name_list.append("noDelayedReturn")
-        else:
-            name_list.append(f"{self.delayed_ret}DelayedReturn")
-        name = "_".join(name_list)
+            name_parts.append(f"{self.pf_freq}")
+        
+        if self.delayed_ret != 0:
+            name_parts.append(f"d{self.delayed_ret}")
+        
+        name = "_".join(name_parts)
         pf_dir = cf.get_dir(os.path.join(cf.PORTFOLIO_DIR, name))
         return pf_dir
 
@@ -297,6 +290,18 @@ class Experiment(object):
         df = pd.concat(df_list)
         df.reset_index(drop=True)
         return df
+    
+    def save_training_metrics(self, val_df, train_df=None):
+        metrics = {
+            "validation": val_df.to_dict(),
+            "train": train_df.to_dict() if train_df is not None else None
+        }
+        
+        yaml_path = os.path.join(self.model_dir, f"training_metrics_ensem{self.ensem}.yaml")
+        with open(yaml_path, 'w') as yaml_file:
+            yaml.dump(metrics, yaml_file, default_flow_style=False)
+        
+        print(f"학습 메트릭이 {yaml_path}에 저장되었습니다.")
 
     def train_empirical_ensem_model(self, ensem_range=None, pretrained=True):
         val_df = pd.DataFrame(columns=["MCC", "loss", "accy", "diff", "epoch"])
@@ -324,43 +329,38 @@ class Experiment(object):
 
         val_df = val_df.astype(np.float64).round(3)
         val_df.loc["Mean"] = val_df.mean()
-        val_df.to_csv(
-            os.path.join(
-                cf.LOG_DIR,
-                f"{self.model_obj.name}-{self.exp_name}-ensem{self.ensem}.csv",
-            ),
-            index=True,
-        )
-
-        with open(
-            os.path.join(
-                cf.LATEX_DIR,
-                f"{self.model_obj.name}-{self.exp_name}-ensem{self.ensem}.txt",
-            ),
-            "w+",
-        ) as file:
+        
+        # CSV 파일 저장
+        csv_path = os.path.join(self.model_dir, f"validation_metrics_ensem{self.ensem}.csv")
+        val_df.to_csv(csv_path, index=True)
+        
+        # LaTeX 파일 저장
+        latex_path = os.path.join(self.model_dir, f"validation_metrics_ensem{self.ensem}.txt")
+        with open(latex_path, "w+") as file:
             file.write(val_df.to_latex())
+        
+        # YAML 파일에 학습 메트릭 저장
+        self.save_training_metrics(val_df, train_df)
 
     def load_mean_validation_metrics(self):
-        df = pd.read_csv(
-            os.path.join(
-                cf.LOG_DIR,
-                f"{self.model_obj.name}-{self.exp_name}-ensem{self.ensem}.csv",
-            ),
-            index_col=0,
-        )
-        return df.loc["Mean"]
+        yaml_path = os.path.join(self.model_dir, f"training_metrics_ensem{self.ensem}.yaml")
+        with open(yaml_path, 'r') as yaml_file:
+            metrics = yaml.safe_load(yaml_file)
+        
+        val_df = pd.DataFrame(metrics['validation'])
+        return val_df.loc["Mean"]
 
     def load_mean_train_metrics(self):
+        yaml_path = os.path.join(self.model_dir, f"training_metrics_ensem{self.ensem}.yaml")
         try:
-            df = pd.read_csv(
-                os.path.join(
-                    cf.LOG_DIR,
-                    f"{self.model_obj.name}-{self.exp_name}-ensem{self.ensem}_train.csv",
-                ),
-                index_col=0,
-            )
-            return df.loc["Mean"]
+            with open(yaml_path, 'r') as yaml_file:
+                metrics = yaml.safe_load(yaml_file)
+            
+            if metrics['train'] is not None:
+                train_df = pd.DataFrame(metrics['train'])
+                return train_df.loc["Mean"]
+            else:
+                return None
         except FileNotFoundError:
             return None
 
@@ -585,7 +585,7 @@ class Experiment(object):
                         print("{} pct chg: {:.4f}".format(name, pct_chg))
                         prev_weight_dict[name] = param.data.clone()
 
-            if self.early_stop and (epoch - best_validate_metrics["epoch"]) >= 5:
+            if self.early_stop and (epoch - best_validate_metrics["epoch"]) >= 2: # 2번 이상 안 줄면 종료
                 break
             print()
             
@@ -792,6 +792,7 @@ class Experiment(object):
             load_signal=load_signal,
             custom_ret=custom_ret,
             transaction_cost=transaction_cost,
+            model_name = self.model_obj.name
         )
         return pf_obj
 
@@ -935,8 +936,8 @@ class Experiment(object):
         return df.loc["Mean"]
 
     def summarize_true_up_label(self):
-        tv_df = self._df_true_up_label(list(range(2007, 2018)), "In Sample")
-        test_df = self._df_true_up_label(list(range(2018, 2024)), "OOS")
+        tv_df = self._df_true_up_label(list(range(2001, 2009)), "In Sample")
+        test_df = self._df_true_up_label(list(range(2009, 2024)), "OOS")
         df = pd.concat([tv_df, test_df])
         df.to_csv(
             os.path.join(
@@ -1095,9 +1096,6 @@ def get_exp_obj_by_spec(
         lr=lr,
         drop_prob=drop_prob,
         device_number=dn,
-        max_epoch=50,
-        enable_tqdm=True,
-        early_stop=True,
         has_ma=has_ma,
         has_volume_bar=has_volume_bar,
         is_years=is_years,
@@ -1116,10 +1114,14 @@ def get_exp_obj_by_spec(
         chart_type=chart_type,
         delayed_ret=delayed_ret,
         ts_scale=ts_scale,
+        
+        # 여기서 따로 설정해 max_epoch, enable_tqdm, Early_stop
+        max_epoch=500,
+        enable_tqdm=True,
+        early_stop=True,
     )
 
     return exp_obj
-
 
 def get_bl_exp_obj(
     ws,
@@ -1215,9 +1217,7 @@ def get_bl_exp_obj(
         ts_scale=ts_scale,
         regression_label=regression_label,
     )
-
     return exp_obj
-
 
 def run_arch_comparison(
     ws=20,
@@ -1371,6 +1371,75 @@ def train_us_model(
                 delay_list=pf_delay_list,
             )
         del exp_obj
+
+def train_my_model(
+    ws_list,
+    pw_list,
+    drop_prob=0.50,
+    ensem=5,
+    total_worker=1,
+    is_ensem_res=True,
+    has_volume_bar=True,
+    has_ma=True,
+    chart_type="bar",
+    calculate_portfolio=False,
+    ts1d_model=False,
+    lr=1e-5,
+):
+    torch.set_num_threads(1)
+    if total_worker > 1:
+        worker_idx = int(sys.argv[1])
+        assert 0 < (worker_idx + 1) <= total_worker
+    else:
+        worker_idx = 0
+
+    setting_list = list(itertools.product(ws_list, pw_list))
+
+    print(f"Worker {worker_idx} from {total_worker} workers for {len(setting_list)} jobs")
+
+    worker_setting_list = [setting_list[i] for i in range(worker_idx, len(setting_list), total_worker)]
+    device_number = (worker_idx + 0) % 2
+
+    for ws, pw in worker_setting_list:
+        exp_obj = get_bl_exp_obj(
+            ws,
+            pw,
+            dn=device_number,
+            drop_prob=drop_prob,
+            ensem=ensem,
+            has_volume_bar=has_volume_bar,
+            has_ma=has_ma,
+            chart_type=chart_type,
+            ts1d_model=ts1d_model,
+            lr=lr,
+        )
+
+        # Train the model
+        exp_obj.train_empirical_ensem_model()
+
+        # Calculate OOS ensemble statistics
+        oos_metrics = exp_obj.load_oos_ensem_stat()
+        print("OOS Ensemble Statistics:")
+        print(oos_metrics)
+
+        # Calculate true up probability
+        true_up_prob = exp_obj.calculate_oos_up_prob()
+        print("True Up Probability:")
+        print(true_up_prob)
+
+        if calculate_portfolio:
+            exp_obj.calculate_portfolio(
+                load_saved_data=is_ensem_res,
+                is_ensem_res=is_ensem_res
+            )
+
+        # Summarize true up label
+        exp_obj.summarize_true_up_label()
+
+        del exp_obj
+        torch.cuda.empty_cache()
+
+    print("Training completed for all settings.")
 
 
 def main():

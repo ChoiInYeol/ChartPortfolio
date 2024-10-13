@@ -40,23 +40,23 @@ EMP_CNN1d_BL_SETTING = {
     60: ([3] * 3, [1] * 3, [1] * 3, [2] * 3),
 }
 
-NUM_WORKERS = 1
+NUM_WORKERS = 4
 
 
 START_YEAR_DICT = {
-    "Russia": 1999,
-    "Greece": 1999,
-    "Finland": 1999,
-    "Ireland": 1999,
-    "Sweden": 1999,
+    "Russia": 2001,
+    "Greece": 2001,
+    "Finland": 2001,
+    "Ireland": 2001,
+    "Sweden": 2001,
 }
-IS_YEARS = list(range(2001, 2018))
-OOS_YEARS = list(range(2018, 2024))
+IS_YEARS = list(range(2001, 2009))
+OOS_YEARS = list(range(2009, 2024))
 
 BENCHMARK_MODEL_NAME_DICT = {
-    5: "D5L2F53S1F53S1C64MP11", # WS5
-    20: "D20L3F53S1F53S1F53S1C64MP111", # WS20
-    60: "D60L4F53S1F53S1F53S1F53S1C64MP1111", # WS60
+    5: "BM5L2",  # WS5
+    20: "BM20L3", # WS20
+    60: "BM60L4", # WS60
 }
 
 latex_figw, latex_figh = 20.0, 15.0

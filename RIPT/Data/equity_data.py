@@ -32,30 +32,39 @@ def create_spy_returns():
         print(f"Saved spy_{freq}_ret.csv")
 
 def create_benchmark_returns():
+    """
+    벤치마크 수익률을 계산하고 저장합니다.
+    
+    0인 데이터를 제외하고 유효한 값만을 사용하여 1/N 방식으로 수익률을 계산합니다.
+    주간, 월간, 분기별, 연간 수익률을 계산하여 각각 CSV 파일로 저장합니다.
+    """
     path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
     df = pd.read_csv(path, parse_dates=['date'])
     df.set_index('date', inplace=True)
     
+    # date 를 Date로 변경
+    df.index.name = 'Date'
+    
     df['Return'] = df.groupby('PERMNO')['PRC'].pct_change()
     
-    daily_benchmark = df.groupby(df.index)['Return'].mean()
-    daily_benchmark = pd.DataFrame(daily_benchmark, columns=['Return'])
-
     for freq in ['week', 'month', 'quarter', 'year']:
         if freq == 'week':
-            returns = daily_benchmark['Return'].resample('W').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
+            returns = df.groupby([pd.Grouper(freq='W'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         elif freq == 'month':
-            returns = daily_benchmark['Return'].resample('ME').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
+            returns = df.groupby([pd.Grouper(freq='M'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         elif freq == 'quarter':
-            returns = daily_benchmark['Return'].resample('QE').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
+            returns = df.groupby([pd.Grouper(freq='Q'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         else:  # year
-            returns = daily_benchmark['Return'].resample('YE').apply(lambda x: (1 + x.fillna(0)).prod() - 1)
+            returns = df.groupby([pd.Grouper(freq='Y'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         
-        returns = pd.DataFrame(returns, columns=['Return'])
-        returns['nxt_freq_ewret'] = returns['Return'].shift(-1)  # 다음 기간의 수익률 추가
+        # 0이 아닌 유효한 값만 선택하여 1/N 방식으로 평균 계산
+        benchmark_returns = returns.groupby(level=0).apply(lambda x: x[x != 0].mean())
+        
+        benchmark_returns = pd.DataFrame(benchmark_returns, columns=['Return'])
+        benchmark_returns['nxt_freq_ewret'] = benchmark_returns['Return'].shift(-1)  # 다음 기간의 수익률 추가
         
         output_path = os.path.join(dcf.CACHE_DIR, f"benchmark_{freq}_ret.csv")
-        returns.to_csv(output_path, index=True)
+        benchmark_returns.to_csv(output_path, index=True)
         print(f"{freq} 벤치마크 수익률이 {output_path}에 저장되었습니다.")
 
 def get_spy_freq_rets(freq):
