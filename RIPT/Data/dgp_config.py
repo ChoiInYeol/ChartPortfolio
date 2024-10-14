@@ -27,7 +27,11 @@ VOLUME_CHART_GAP = 1
 BACKGROUND_COLOR = 0
 CHART_COLOR = 255
 
-FREQ_DICT = {5: "week", 20: "month", 60: "quarter", 65: "quarter", 260: "year"}
+FREQ_DICT = {5: "week",
+             20: "month",
+             60: "quarter",
+             65: "quarter",
+             260: "year"}
 
 INTERNATIONAL_COUNTRIES = [
     "Japan",

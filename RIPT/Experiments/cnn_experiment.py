@@ -76,11 +76,11 @@ class Experiment(object):
         self.oos_years = oos_years
         self.country = country
         if self.country == "China":
-            self.oos_years = list(range(2001, 2025))
+            self.oos_years = list(range(2001, 2024))
         elif (
             self.country in cf.START_YEAR_DICT.keys()
         ):
-            self.oos_years = list(range(cf.START_YEAR_DICT[self.country] + 8, 2025))
+            self.oos_years = list(range(cf.START_YEAR_DICT[self.country] + 8, 2024))
         self.oos_start_year = self.oos_years[0]
         assert transfer_learning in [None, "ft", "usa", "scaleDT"]
         self.tl = transfer_learning
@@ -937,7 +937,7 @@ class Experiment(object):
 
     def summarize_true_up_label(self):
         tv_df = self._df_true_up_label(list(range(2001, 2018)), "In Sample")
-        test_df = self._df_true_up_label(list(range(2018, 2025)), "OOS")
+        test_df = self._df_true_up_label(list(range(2018, 2024)), "OOS")
         df = pd.concat([tv_df, test_df])
         df.to_csv(
             os.path.join(
@@ -1117,7 +1117,7 @@ def get_exp_obj_by_spec(
         
         # 여기서 따로 설정해 max_epoch, enable_tqdm, Early_stop
         max_epoch=500,
-        enable_tqdm=False,
+        enable_tqdm=True,
         early_stop=True,
     )
 

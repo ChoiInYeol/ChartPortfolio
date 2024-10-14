@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 import pandas as pd
 import os.path as op
@@ -54,12 +55,13 @@ class EquityDataset(Dataset):
         self.demean = self._get_insample_mean_std()
 
         assert delayed_ret in [0, 1, 2, 3, 4, 5]
+        # 기존 코드 수정
         if self.country == "USA":
-            self.ret_val_name = f"Ret_{dcf.FREQ_DICT[self.pw]}" + (
+            self.ret_val_name = f"Ret_{self.pw}d" + (
                 "" if delayed_ret == 0 else f"_{delayed_ret}delay"
             )
         else:
-            self.ret_val_name = f"next_{dcf.FREQ_DICT[self.pw]}_ret_{delayed_ret}delay"
+            self.ret_val_name = f"next_{self.pw}d_ret_{delayed_ret}delay"
         self.label = self.get_label_value()
 
         self.filter_data(
@@ -67,51 +69,28 @@ class EquityDataset(Dataset):
         )
 
     def filter_data(self, annual_stocks_num, stockid_filter, tstat_threshold, remove_tail):
-        """
-        데이터를 필터링하여 분석에 사용할 주식 데이터를 선별합니다.
-
-        Args:
-            annual_stocks_num (str or int): 연간 선택할 주식 수. "all"이면 모든 주식 선택, 
-                                            숫자면 시가총액 기준 상위 n개 주식 선택
-            stockid_filter (list or None): 특정 주식 ID만 선택하고 싶을 때 사용
-            tstat_threshold (float): t-통계량 기준으로 필터링할 하위 백분위 값
-            remove_tail (bool): 연도 말미의 데이터를 제거할지 여부
-
-        이 함수는 여러 단계를 거쳐 데이터를 필터링합니다:
-        1. 연간 주식 선택
-        2. t-통계량 기반 필터링
-        3. 연도 말미 데이터 제거
-        4. 주기에 따른 데이터 선택
-        """
-
-        # 기본 데이터프레임 생성
         df = pd.DataFrame({
             "StockID": self.label_dict["StockID"],
-            "MarketCap": abs(self.label_dict["MarketCap"]),
-            "Date": pd.to_datetime([str(t) for t in self.label_dict["Date"]]),
+            "MarketCap": np.abs(self.label_dict["MarketCap"]),
+            "Date": pd.to_datetime(self.label_dict["Date"]),
         })
-
-        # 1. 연간 주식 선택
+        
         if annual_stocks_num != "all":
             num_stockid = len(np.unique(df.StockID))
             new_df = df
             period_end_dates = eqd.get_period_end_dates(self.freq)
-            
-            # 해당 연도의 6월 데이터를 찾음 (없으면 이전 달의 데이터 사용)
             for i in range(15):
                 date = period_end_dates[
                     (period_end_dates.year == self.year) & (period_end_dates.month == 6)
-                ][-i]
+                ][
+                    -i
+                ]
                 print(date)
                 new_df = df[df.Date == date]
                 if len(np.unique(new_df.StockID)) > num_stockid / 2:
                     break
-            
-            # stockid_filter가 제공된 경우 해당 주식만 선택
             if stockid_filter is not None:
                 new_df = new_df[new_df.StockID.isin(stockid_filter)]
-            
-            # 시가총액 기준으로 정렬하고 상위 n개 선택
             new_df = new_df.sort_values(by=["MarketCap"], ascending=False)
             if len(new_df) > int(annual_stocks_num):
                 stockids = new_df.iloc[: int(annual_stocks_num)]["StockID"]
@@ -121,19 +100,17 @@ class EquityDataset(Dataset):
                 f"Year {self.year}: select top {annual_stocks_num} stocks ({len(stockids)}/{num_stockid}) stocks for training"
             )
         else:
-            stockids = stockid_filter if stockid_filter is not None else np.unique(df.StockID)
-        
-        # 선택된 주식 ID에 해당하는 데이터만 필터링
+            stockids = (
+                stockid_filter if stockid_filter is not None else np.unique(df.StockID)
+            )
         stockid_idx = pd.Series(df.StockID).isin(stockids)
 
-        # 기본 필터링 조건 적용
         idx = (
             stockid_idx
             & pd.Series(self.label != -99)
             & pd.Series(self.label_dict["EWMA_vol"] != 0.0)
         )
 
-        # 2. t-통계량 기반 필터링
         if tstat_threshold != 0:
             tstats = np.divide(
                 self.label_dict[self.ret_val_name], np.sqrt(self.label_dict["EWMA_vol"])
@@ -149,7 +126,6 @@ class EquityDataset(Dataset):
                 f"After filtering bottom {tstat_threshold}% tstats, sample size:{np.sum(idx)}"
             )
 
-        # 3. 연도 말미 데이터 제거
         if remove_tail:
             print(
                 f"I{self.ws}R{self.pw}: removing tail for year {self.year} ({np.sum(idx)} samples)"
@@ -160,7 +136,6 @@ class EquityDataset(Dataset):
                 pd.to_datetime([str(t) for t in self.label_dict["Date"]]) < last_day
             )
 
-        # 4. 주기에 따른 데이터 선택
         if self.freq != self.data_freq and self.ohlc_len != self.ws:
             assert self.freq in ["quarter", "year"] and self.data_freq == "month"
             print(f"Selecting data of freq {self.freq}")
@@ -172,23 +147,28 @@ class EquityDataset(Dataset):
             )
             idx = idx & date_idx
 
-        # 최종 필터링 적용
+        # After filtering
         self.label = self.label[idx]
         print(f"Year {self.year}: samples size: {len(self.label)}")
         for k in self.label_dict.keys():
             self.label_dict[k] = self.label_dict[k][idx]
         self.images = self.images[idx]
         self.label_dict["StockID"] = self.label_dict["StockID"].astype(str)
-        self.label_dict["Date"] = self.label_dict["Date"].astype(str)
+        self.label_dict["Date"] = pd.to_datetime(self.label_dict["Date"]).astype(str)
 
-        # 데이터 정합성 검증
         assert len(self.label) == len(self.images)
         for k in self.label_dict.keys():
             assert len(self.images) == len(self.label_dict[k])
 
     def get_label_value(self):
         print(f"Using {self.ret_val_name} as label")
+        print(f"Available labels: {list(self.label_dict.keys())}")
+        if self.ret_val_name not in self.label_dict:
+            raise KeyError(f"{self.ret_val_name} not found in label_dict")
         ret = self.label_dict[self.ret_val_name]
+
+        # ret를 NumPy 배열로 변환
+        ret = np.array(ret)
 
         print(
             f"Using {self.regression_label} regression label (None represents classification label)"
@@ -243,9 +223,8 @@ class EquityDataset(Dataset):
             country = self.country
         save_dir = op.join(dcf.STOCKS_SAVEPATH, f"stocks_{country}", "dataset_all")
         dataset_name = self.__get_stock_dataset_name()
-        img_save_path = op.join(save_dir, f"{dataset_name}_images.dat")
-        label_path = op.join(save_dir, f"{dataset_name}_labels.feather")
-        return img_save_path, label_path
+        data_save_path = op.join(save_dir, f"{dataset_name}_data.npz")
+        return data_save_path, None  # 두 번째 반환값은 더 이상 사용하지 않지만, 기존 코드와의 호환성을 위해 None을 반환
 
     @staticmethod
     def rebuild_image(image, image_name, par_save_dir, image_mode="L"):
@@ -262,19 +241,24 @@ class EquityDataset(Dataset):
         return images
 
     def load_annual_data_by_country(self, country):
-        img_save_path, label_path = self.get_image_label_save_path(country)
+        img_save_path, _ = self.get_image_label_save_path(country)
 
-        print(f"loading images from {img_save_path}")
-        images = self.load_image_np_data(img_save_path, self.ohlc_len)
-        self.rebuild_image(
-            images[0][0],
-            image_name=self.__get_stock_dataset_name(),
-            par_save_dir=self.save_dir,
-        )
+        print(f"Loading data from {img_save_path}")
+        data = np.load(img_save_path, allow_pickle=True)
+        
+        images = data['images']
+        images = images.reshape((-1, 1, dcf.IMAGE_HEIGHT[self.ohlc_len], dcf.IMAGE_WIDTH[self.ohlc_len]))
+        
+        label_dict = data['labels'].item()
+        
+        # Convert all list values to numpy arrays
+        for key in label_dict:
+            label_dict[key] = np.array(label_dict[key])
+        
+        print(f"Number of images loaded: {len(images)}")
+        print(f"Number of labels loaded: {len(label_dict['StockID'])}")
 
-        label_df = pd.read_feather(label_path)
-        label_df["StockID"] = label_df["StockID"].astype(str)
-        label_dict = {c: np.array(label_df[c]) for c in label_df.columns}
+        assert len(images) == len(label_dict['StockID']), "Mismatch between images and labels"
 
         return images, label_dict
 
@@ -286,8 +270,8 @@ class EquityDataset(Dataset):
         return len(self.label)
 
     def __getitem__(self, idx):
-        image = (self.images[idx] / 255.0 - self.demean[0]) / self.demean[1]
-
+        image = self.images[idx]
+        
         sample = {
             "image": image,
             "label": self.label[idx],
@@ -332,7 +316,7 @@ class TS1DDataset(Dataset):
         assert self.ts_scale in ["image_scale", "ret_scale", "vol_scale"]
         self.regression_label = regression_label
         assert self.regression_label in [None, "raw_ret", "vol_adjust_ret"]
-        self.ret_val_name = f"Ret_{dcf.FREQ_DICT[self.pw]}"
+        self.ret_val_name = f"Retx_{dcf.FREQ_DICT[self.pw]}"
         self.images, self.label_dict = self.load_ts1d_data()
         self.label = self.get_label_value()
         self.demean = self._get_1d_mean_std()
