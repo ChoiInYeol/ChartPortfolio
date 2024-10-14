@@ -40,7 +40,7 @@ EMP_CNN1d_BL_SETTING = {
     60: ([3] * 3, [1] * 3, [1] * 3, [2] * 3),
 }
 
-NUM_WORKERS = 4
+NUM_WORKERS = 32
 
 
 START_YEAR_DICT = {
@@ -50,8 +50,8 @@ START_YEAR_DICT = {
     "Ireland": 2001,
     "Sweden": 2001,
 }
-IS_YEARS = list(range(2001, 2009))
-OOS_YEARS = list(range(2009, 2024))
+IS_YEARS = list(range(2001, 2018))
+OOS_YEARS = list(range(2018, 2024))
 
 BENCHMARK_MODEL_NAME_DICT = {
     5: "BM5L2",  # WS5

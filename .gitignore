@@ -25,3 +25,5 @@
 *.pyc
 *.dat
 *.pq
+*.json
+*.yml

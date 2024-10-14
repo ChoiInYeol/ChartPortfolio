@@ -1,4 +1,4 @@
-name: imagedpo2
+name: imagedpo
 channels:
   - pytorch
   - nvidia
