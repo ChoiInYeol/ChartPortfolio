@@ -26,3 +26,5 @@
 *.dat
 *.pq
 *.parquet
+*.json
+*.yml

@@ -11,7 +11,7 @@ def safe_exp(x):
     return np.exp(np.clip(x, -10, 10))
 
 def create_spy_returns():
-    spy = pd.read_csv('data/snp500_index.csv', parse_dates=['Date'], index_col='Date')
+    spy = pd.read_csv('data/spy.csv', parse_dates=['Date'], index_col='Date')
     spy['Return'] = spy['Adj Close'].pct_change()
 
     for freq in ['week', 'month', 'quarter', 'year']:
@@ -38,7 +38,7 @@ def create_benchmark_returns():
     0인 데이터를 제외하고 유효한 값만을 사용하여 1/N 방식으로 수익률을 계산합니다.
     주간, 월간, 분기별, 연간 수익률을 계산하여 각각 CSV 파일로 저장합니다.
     """
-    path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
+    path = op.join(dcf.RAW_DATA_DIR, "filtered_stock_1985.csv")
     df = pd.read_csv(path, parse_dates=['date'])
     df.set_index('date', inplace=True)
     
@@ -108,7 +108,7 @@ def processed_US_data():
         print(f"Finish loading processed data in {(time.time() - since) / 60:.2f} min")
         return df.copy()
 
-    raw_us_data_path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
+    raw_us_data_path = op.join(dcf.RAW_DATA_DIR, "filtered_stock_1985.csv")
     print("Reading raw data from {}".format(raw_us_data_path))
     since = time.time()
     df = pd.read_csv(

@@ -28,7 +28,7 @@ class GenerateStockData(object):
         ma_lags=None,
         volume_bar=False,
         need_adjust_price=True,
-        allow_tqdm=True,
+        allow_tqdm=False,
         chart_type="bar",
     ):
         self.country = country
@@ -43,7 +43,7 @@ class GenerateStockData(object):
         self.ma_lags = ma_lags
         self.volume_bar = volume_bar
         self.need_adjust_price = need_adjust_price
-        self.allow_tqdm = allow_tqdm
+        self.allow_tqdm = False
         assert chart_type in ["bar", "pixel", "centered_pixel"]
         self.chart_type = chart_type
 
@@ -289,11 +289,13 @@ class GenerateStockData(object):
         data_dict["image"].fill(np.nan)
 
         sample_num = 0
+        print(f"allow_tqdm: {self.allow_tqdm}, 'tqdm' in sys.modules: {'tqdm' in sys.modules}")
+
         iterator = (
-            tqdm(self.stock_id_list)
-            if (self.allow_tqdm and "tqdm" in sys.modules)
-            else self.stock_id_list
-        )
+            self.stock_id_list if not (self.allow_tqdm and "tqdm" in sys.modules) 
+            else tqdm(self.stock_id_list)
+            )
+
         for i, stock_id in enumerate(iterator):
             stock_df = self.df.xs(stock_id, level=1).copy()
             stock_df = stock_df.reset_index()
@@ -328,8 +330,13 @@ class GenerateStockData(object):
                 except ChartGenerationError:
                     print(f"DGP Error on {stock_id} {date}")
                     continue
+                
         for feature in feature_list:
             data_dict[feature] = data_dict[feature][:sample_num]
+
+        if sample_num == 0:
+            print("No valid samples generated. Skipping memmap.")
+            return
 
         fp_x = np.memmap(
             self.images_filename,
@@ -340,6 +347,7 @@ class GenerateStockData(object):
         fp_x[:] = data_dict["image"][:]
         del fp_x
         print(f"Save image data to {self.images_filename}")
+
         data_dict = {x: data_dict[x] for x in data_dict.keys() if x != "image"}
         pd.DataFrame(data_dict).to_feather(self.labels_filename)
         print(f"Save label data to {self.labels_filename}")
@@ -512,11 +520,13 @@ class GenerateStockData(object):
         data_dict["predictor"].fill(np.nan)
 
         sample_num = 0
+        print(f"allow_tqdm: {self.allow_tqdm}, 'tqdm' in sys.modules: {'tqdm' in sys.modules}")
+
         iterator = (
-            tqdm(self.stock_id_list)
-            if (self.allow_tqdm and "tqdm" in sys.modules)
-            else self.stock_id_list
+            self.stock_id_list if not (self.allow_tqdm and "tqdm" in sys.modules) 
+            else tqdm(self.stock_id_list)
         )
+
         for i, stock_id in enumerate(iterator):
             stock_df = self.df.xs(stock_id, level=1).copy()
             stock_df = stock_df.reset_index()
