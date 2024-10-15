@@ -25,11 +25,11 @@ def load_config(config_path: str):
 
 def generate_model_configs(base_config):
     param_lists = {
-        'MODEL': base_config.get('MODELS', ['GRU', 'TCN', 'TRANSFORMER']),
+        'MODEL': base_config.get('MODELS', ['TCN']),
         'MULTIMODAL': base_config.get('MULTIMODAL_OPTIONS', [False]),
-        'LOSS_FUNCTION': base_config.get('LOSS_FUNCTIONS', ['max_sharpe', 'equal_risk_parity', 'mean_variance']),
-        'TRAIN_LEN': base_config.get('TRAIN_LEN_OPTIONS', [20, 60, 120]),
-        'PRED_LEN': base_config.get('PRED_LEN_OPTIONS', [5, 20])
+        'LOSS_FUNCTION': base_config.get('LOSS_FUNCTIONS', ['max_sharpe']),
+        'TRAIN_LEN': base_config.get('TRAIN_LEN_OPTIONS', [60]),
+        'PRED_LEN': base_config.get('PRED_LEN_OPTIONS', [20])
     }
     
     keys, values = zip(*param_lists.items())

@@ -47,7 +47,7 @@ class Trainer:
         self.multimodal = config.get("MULTIMODAL", False)
         self.len_train = config['TRAIN_LEN']
         self.len_pred = config['PRED_LEN']
-        self.n_stock = config['N_FEAT']
+        self.n_stock = config['N_STOCK']
         self.lb = config['LB']
         self.ub = config['UB']
         self.beta = config.get("BETA", 0.2)
@@ -112,6 +112,7 @@ class Trainer:
                 hidden_dim=gru_config['hidden_dim'],
                 dropout_p=gru_config['dropout_p'],
                 bidirectional=gru_config['bidirectional'],
+                n_output=gru_config['n_output'],
                 **common_params
             ).to(self.device)
         elif self.model_name == "transformer":
@@ -186,7 +187,7 @@ class Trainer:
 
         self.train_date = date_info['train']
         self.val_date = date_info['val']
-        self.N_STOCK = self.config['N_FEAT']
+        self.N_STOCK = self.config['N_STOCK']
         self.LEN_PRED = train_y.shape[1]
 
         train_dataset = PortfolioDataset(train_x, train_y, train_img, train_labels)

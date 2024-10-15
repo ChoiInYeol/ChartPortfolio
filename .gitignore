@@ -28,3 +28,4 @@
 *.parquet
 *.json
 *.yml
+*.zip

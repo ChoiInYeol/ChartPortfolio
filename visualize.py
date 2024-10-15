@@ -9,9 +9,24 @@ import scienceplots
 plt.style.use('science')
 
 def visualize_backtest(performance, config):
+    """
+    백테스트 성과를 시각화합니다.
+
+    Args:
+        performance (pd.DataFrame): 포트폴리오 성과 데이터
+        config (dict): 설정 정보
+
+    Returns:
+        None
+    """
     plt.figure(figsize=(14, 7))
     for col in performance.columns:
-        plt.plot(performance.index, performance[col], label=col)
+        if col == 'EWP':
+            plt.plot(performance.index, performance[col], label=col, color='black', linewidth=2)
+        elif col == 'SPY':
+            plt.plot(performance.index, performance[col], label=col, color='gray', linewidth=2)
+        else:
+            plt.plot(performance.index, performance[col], label=col, linestyle='--')
     plt.title("Portfolio Performance Comparison", fontsize=16)
     plt.xlabel("Date", fontsize=14)
     plt.ylabel("Portfolio Value", fontsize=14)
@@ -24,10 +39,25 @@ def visualize_backtest(performance, config):
 
 
 def visualize_returns_distribution(performance, config):
+    """
+    수익률 분포를 시각화합니다.
+
+    Args:
+        performance (pd.DataFrame): 포트폴리오 성과 데이터
+        config (dict): 설정 정보
+
+    Returns:
+        None
+    """
     returns = performance.pct_change().dropna()
     plt.figure(figsize=(14, 7))
     for col in returns.columns:
-        sns.kdeplot(returns[col], label=col, fill=True)
+        if col == 'EWP':
+            sns.kdeplot(returns[col], label=col, color='black', linewidth=2)
+        elif col == 'SPY':
+            sns.kdeplot(returns[col], label=col, color='gray', linewidth=2)
+        else:
+            sns.kdeplot(returns[col], label=col, linestyle='--', fill=False)
     plt.title("Returns Distribution", fontsize=16)
     plt.xlabel("Returns", fontsize=14)
     plt.ylabel("Density", fontsize=14)
@@ -40,15 +70,31 @@ def visualize_returns_distribution(performance, config):
 
 
 def visualize_drawdown(performance, config):
+    """
+    포트폴리오 드로우다운을 시각화합니다.
+
+    Args:
+        performance (pd.DataFrame): 포트폴리오 성과 데이터
+        config (dict): 설정 정보
+
+    Returns:
+        None
+    """
     def calculate_drawdown(series):
         wealth_index = series
         previous_peaks = wealth_index.cummax()
         drawdowns = (wealth_index - previous_peaks) / previous_peaks
         return drawdowns
+
     plt.figure(figsize=(14, 7))
     for col in performance.columns:
         drawdown = calculate_drawdown(performance[col])
-        plt.plot(drawdown.index, drawdown, label=col)
+        if col == 'EWP':
+            plt.plot(drawdown.index, drawdown, label=col, color='black', linewidth=2)
+        elif col == 'SPY':
+            plt.plot(drawdown.index, drawdown, label=col, color='gray', linewidth=2)
+        else:
+            plt.plot(drawdown.index, drawdown, label=col, linestyle='--')
     plt.title("Portfolio Drawdown", fontsize=16)
     plt.xlabel("Date", fontsize=14)
     plt.ylabel("Drawdown", fontsize=14)
@@ -61,6 +107,17 @@ def visualize_drawdown(performance, config):
 
 
 def visualize_weights_over_time(weights_over_time, date_index, config):
+    """
+    시간에 따른 포트폴리오 가중치를 시각화합니다.
+
+    Args:
+        weights_over_time (dict): 시간에 따른 가중치 데이터
+        date_index (pd.DatetimeIndex): 날짜 인덱스
+        config (dict): 설정 정보
+
+    Returns:
+        None
+    """
     n_stocks = list(weights_over_time.values())[0].shape[1]
     tickers = pd.read_csv("data/return_df.csv", index_col=0).columns[:n_stocks]
 
@@ -83,7 +140,7 @@ def visualize_weights_over_time(weights_over_time, date_index, config):
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
         # Plot area chart
-        weights_df.plot.area(stacked=True, ax=ax)
+        weights_df.plot.area(stacked=True, ax=ax, alpha=0.5)
         
         plt.title(f"Weights Over Time - {identifier}", fontsize=14)
         plt.ylabel("Weight", fontsize=12)
@@ -105,4 +162,3 @@ def visualize_weights_over_time(weights_over_time, date_index, config):
         plt.close()
 
     print(f"생성된 그래프: {len(weights_over_time)}개")
-

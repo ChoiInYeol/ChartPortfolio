@@ -1,0 +1,252 @@
+Configuration: {'START': '2001-01-01', 'END': '2024-09-01', 'N_STOCK': 50, 'LEN_DATA': 5000, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_RATIO': 0.6, 'VAL_RATIO': 0.2, 'TEST_RATIO': 0.2, 'RESULT_DIR': 'result/TRANSFORMER_False_mean_variance_60_20', 'MODELS': ['GRU', 'TCN', 'TRANSFORMER'], 'MULTIMODAL_OPTIONS': [False], 'LOSS_FUNCTIONS': ['max_sharpe', 'equal_risk_parity', 'mean_variance'], 'TRAIN_LEN_OPTIONS': [60], 'PRED_LEN_OPTIONS': [20], 'SEED': 42, 'BATCH': 32, 'EPOCHS': 500, 'EARLY_STOP': 20, 'MIN_DELTA': 0.0001, 'LR': 0.005, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'LB': 0, 'UB': 0.2, 'N_FEAT': 50, 'BETA': 0.2, 'LOSS_FUNCTION': 'mean_variance', 'TCN': {'n_output': 50, 'kernel_size': 4, 'n_dropout': 0.1, 'n_timestep': 60, 'hidden_size': 64, 'level': 3}, 'GRU': {'n_layers': 1, 'hidden_dim': 128, 'dropout_p': 0.3, 'bidirectional': False}, 'TRANSFORMER': {'n_timestep': 60, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.1, 'n_output': 50}, 'MODEL': 'TRANSFORMER', 'MULTIMODAL': False}
+Model: transformer, Multimodal: False, Loss Function: mean_variance
+Loading and processing data...
+Epoch 1/500, Training Loss: 0.045706
+Epoch 1/500, Validation Loss: 0.047086
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_1_loss_0.0471.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 2/500, Training Loss: 0.037415
+Epoch 2/500, Validation Loss: 0.044649
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_2_loss_0.0446.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 3/500, Training Loss: 0.033264
+Epoch 3/500, Validation Loss: 0.043371
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_3_loss_0.0434.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 4/500, Training Loss: 0.030888
+Epoch 4/500, Validation Loss: 0.042359
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_4_loss_0.0424.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 5/500, Training Loss: 0.029992
+Epoch 5/500, Validation Loss: 0.042428
+No significant improvement in validation loss. Early stop count: 1
+Epoch 6/500, Training Loss: 0.029855
+Epoch 6/500, Validation Loss: 0.042286
+No significant improvement in validation loss. Early stop count: 2
+Epoch 7/500, Training Loss: 0.029469
+Epoch 7/500, Validation Loss: 0.042042
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_7_loss_0.0420.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 8/500, Training Loss: 0.029356
+Epoch 8/500, Validation Loss: 0.041871
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_8_loss_0.0419.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 9/500, Training Loss: 0.028978
+Epoch 9/500, Validation Loss: 0.041767
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_9_loss_0.0418.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 10/500, Training Loss: 0.028779
+Epoch 10/500, Validation Loss: 0.041694
+No significant improvement in validation loss. Early stop count: 1
+Epoch 11/500, Training Loss: 0.028975
+Epoch 11/500, Validation Loss: 0.041657
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_11_loss_0.0417.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 12/500, Training Loss: 0.028532
+Epoch 12/500, Validation Loss: 0.041623
+No significant improvement in validation loss. Early stop count: 1
+Epoch 13/500, Training Loss: 0.028961
+Epoch 13/500, Validation Loss: 0.041603
+No significant improvement in validation loss. Early stop count: 2
+Epoch 14/500, Training Loss: 0.028569
+Epoch 14/500, Validation Loss: 0.041584
+No significant improvement in validation loss. Early stop count: 3
+Epoch 15/500, Training Loss: 0.028638
+Epoch 15/500, Validation Loss: 0.041571
+No significant improvement in validation loss. Early stop count: 4
+Epoch 16/500, Training Loss: 0.028579
+Epoch 16/500, Validation Loss: 0.041549
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_16_loss_0.0415.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 17/500, Training Loss: 0.028533
+Epoch 17/500, Validation Loss: 0.041531
+No significant improvement in validation loss. Early stop count: 1
+Epoch 18/500, Training Loss: 0.028445
+Epoch 18/500, Validation Loss: 0.041511
+No significant improvement in validation loss. Early stop count: 2
+Epoch 19/500, Training Loss: 0.028615
+Epoch 19/500, Validation Loss: 0.041500
+No significant improvement in validation loss. Early stop count: 3
+Epoch 20/500, Training Loss: 0.028365
+Epoch 20/500, Validation Loss: 0.041491
+No significant improvement in validation loss. Early stop count: 4
+Epoch 21/500, Training Loss: 0.028457
+Epoch 21/500, Validation Loss: 0.041471
+No significant improvement in validation loss. Early stop count: 5
+Epoch 22/500, Training Loss: 0.028380
+Epoch 22/500, Validation Loss: 0.041452
+No significant improvement in validation loss. Early stop count: 6
+Epoch 23/500, Training Loss: 0.028377
+Epoch 23/500, Validation Loss: 0.041446
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_23_loss_0.0414.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 24/500, Training Loss: 0.028357
+Epoch 24/500, Validation Loss: 0.041430
+No significant improvement in validation loss. Early stop count: 1
+Epoch 25/500, Training Loss: 0.028586
+Epoch 25/500, Validation Loss: 0.041415
+No significant improvement in validation loss. Early stop count: 2
+Epoch 26/500, Training Loss: 0.028210
+Epoch 26/500, Validation Loss: 0.041400
+No significant improvement in validation loss. Early stop count: 3
+Epoch 27/500, Training Loss: 0.028140
+Epoch 27/500, Validation Loss: 0.041368
+No significant improvement in validation loss. Early stop count: 4
+Epoch 28/500, Training Loss: 0.028160
+Epoch 28/500, Validation Loss: 0.041358
+No significant improvement in validation loss. Early stop count: 5
+Epoch 29/500, Training Loss: 0.028260
+Epoch 29/500, Validation Loss: 0.041341
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_29_loss_0.0413.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 30/500, Training Loss: 0.028152
+Epoch 30/500, Validation Loss: 0.041330
+No significant improvement in validation loss. Early stop count: 1
+Epoch 31/500, Training Loss: 0.028061
+Epoch 31/500, Validation Loss: 0.041314
+No significant improvement in validation loss. Early stop count: 2
+Epoch 32/500, Training Loss: 0.028079
+Epoch 32/500, Validation Loss: 0.041299
+No significant improvement in validation loss. Early stop count: 3
+Epoch 33/500, Training Loss: 0.027973
+Epoch 33/500, Validation Loss: 0.041261
+No significant improvement in validation loss. Early stop count: 4
+Epoch 34/500, Training Loss: 0.027968
+Epoch 34/500, Validation Loss: 0.041268
+No significant improvement in validation loss. Early stop count: 5
+Epoch 35/500, Training Loss: 0.027794
+Epoch 35/500, Validation Loss: 0.041245
+No significant improvement in validation loss. Early stop count: 6
+Epoch 36/500, Training Loss: 0.027949
+Epoch 36/500, Validation Loss: 0.041246
+No significant improvement in validation loss. Early stop count: 7
+Epoch 37/500, Training Loss: 0.027893
+Epoch 37/500, Validation Loss: 0.041216
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_37_loss_0.0412.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 38/500, Training Loss: 0.027697
+Epoch 38/500, Validation Loss: 0.041201
+No significant improvement in validation loss. Early stop count: 1
+Epoch 39/500, Training Loss: 0.027752
+Epoch 39/500, Validation Loss: 0.041181
+No significant improvement in validation loss. Early stop count: 2
+Epoch 40/500, Training Loss: 0.027767
+Epoch 40/500, Validation Loss: 0.041158
+No significant improvement in validation loss. Early stop count: 3
+Epoch 41/500, Training Loss: 0.027724
+Epoch 41/500, Validation Loss: 0.041140
+No significant improvement in validation loss. Early stop count: 4
+Epoch 42/500, Training Loss: 0.027927
+Epoch 42/500, Validation Loss: 0.041121
+No significant improvement in validation loss. Early stop count: 5
+Epoch 43/500, Training Loss: 0.028016
+Epoch 43/500, Validation Loss: 0.041113
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_43_loss_0.0411.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 44/500, Training Loss: 0.027607
+Epoch 44/500, Validation Loss: 0.041094
+No significant improvement in validation loss. Early stop count: 1
+Epoch 45/500, Training Loss: 0.027832
+Epoch 45/500, Validation Loss: 0.041083
+No significant improvement in validation loss. Early stop count: 2
+Epoch 46/500, Training Loss: 0.027605
+Epoch 46/500, Validation Loss: 0.041082
+No significant improvement in validation loss. Early stop count: 3
+Epoch 47/500, Training Loss: 0.027690
+Epoch 47/500, Validation Loss: 0.041073
+No significant improvement in validation loss. Early stop count: 4
+Epoch 48/500, Training Loss: 0.027495
+Epoch 48/500, Validation Loss: 0.041061
+No significant improvement in validation loss. Early stop count: 5
+Epoch 49/500, Training Loss: 0.027552
+Epoch 49/500, Validation Loss: 0.041045
+No significant improvement in validation loss. Early stop count: 6
+Epoch 50/500, Training Loss: 0.027612
+Epoch 50/500, Validation Loss: 0.041057
+No significant improvement in validation loss. Early stop count: 7
+Epoch 51/500, Training Loss: 0.027404
+Epoch 51/500, Validation Loss: 0.041035
+No significant improvement in validation loss. Early stop count: 8
+Epoch 52/500, Training Loss: 0.027313
+Epoch 52/500, Validation Loss: 0.041054
+No significant improvement in validation loss. Early stop count: 9
+Epoch 53/500, Training Loss: 0.027392
+Epoch 53/500, Validation Loss: 0.041043
+No significant improvement in validation loss. Early stop count: 10
+Epoch 54/500, Training Loss: 0.027583
+Epoch 54/500, Validation Loss: 0.041041
+No significant improvement in validation loss. Early stop count: 11
+Epoch 55/500, Training Loss: 0.027260
+Epoch 55/500, Validation Loss: 0.041029
+No significant improvement in validation loss. Early stop count: 12
+Epoch 56/500, Training Loss: 0.027208
+Epoch 56/500, Validation Loss: 0.041038
+No significant improvement in validation loss. Early stop count: 13
+Epoch 57/500, Training Loss: 0.027285
+Epoch 57/500, Validation Loss: 0.041022
+No significant improvement in validation loss. Early stop count: 14
+Epoch 58/500, Training Loss: 0.027260
+Epoch 58/500, Validation Loss: 0.041011
+Best model saved to result/TRANSFORMER_False_mean_variance_60_20/models/best_model_epoch_58_loss_0.0410.pth
+Validation loss improved. Early stop count reset to 0.
+Epoch 59/500, Training Loss: 0.027088
+Epoch 59/500, Validation Loss: 0.041010
+No significant improvement in validation loss. Early stop count: 1
+Epoch 60/500, Training Loss: 0.027107
+Epoch 60/500, Validation Loss: 0.041025
+No significant improvement in validation loss. Early stop count: 2
+Epoch 61/500, Training Loss: 0.027125
+Epoch 61/500, Validation Loss: 0.041024
+No significant improvement in validation loss. Early stop count: 3
+Epoch 62/500, Training Loss: 0.027426
+Epoch 62/500, Validation Loss: 0.041031
+No significant improvement in validation loss. Early stop count: 4
+Epoch 63/500, Training Loss: 0.027037
+Epoch 63/500, Validation Loss: 0.041031
+No significant improvement in validation loss. Early stop count: 5
+Epoch 64/500, Training Loss: 0.027090
+Epoch 64/500, Validation Loss: 0.041026
+No significant improvement in validation loss. Early stop count: 6
+Epoch 65/500, Training Loss: 0.027347
+Epoch 65/500, Validation Loss: 0.041026
+No significant improvement in validation loss. Early stop count: 7
+Epoch 66/500, Training Loss: 0.027022
+Epoch 66/500, Validation Loss: 0.041050
+No significant improvement in validation loss. Early stop count: 8
+Epoch 67/500, Training Loss: 0.026973
+Epoch 67/500, Validation Loss: 0.041035
+No significant improvement in validation loss. Early stop count: 9
+Epoch 68/500, Training Loss: 0.027217
+Epoch 68/500, Validation Loss: 0.041065
+No significant improvement in validation loss. Early stop count: 10
+Epoch 69/500, Training Loss: 0.027208
+Epoch 69/500, Validation Loss: 0.041069
+No significant improvement in validation loss. Early stop count: 11
+Epoch 70/500, Training Loss: 0.027149
+Epoch 70/500, Validation Loss: 0.041040
+No significant improvement in validation loss. Early stop count: 12
+Epoch 71/500, Training Loss: 0.026929
+Epoch 71/500, Validation Loss: 0.041033
+No significant improvement in validation loss. Early stop count: 13
+Epoch 72/500, Training Loss: 0.026916
+Epoch 72/500, Validation Loss: 0.041034
+No significant improvement in validation loss. Early stop count: 14
+Epoch 73/500, Training Loss: 0.027175
+Epoch 73/500, Validation Loss: 0.041024
+No significant improvement in validation loss. Early stop count: 15
+Epoch 74/500, Training Loss: 0.026964
+Epoch 74/500, Validation Loss: 0.041027
+No significant improvement in validation loss. Early stop count: 16
+Epoch 75/500, Training Loss: 0.026952
+Epoch 75/500, Validation Loss: 0.041024
+No significant improvement in validation loss. Early stop count: 17
+Epoch 76/500, Training Loss: 0.026776
+Epoch 76/500, Validation Loss: 0.041006
+No significant improvement in validation loss. Early stop count: 18
+Epoch 77/500, Training Loss: 0.026789
+Epoch 77/500, Validation Loss: 0.041003
+No significant improvement in validation loss. Early stop count: 19
+Epoch 78/500, Training Loss: 0.026807
+Epoch 78/500, Validation Loss: 0.041000
+No significant improvement in validation loss. Early stop count: 20
+Early stopping at epoch 78 after 20 epochs without significant improvement.

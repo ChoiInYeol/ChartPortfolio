@@ -17,7 +17,7 @@ class PortfolioManager(object):
         signal_df: pd.DataFrame,
         freq: str,
         portfolio_dir: str,
-        start_year=2009,
+        start_year=2018,
         end_year=2024,
         country="USA",
         delay_list=None,

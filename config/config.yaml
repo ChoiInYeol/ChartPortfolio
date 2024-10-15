@@ -1,5 +1,3 @@
-# config.yaml
-
 # data
 START: '2001-01-01'
 END: '2024-09-01'
@@ -19,15 +17,17 @@ SIZE_DICT:
   120: [128, 360]
 
 # model parameter
-N_STOCK: 500
+N_STOCK: 366  # 입력 주식 수
 TRAIN_LEN: 60
 PRED_LEN: 20
-TRAIN_RATIO: 0.60
-VAL_RATIO: 0.20
-TEST_RATIO: 0.20
+
+# 데이터 분할을 날짜로 수행하므로 비율은 제거
+# 데이터 설정
+TRAIN_START_DATE: '2001-01-01'
+VAL_END_DATE: '2017-12-31'
+TEST_START_DATE: '2018-01-01'
+TEST_END_DATE: '2024-09-01'
 RESULT_DIR: 'result'
-USE_TOP_M_ASSETS: true
-TOP_M: 20
 
 # model parameter
 MODELS: ['GRU', 'TCN', 'TRANSFORMER']
@@ -40,7 +40,7 @@ SEED: 42
 # learning parameter
 BATCH: 32
 EPOCHS: 500
-EARLY_STOP: 20
+EARLY_STOP: 5
 MIN_DELTA: 0.0001
 LR: 0.005
 MOMENTUM: 0.9
@@ -67,12 +67,11 @@ GRU:
   hidden_dim: 128
   dropout_p: 0.3
   bidirectional: false
+  n_output: 50 # Best 50 in N_STOCK
 
 TRANSFORMER:
   n_timestep: 60 # TRAIN_LEN
   n_output: 50 # Best 50 in N_STOCK
-
   n_layer: 6
   n_head: 5
   n_dropout: 0.1
-  

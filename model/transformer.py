@@ -205,8 +205,11 @@ class Transformer(nn.Module):
         self.lb = lb
         self.ub = ub
         self.multimodal = multimodal
-
-        input_dim = n_stocks
+        
+        self.input_size = n_stocks   # 입력 크기 (4586)
+        self.output_size = n_output  # 출력 크기 (50)
+        
+        input_dim = self.input_size 
         self.encoder = Encoder(input_dim, n_timestep, n_layer, n_head, n_dropout)
         self.out = nn.Linear(input_dim, n_output)
         self.tempmaxpool = nn.MaxPool1d(n_timestep)

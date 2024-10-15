@@ -32,7 +32,6 @@ class Experiment(object):
         ensem=5,
         lr=1e-5,
         drop_prob=0.50,
-        device_number=0,
         max_epoch=50,
         enable_tqdm=False,
         early_stop=True,
@@ -63,10 +62,7 @@ class Experiment(object):
         self.ensem = ensem
         self.lr = lr
         self.drop_prob = drop_prob
-        self.device_number = device_number if device_number is not None else 0
-        self.device = torch.device(
-            "cuda:{}".format(self.device_number) if torch.cuda.is_available() else "cpu"
-        )
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.max_epoch = max_epoch
         self.enable_tqdm = enable_tqdm
         self.early_stop = early_stop
@@ -77,9 +73,7 @@ class Experiment(object):
         self.country = country
         if self.country == "China":
             self.oos_years = list(range(2001, 2024))
-        elif (
-            self.country in cf.START_YEAR_DICT.keys()
-        ):
+        elif self.country in cf.START_YEAR_DICT.keys():
             self.oos_years = list(range(cf.START_YEAR_DICT[self.country] + 8, 2024))
         self.oos_start_year = self.oos_years[0]
         assert transfer_learning in [None, "ft", "usa", "scaleDT"]
@@ -144,10 +138,17 @@ class Experiment(object):
 
     def load_model_state_dict_from_save_path(self, model_save_path):
         print(f"Loading model state dict from {model_save_path}")
-        model_state_dict = torch.load(model_save_path, map_location=self.device, weights_only=True)[
-            "model_state_dict"
-        ]
-        return model_state_dict
+        checkpoint = torch.load(model_save_path, map_location=self.device)
+        model_state_dict = checkpoint["model_state_dict"]
+
+        # DataParallel로 저장된 모델의 키 수정
+        from collections import OrderedDict
+        new_state_dict = OrderedDict()
+        for k, v in model_state_dict.items():
+            name = k.replace("module.", "")  # remove `module.`
+            new_state_dict[name] = v
+
+        return new_state_dict
 
     def save_exp_params_to_yaml(self):
         params = {
@@ -254,14 +255,17 @@ class Experiment(object):
             tv_dataset,
             [train_size, validate_size],
         )
+        batch_size = cf.BATCH_SIZE * max(torch.cuda.device_count(), 1)
         train_dataloader = DataLoader(
             train_dataset,
-            batch_size=cf.BATCH_SIZE,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=cf.NUM_WORKERS,
         )
         validate_dataloader = DataLoader(
-            validate_dataset, batch_size=cf.BATCH_SIZE, num_workers=cf.NUM_WORKERS
+            validate_dataset,
+            batch_size=batch_size,
+            num_workers=cf.NUM_WORKERS
         )
         dataloaders_dict = {"train": train_dataloader, "validate": validate_dataloader}
         return dataloaders_dict
@@ -313,7 +317,7 @@ class Experiment(object):
             model_save_path = self.get_model_checkpoint_path(model_num)
             if os.path.exists(model_save_path) and pretrained:
                 print("Found pretrained model {}".format(model_save_path))
-                validate_metrics = torch.load(model_save_path, weights_only=True)
+                validate_metrics = torch.load(model_save_path, map_location=self.device)
             else:
                 dataloaders_dict = self.get_train_validate_dataloaders_dict()
                 train_metrics, validate_metrics, _ = self.train_single_model(
@@ -397,6 +401,11 @@ class Experiment(object):
     def evaluate(self, model, dataloaders_dict, new_label=None):
         assert new_label in [None, 0, 1]
         print("Evaluating model on device: {}".format(self.device))
+        
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs for evaluation")
+            model = nn.DataParallel(model)
+        
         model.to(self.device)
         res_dict = {}
         for subset in dataloaders_dict.keys():
@@ -466,8 +475,6 @@ class Experiment(object):
         return loss
 
     def train_single_model(self, dataloaders_dict, model_save_path, model_num=None):
-        
-        
         if self.country != "USA" and self.tl is not None:
             us_model_save_path = model_save_path.replace(
                 f"-{self.country}-{self.tl}", ""
@@ -479,6 +486,10 @@ class Experiment(object):
                 model_state_dict=model_state_dict, device=self.device
             )
             if self.tl == "usa":
+                if torch.cuda.device_count() > 1:
+                    print(f"Using {torch.cuda.device_count()} GPUs for training")
+                    model = nn.DataParallel(model)
+                model.to(self.device)
                 validate_metrics = self.evaluate(
                     model, {"validate": dataloaders_dict["validate"]}
                 )["validate"]
@@ -493,11 +504,18 @@ class Experiment(object):
                 optimizer = optim.Adam(
                     model.fc.parameters(), lr=self.lr, weight_decay=self.weight_decay
                 )
+                if torch.cuda.device_count() > 1:
+                    print(f"Using {torch.cuda.device_count()} GPUs for training")
+                    model = nn.DataParallel(model)
                 model.to(self.device)
             else:
                 raise ValueError(f"{self.tl} on {self.country} not supported")
         else:
             model = self.model_obj.init_model(device=self.device, state_dict=None)
+            if torch.cuda.device_count() > 1:
+                print(f"Using {torch.cuda.device_count()} GPUs for training")
+                model = nn.DataParallel(model)
+            model.to(self.device)
             optimizer = optim.Adam(
                 model.parameters(), lr=self.lr, weight_decay=self.weight_decay
             )
@@ -564,10 +582,6 @@ class Experiment(object):
                 )
                 
                 print(epoch_stat)
-                
-                # if "tqdm" in sys.modules and self.enable_tqdm:
-                #     data_iterator.set_postfix(postfix_for_tqdm)
-                #     data_iterator.update()
                     
                 if phase == "validate":
                     if epoch_stat["loss"] < best_validate_metrics["loss"]:
@@ -585,10 +599,10 @@ class Experiment(object):
                         print("{} pct chg: {:.4f}".format(name, pct_chg))
                         prev_weight_dict[name] = param.data.clone()
 
-            if self.early_stop and (epoch - best_validate_metrics["epoch"]) >= 2: # 2번 이상 안 줄면 종료
+            if self.early_stop and (epoch - best_validate_metrics["epoch"]) >= 2:
                 break
             print()
-            
+                
         time_elapsed = time.time() - since
         print(
             "Training complete in {:.0f}m {:.0f}s".format(
@@ -602,7 +616,13 @@ class Experiment(object):
         )
         model.load_state_dict(best_model)
         best_validate_metrics["model_state_dict"] = model.state_dict().copy()
-        torch.save(best_validate_metrics, model_save_path)
+
+        # 모델 저장 시 DataParallel 사용 여부에 따라 저장 방식 변경
+        if isinstance(model, nn.DataParallel):
+            torch.save(best_validate_metrics, model_save_path)
+        else:
+            torch.save(best_validate_metrics, model_save_path)
+        
         train_metrics = self.evaluate(model, {"train": dataloaders_dict["train"]})[
             "train"
         ]
@@ -623,11 +643,16 @@ class Experiment(object):
         model_list = [self.model_obj.init_model() for _ in range(self.ensem)]
         try:
             for i in range(self.ensem):
-                model_list[i].load_state_dict(
-                    self.load_model_state_dict_from_save_path(
-                        self.get_model_checkpoint_path(i)
-                    )
+                state_dict = self.load_model_state_dict_from_save_path(
+                    self.get_model_checkpoint_path(i)
                 )
+                model_list[i].load_state_dict(state_dict)
+
+                # 모델을 DataParallel로 래핑
+                if torch.cuda.device_count() > 1:
+                    model_list[i] = nn.DataParallel(model_list[i])
+
+                model_list[i].to(self.device)
         except FileNotFoundError:
             print("Failed to load pretrained models")
             return None
@@ -650,7 +675,6 @@ class Experiment(object):
             else:
                 total_prob = torch.zeros(len(image), 1, device=self.device)
             for model in model_list:
-                model.to(self.device)
                 model.eval()
                 with torch.set_grad_enabled(False):
                     outputs = model(image)
@@ -702,11 +726,17 @@ class Experiment(object):
                     )
                 )
                 for i, model in enumerate(model_list):
-                    model.load_state_dict(
-                        self.load_model_state_dict_from_save_path(
-                            year_models_path_dict[year][i]
-                        )
+                    state_dict = self.load_model_state_dict_from_save_path(
+                        year_models_path_dict[year][i]
                     )
+                    model.load_state_dict(state_dict)
+
+                    # 모델을 DataParallel로 래핑
+                    if torch.cuda.device_count() > 1:
+                        model = nn.DataParallel(model)
+
+                    model.to(self.device)
+                    model_list[i] = model
 
                 year_dataloader = self._get_dataloader_for_year(
                     year,
@@ -891,7 +921,8 @@ class Experiment(object):
                 chart_type=self.chart_type,
                 delayed_ret=self.delayed_ret,
             )
-        year_dataloader = DataLoader(year_dataset, batch_size=cf.BATCH_SIZE)
+        batch_size = cf.BATCH_SIZE * max(torch.cuda.device_count(), 1)
+        year_dataloader = DataLoader(year_dataset, batch_size=batch_size)
         return year_dataloader
 
     def get_pf_res_path(
@@ -1002,7 +1033,6 @@ def get_exp_obj_by_spec(
     pw,
     train_freq=None,
     ensem=5,
-    dn=0,
     country="USA",
     transfer_learning=None,
     is_years=cf.IS_YEARS,
@@ -1095,7 +1125,6 @@ def get_exp_obj_by_spec(
         ensem=ensem,
         lr=lr,
         drop_prob=drop_prob,
-        device_number=dn,
         has_ma=has_ma,
         has_volume_bar=has_volume_bar,
         is_years=is_years,
@@ -1117,7 +1146,7 @@ def get_exp_obj_by_spec(
         
         # 여기서 따로 설정해 max_epoch, enable_tqdm, Early_stop
         max_epoch=500,
-        enable_tqdm=True,
+        enable_tqdm=False,
         early_stop=True,
     )
 
@@ -1126,7 +1155,6 @@ def get_exp_obj_by_spec(
 def get_bl_exp_obj(
     ws,
     pw,
-    dn=0,
     train_freq=None,
     drop_prob=0.5,
     train_size_ratio=0.7,
@@ -1178,7 +1206,6 @@ def get_bl_exp_obj(
         if train_freq is not None
         else "month",
         ensem=ensem,
-        dn=dn,
         country=country,
         is_years=is_years,
         oos_years=oos_years,
@@ -1224,7 +1251,6 @@ def run_arch_comparison(
     pw=20,
     ensem=5,
     load_saved_data=True,
-    dn=None,
     ohlc_len=None,
     tl=None,
     pretrained=True,
@@ -1234,11 +1260,9 @@ def run_arch_comparison(
 ):
     torch.set_num_threads(1)
     if total_worker > 1:
-        assert 0 < (worker_idx + 1) <= total_worker
-        dn = worker_idx % 2 if dn is None else dn
+        assert 0 <= worker_idx < total_worker
     else:
         worker_idx = 0
-        dn = dn if dn is not None else 0
 
     _ohlc_len = ws if ohlc_len is None else ohlc_len
     param_dict_list = [
@@ -1280,7 +1304,6 @@ def run_arch_comparison(
             pw,
             train_freq=None,
             ensem=ensem,
-            dn=dn,
             ohlc_len=ohlc_len,
             transfer_learning=tl,
             chart_type=chart_type,
@@ -1304,7 +1327,6 @@ def train_us_model(
     dp=0.50,
     ensem=5,
     total_worker=1,
-    dn=None,
     from_ensem_res=True,
     ensem_range=None,
     train_size_ratio=0.7,
@@ -1325,8 +1347,12 @@ def train_us_model(
 ):
     torch.set_num_threads(1)
     if total_worker > 1:
-        worker_idx = int(sys.argv[1])
-        assert 0 < (worker_idx + 1) <= total_worker
+        try:
+            worker_idx = int(sys.argv[1])
+            assert 0 <= worker_idx < total_worker
+        except (IndexError, ValueError):
+            print("명령줄 인자가 없거나 잘못되었습니다. worker_idx를 0으로 설정합니다.")
+            worker_idx = 0
     else:
         worker_idx = 0
 
@@ -1339,14 +1365,11 @@ def train_us_model(
     worker_setting_list = [
         setting_list[i] for i in range(worker_idx, len(setting_list), total_worker)
     ]
-    if dn is None:
-        dn = (worker_idx + 0) % 2
 
     for ws, pw in worker_setting_list:
         exp_obj = get_bl_exp_obj(
             ws,
             pw,
-            dn=dn,
             drop_prob=dp,
             train_size_ratio=train_size_ratio,
             ensem=ensem,
@@ -1388,8 +1411,12 @@ def train_my_model(
 ):
     torch.set_num_threads(1)
     if total_worker > 1:
-        worker_idx = int(sys.argv[1])
-        assert 0 < (worker_idx + 1) <= total_worker
+        try:
+            worker_idx = int(sys.argv[1])
+            assert 0 <= worker_idx < total_worker
+        except (IndexError, ValueError):
+            print("명령줄 인자가 없거나 잘못되었습니다. worker_idx를 0으로 설정합니다.")
+            worker_idx = 0
     else:
         worker_idx = 0
 
@@ -1398,13 +1425,11 @@ def train_my_model(
     print(f"Worker {worker_idx} from {total_worker} workers for {len(setting_list)} jobs")
 
     worker_setting_list = [setting_list[i] for i in range(worker_idx, len(setting_list), total_worker)]
-    device_number = (worker_idx + 0) % 2
-
+    
     for ws, pw in worker_setting_list:
         exp_obj = get_bl_exp_obj(
             ws,
             pw,
-            dn=device_number,
             drop_prob=drop_prob,
             ensem=ensem,
             has_volume_bar=has_volume_bar,

@@ -11,9 +11,15 @@ class TCN(nn.Module):
         self.lb = lb
         self.ub = ub
         self.multimodal = multimodal
-        input_dim = n_stocks
+        
+        self.input_size = n_stocks   # 입력 크기 (4586)
+        self.output_size = n_output  # 출력 크기 (50)
+        
+        input_dim = self.input_size
+        
         num_channels = [hidden_size] * (level - 1) + [n_timestep]
         self.tcn = TemporalConvNet(input_dim, num_channels, kernel_size=kernel_size, dropout=n_dropout)
+
         self.fc = nn.Linear(num_channels[-1], n_output)
         self.tempmaxpool = nn.MaxPool1d(n_timestep)
 

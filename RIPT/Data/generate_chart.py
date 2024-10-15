@@ -476,7 +476,7 @@ class GenerateStockData(object):
             ret_len_list=self.ret_len_list
         )
         
-        chunksize = max(1, len(self.stock_id_list) // (mp.cpu_count() * 2))
+        chunksize = max(1, len(self.stock_id_list) // (mp.cpu_count() * 4))
         with mp.Pool(processes=mp.cpu_count()) as pool:
             all_results = list(tqdm(
                 pool.imap(process_stock_partial, self.stock_id_list, chunksize=chunksize),
@@ -612,7 +612,7 @@ class GenerateStockData(object):
             ma_lags=self.ma_lags,
             ret_len_list=self.ret_len_list
         )
-        chunksize = max(1, len(self.stock_id_list) // (mp.cpu_count() * 2))
+        chunksize = max(1, len(self.stock_id_list) // (mp.cpu_count() * 4))
         with mp.Pool(processes=mp.cpu_count()) as pool:
             all_results = list(tqdm(pool.imap(process_stock_ts_partial, self.stock_id_list, chunksize=chunksize), total=len(self.stock_id_list), disable=not self.allow_tqdm))
 

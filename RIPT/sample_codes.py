@@ -3,7 +3,7 @@ from Data.generate_chart import GenerateStockData
 import torch
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.set_num_threads(1)
 
@@ -50,14 +50,14 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
 if __name__ == "__main__":
     # 데이터 생성
     year_list = list(range(2001, 2025))
-    ws_list = [20]
+    ws_list = [5, 20]
     # generate_training_data(year_list, ws_list)
     
     print(device)
 
     # CNN2D 모델 훈련
     train_my_model(
-        ws_list=[20],
+        ws_list=ws_list,
         pw_list=[20],
         drop_prob=0.50,
         ensem=5,
