@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import time
 from Data import dgp_config as dcf
-from tqdm import tqdm
 
 def safe_exp(x):
     return np.exp(np.clip(x, -10, 10))
@@ -51,11 +50,11 @@ def create_benchmark_returns():
         if freq == 'week':
             returns = df.groupby([pd.Grouper(freq='W'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         elif freq == 'month':
-            returns = df.groupby([pd.Grouper(freq='M'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
+            returns = df.groupby([pd.Grouper(freq='ME'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         elif freq == 'quarter':
-            returns = df.groupby([pd.Grouper(freq='Q'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
+            returns = df.groupby([pd.Grouper(freq='QE'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         else:  # year
-            returns = df.groupby([pd.Grouper(freq='Y'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
+            returns = df.groupby([pd.Grouper(freq='YE'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
         
         # 0이 아닌 유효한 값만 선택하여 1/N 방식으로 평균 계산
         benchmark_returns = returns.groupby(level=0).apply(lambda x: x[x != 0].mean())

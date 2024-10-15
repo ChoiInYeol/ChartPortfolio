@@ -103,7 +103,7 @@ class Experiment(object):
         self.exp_name = f"{self.ws}D{self.pw}P"
         self.pf_dir = self.get_portfolio_dir()
         
-        self.model_dir = os.path.join(cf.EXP_DIR, self.model_obj.name, self.exp_name)
+        self.model_dir = os.path.join(cf.WORK_DIR, self.model_obj.name, self.exp_name)
         os.makedirs(self.model_dir, exist_ok=True)
         
         self.ensem_res_dir = ut.get_dir(os.path.join(self.model_dir, "ensem_res"))

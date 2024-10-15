@@ -5,16 +5,26 @@ from pathlib import Path
 from Misc.config import WORK_DIR
 
 def get_dir(path):
+    """
+    Creates a directory if it does not exist.
+
+    Args:
+        path (str): The directory path to create.
+
+    Returns:
+        str: The directory path.
+    """
     if not op.exists(path):
         os.makedirs(path)
     return path
 
-WORK_DIR = os.getcwd()
+# Set WORK_DIR to the RIPT folder
+WORK_DIR = op.join(os.getcwd(), "RIPT")
 DATA_DIR = op.join(WORK_DIR, "data")
-PROCESSED_DATA_DIR = op.join(WORK_DIR, "RIPT_processed_data")
-STOCKS_SAVEPATH = op.join(WORK_DIR, "RIPT_stocks_dataset")
+PROCESSED_DATA_DIR = op.join(WORK_DIR, "processed_data")
+STOCKS_SAVEPATH = op.join(WORK_DIR, "Dataset")
 RAW_DATA_DIR = op.join(STOCKS_SAVEPATH, "raw_data")
-CACHE_DIR = op.join(WORK_DIR, "RIPT_cache")
+CACHE_DIR = op.join(WORK_DIR, "cache")
 
 for dir_path in [PROCESSED_DATA_DIR, STOCKS_SAVEPATH, RAW_DATA_DIR, CACHE_DIR]:
     get_dir(dir_path)

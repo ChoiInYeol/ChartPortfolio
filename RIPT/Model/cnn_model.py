@@ -497,7 +497,7 @@ def get_full_model_name(
     }
     
     # YAML 파일로 저장
-    yaml_dir = os.path.join(cf.EXP_DIR, model_name)
+    yaml_dir = os.path.join(cf.WORK_DIR, model_name)
     os.makedirs(yaml_dir, exist_ok=True)
     yaml_path = os.path.join(yaml_dir, "model_details.yaml")
     

@@ -1,4 +1,5 @@
 # coding: utf-8
+# optimization.py
 
 import pandas as pd
 import numpy as np
@@ -11,11 +12,22 @@ import scienceplots
 plt.style.use(['science', 'nature'])
 
 # 설정 값들
-TRAIN = '2018-12-31'
+TRAIN = '2017-12-31'
 MODELS = ['CNN', 'TS']
 WINDOW_SIZES = [5, 20, 60]
-BASE_FOLDER = 'RIPT_WORK_SPACE/new_model_res/'
+BASE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'WORK_DIR')
 
+# 1. 데이터 로드 및 전처리
+def load_and_preprocess_data():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, 'processed_data', 'us_ret.feather')
+    us_ret = pd.read_feather(file_path)
+    us_ret = us_ret[us_ret['Date'] >= TRAIN]
+    us_ret = us_ret.pivot(index='Date', columns='StockID', values='Ret')
+    us_ret.fillna(0, inplace=True)
+    return us_ret
+
+# 2. 앙상블 결과 처리
 def load_ensemble_results(folder_path):
     """
     폴더 내의 모든 앙상블 결과 파일을 로드하고 하나의 데이터프레임으로 병합합니다.
@@ -48,25 +60,52 @@ def load_ensemble_results(folder_path):
     
     return combined_df
 
+def process_ensemble_results(base_folder):
+    for model in MODELS:
+        for w in WINDOW_SIZES:
+            folder_path = os.path.join(base_folder, f'{model}{w}', f'{w}D20P', 'ensem_res')
+            output_path = os.path.join(base_folder, f'ensemble_{model}{w}_res.feather')
+            
+            print(f'Processing Ensemble {model}{w}...   ', end='')
+            try:
+                ensemble_results = load_ensemble_results(folder_path)
+                ensemble_results.to_feather(output_path)
+                print(f'Shape of the dataframe: {ensemble_results.shape}')
+            except Exception as e:
+                print(f'Error processing {model}{w}: {str(e)}')
+
 def load_and_process_ensemble_results(file_path, n_stocks, top=True):
     """
-    앙상블 결과를 로드하고 처리하여 각 날짜별 상위 N개 또는 하위 N개 주식을 선택합니다.
+    앙상블 결과를 로드하고 처리합니다.
+
+    Args:
+        file_path (str): 앙상블 결과 파일 경로
+        n_stocks (int): 선택할 주식 수
+        top (bool): True면 상위 주식 선택, False면 하위 주식 선택
+
+    Returns:
+        pd.DataFrame: 처리된 주식 선택 결과
     """
     # 앙상블 결과 로드
     ensemble_results = pd.read_feather(file_path)
     
-    # up_prob 확인
-    print(f"up_prob range: {ensemble_results['up_prob'].min()} to {ensemble_results['up_prob'].max()}")
+    # MultiIndex인 경우 리셋
+    if isinstance(ensemble_results.index, pd.MultiIndex):
+        ensemble_results = ensemble_results.reset_index()
     
-    # Long format으로 변환 및 정렬
-    ensemble_results_long = (ensemble_results
-                             .pivot_table(index='ending_date', columns='StockID', values='up_prob')
-                             .reset_index()
-                             .melt(id_vars=['ending_date'], var_name='StockID', value_name='up_prob')
-                             .sort_values(['ending_date', 'up_prob'], ascending=[True, not top]))
+    print(ensemble_results.head())
     
-    # 각 날짜별 상위 N개 또는 하위 N개 주식 선택
-    selected_stocks = ensemble_results_long.groupby('ending_date').head(n_stocks)
+    # 날짜 변환
+    ensemble_results['investment_date'] = pd.to_datetime(ensemble_results['investment_date'])
+    
+    # StockID를 문자열로 변환
+    ensemble_results['StockID'] = ensemble_results['StockID'].astype(str)
+    
+    # investment_date 기준으로 정렬 및 up_prob에 따라 선택
+    ensemble_results_sorted = ensemble_results.sort_values(['investment_date', 'up_prob'], ascending=[True, not top])
+    
+    # 각 investment_date에 대해 상위 또는 하위 N개 주식 선택
+    selected_stocks = ensemble_results_sorted.groupby('investment_date').head(n_stocks)
     selected_stocks.reset_index(drop=True, inplace=True)
     
     return selected_stocks
@@ -117,64 +156,41 @@ def portfolio_optimization(returns, method='min_var'):
         return initial_weights  # 최적화 실패 시 균등 가중치 반환
 
 def calculate_portfolio_returns(us_ret, selected_stocks_list, method='min_var'):
-    """
-    포트폴리오 최적화 및 수익률 계산을 수행합니다.
-    """
     portfolio_weights = {}
-    
-    for i, (rebalance_date, stock_ids) in enumerate(selected_stocks_list):
-        # 리밸런싱 날짜 설정
-        end_date = rebalance_date
-        if i > 0:
-            start_date = selected_stocks_list[i - 1][0]
-        else:
-            start_date = us_ret.index.min()
-        
-        # 최적화에 사용할 기간의 수익률 데이터 추출
-        period_returns = us_ret.loc[start_date:end_date, stock_ids]
-        
-        # 결측치 처리
-        period_returns = period_returns.dropna(axis=0, how='any')
-        
-        if period_returns.shape[0] < 2:
-            print(f"Not enough data to optimize for period ending on {end_date}")
-            continue
-        
-        # 포트폴리오 최적화 수행
-        try:
-            if method == 'equal_weight':
-                n = len(stock_ids)
-                weights = np.array(n * [1. / n])
-            else:
-                weights = portfolio_optimization(period_returns, method=method)
-            portfolio_weights[rebalance_date] = pd.Series(weights, index=stock_ids)
-        except Exception as e:
-            print(f"Optimization failed for period starting on {rebalance_date}: {e}")
-            continue
-    
-    # 포트폴리오 수익률 계산
     portfolio_returns = pd.Series(dtype=float)
     
-    dates = list(portfolio_weights.keys())
-    for i, date in enumerate(dates):
-        weights_series = portfolio_weights[date]
-        start_date = date
-        if i < len(dates) - 1:
-            end_date = dates[i + 1]
+    for i, (investment_date, stock_ids) in enumerate(selected_stocks_list):
+        # Determine the end date of the investment period
+        if i < len(selected_stocks_list) - 1:
+            end_date = selected_stocks_list[i + 1][0]
         else:
             end_date = us_ret.index.max()
         
-        # 투자 기간의 수익률 데이터 추출
-        period_returns = us_ret.loc[start_date:end_date, weights_series.index]
-        # 일별 포트폴리오 수익률 계산
-        daily_portfolio_returns = period_returns.dot(weights_series)
-        # 포트폴리오 수익률에 추가
+        # Get returns for the investment period
+        period_returns = us_ret.loc[investment_date:end_date, stock_ids]
+        
+        # Handle missing data
+        period_returns = period_returns.dropna(axis=0, how='any')
+        
+        if period_returns.empty:
+            continue
+        
+        # Perform portfolio optimization
+        if method == 'equal_weight':
+            n = len(stock_ids)
+            weights = np.array(n * [1. / n])
+        else:
+            weights = portfolio_optimization(period_returns, method=method)
+        
+        # Calculate daily portfolio returns
+        daily_portfolio_returns = period_returns.dot(weights)
         portfolio_returns = portfolio_returns._append(daily_portfolio_returns)
     
-    # 누적 수익률 계산
+    # Compute cumulative returns
     cumulative_returns = (1 + portfolio_returns).cumprod()
     
     return cumulative_returns
+
 
 def calculate_portfolio_up_prob(selected_stocks, rebalance_dates):
     """
@@ -188,8 +204,13 @@ def calculate_portfolio_up_prob(selected_stocks, rebalance_dates):
     return up_prob_series
 
 def main():
-    # us_ret 데이터 로드
-    us_ret = pd.read_feather('./RIPT_processed_data/us_ret_TRAIN.feather')
+    # 1. 데이터 로드 및 전처리
+    us_ret = load_and_preprocess_data()
+    print("Data loaded and preprocessed.")
+
+    # 2. 앙상블 결과 처리
+    process_ensemble_results(BASE_FOLDER)
+    print("Ensemble results processed.")
     
     # 모델 및 윈도우 사이즈 설정
     models = ['CNN', 'TS']
@@ -234,11 +255,11 @@ def main():
     for model in models:
         for window_size in window_sizes:
             # 앙상블 결과 파일 로드
-            file_path = f'./RIPT_WORK_SPACE/ensemble_{model}{window_size}_res.feather'
+            file_path = os.path.join(BASE_FOLDER, f'ensemble_{model}{window_size}_res.feather')
             if not os.path.exists(file_path):
-                print(f"File not found: {file_path}")
+                print(f"파일을 찾을 수 없습니다: {file_path}")
                 continue
-            print(f'Processing Model: {model}, Window Size: {window_size}')
+            print(f'처리 중인 모델: {model}, 윈도우 크기: {window_size}')
             
             cumulative_returns_dict = {}  # 포트폴리오별 누적 수익률 저장
             up_prob_dict = {}  # 포트폴리오별 평균 up_prob 저장
@@ -252,8 +273,8 @@ def main():
                 selected_stocks = load_and_process_ensemble_results(file_path, n_stocks=n_stocks, top=top)
                 
                 # 리밸런싱 날짜 설정
-                selected_stocks = selected_stocks[selected_stocks['ending_date'] >= TRAIN]
-                rebalance_dates = selected_stocks['ending_date'].unique()
+                selected_stocks = selected_stocks[selected_stocks['investment_date'] >= TRAIN]
+                rebalance_dates = selected_stocks['investment_date'].unique()
                 
                 # 포트폴리오 구성
                 selected_stocks_list = select_top_stocks(selected_stocks, rebalance_dates, n_stocks)
@@ -312,7 +333,6 @@ def main():
             ax1.legend()
             ax1.grid(True)
             fig1.tight_layout()
-            fig1.savefig(f'cumulative_returns_{model}{window_size}.png')
 
             # 예측 편향 검증
             benchmark = cumulative_returns_df.mean(axis=1)
@@ -342,7 +362,6 @@ def main():
             ax2.grid(True)
             ax2.axhline(y=1, color='black', linestyle='--')  # 벤치마크 라인
             fig2.tight_layout()
-            fig2.savefig(f'relative_performance_{model}{window_size}.png')
 
             # 평균 up_prob 그래프
             color_index = 0
@@ -363,13 +382,12 @@ def main():
             ax3.set_title(f'Average up_prob - Model: {model}, Window Size: {window_size}')
             ax3.set_xlabel('Date')
             ax3.set_ylabel('Average up_prob')
-            ax3.legend()@
+            ax3.legend()
             ax3.grid(True)
             fig3.tight_layout()
-            fig3.savefig(f'average_up_prob_{model}{window_size}.png')
 
             # 폴더 생성
-            folder_name = f'{model}_{window_size}'
+            folder_name = os.path.join(BASE_FOLDER, f'{model}{window_size}')
             os.makedirs(folder_name, exist_ok=True)
 
             # 그래프 저장
