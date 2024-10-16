@@ -48,16 +48,16 @@ def plot_portfolio_performance(data_dict, folder_name):
     plt.grid(True)
     plt.tight_layout()
     
-    save_path = os.path.join('RIPT_WORK_SPACE/new_model_res/portfolio', folder_name, 'cumulative_returns.png')
+    save_path = os.path.join('RIPT/WORK_DIR/portfolio', folder_name, 'cumulative_returns.png')
     plt.savefig(save_path)
     plt.close()
 
 def main():
-    portfolio_dir = 'RIPT_WORK_SPACE/new_model_res/portfolio'
-    folders = [
-        'USA_CNN20_20d20p_e5_2018-2023',
-        'USA_CNN5_5d20p_e5_2018-2023'
-    ]
+    portfolio_dir = 'RIPT/WORK_DIR/portfolio'
+    
+    # 폴더 리스트 portfolio_dir에서 모든 폴더를 가져옴
+    # glob 이용
+    folders = os.listdir(portfolio_dir)
 
     for folder in folders:
         data_dict = {}

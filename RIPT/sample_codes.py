@@ -25,14 +25,14 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
         for ws in ws_list:
             print(f"Generating data for {ws}D {freq} {chart_type} {year}")
             
-            ma_lags = [ws]  # 윈도우 사이즈와 동일한 이동평균 기간 사용
-            vb = True  # 거래량 바 포함
+            ma_lags = None  # 윈도우 사이즈와 동일한 이동평균 기간 사용 or None
+            vb = False  # 거래량 바 포함 여부
             
             dgp_obj = GenerateStockData(
                 country,
                 year,
                 ws,
-                freq,
+                freq='month',
                 chart_freq=1,  # 차트 주기 (I20/R20 to R5/R5의 경우, ws=20, chart_freq=4로 설정)
                 ma_lags=ma_lags,
                 volume_bar=vb,
@@ -55,23 +55,7 @@ if __name__ == "__main__":
     
     print(device)
 
-    # CNN2D 모델 훈련
-    train_my_model(
-        ws_list=ws_list,
-        pw_list=[20],
-        drop_prob=0.50,
-        ensem=5,
-        total_worker=1,
-        is_ensem_res=True,
-        has_volume_bar=True,
-        has_ma=True,
-        chart_type="bar",
-        calculate_portfolio=True,
-        ts1d_model=False,
-        lr=1e-5,
-    )
-    
-    # CNN1D 모델 훈련
+    # # CNN2D 모델 훈련
     # train_my_model(
     #     ws_list=ws_list,
     #     pw_list=[20],
@@ -83,9 +67,25 @@ if __name__ == "__main__":
     #     has_ma=True,
     #     chart_type="bar",
     #     calculate_portfolio=True,
-    #     ts1d_model=True,
+    #     ts1d_model=False,
     #     lr=1e-5,
     # )
+    
+    # CNN1D 모델 훈련
+    train_my_model(
+        ws_list=ws_list,
+        pw_list=[20],
+        drop_prob=0.50,
+        ensem=5,
+        total_worker=1,
+        is_ensem_res=True,
+        has_volume_bar=True,
+        has_ma=True,
+        chart_type="bar",
+        calculate_portfolio=True,
+        ts1d_model=True,
+        lr=1e-5,
+    )
     
     
     # train_us_model(

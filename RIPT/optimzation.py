@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 import os
 from scipy.optimize import minimize
 
+def _ret_to_cum_log_ret(rets):
+    log_rets = np.log(rets.astype(float) + 1)
+    return log_rets.cumsum()
+
 # 그래프 스타일 설정
 import scienceplots
 plt.style.use(['science', 'nature'])
@@ -24,8 +28,110 @@ def load_and_preprocess_data():
     us_ret = pd.read_feather(file_path)
     us_ret = us_ret[us_ret['Date'] >= TRAIN]
     us_ret = us_ret.pivot(index='Date', columns='StockID', values='Ret')
-    us_ret.fillna(0, inplace=True)
-    return us_ret
+    us_ret.index = pd.to_datetime(us_ret.index)
+
+    # Check if returns are in percentages and convert to decimals if necessary
+    if us_ret.abs().mean().mean() > 1:
+        print("Converting returns from percentages to decimals.")
+        us_ret = us_ret / 100
+
+    # 주가 데이터 로드
+    stock_prices_path = os.path.join(current_dir, 'processed_data', 'us_ret.feather')
+    stock_prices = pd.read_feather(stock_prices_path)
+    stock_prices = stock_prices.pivot(index='Date', columns='StockID', values='Close')
+    stock_prices.index = pd.to_datetime(stock_prices.index)
+    stock_prices = stock_prices.fillna(method='ffill')  # 결측치 채움
+
+    # 이상치 처리 함수 호출
+    us_ret_cleaned = handle_outliers(us_ret, stock_prices)
+
+    return us_ret_cleaned
+
+def handle_outliers(returns, prices, lookback=5, tolerance=0.05, volatility_threshold=2.0):
+    """
+    주가와 수익률 데이터를 사용해 이상치를 처리하고, 변동성이 극심한 주식은 제거합니다.
+    
+    Args:
+        returns (pd.DataFrame): 일별 수익률 데이터.
+        prices (pd.DataFrame): 일별 주가 데이터.
+        lookback (int): n일 동안 가격 변화를 추적합니다.
+        tolerance (float): 가격 변화 허용 오차율 (예: 0.05 = 5%).
+        volatility_threshold (float): 제거할 주식의 변동성 임계값 (예: 200% 이상 변동).
+    
+    Returns:
+        pd.DataFrame: 이상치가 처리된 수익률 데이터.
+    """
+    high_threshold = 0.75  # 75% 이상의 수익률   
+    low_threshold = -0.75  # -75% 이하의 수익률
+
+    # 1. 극단적인 수익률을 가진 주식 탐지
+    extreme_returns = returns[(returns > high_threshold) | (returns < low_threshold)]
+
+    # 2. 변동성이 높은 주식 식별 (최대 변동률이 volatility_threshold 이상인 주식)
+    max_daily_volatility = prices.pct_change().abs().max()
+    stocks_to_remove = max_daily_volatility[max_daily_volatility > volatility_threshold].index
+
+    # 주식 제거 결과 출력
+    print(f"총 {len(stocks_to_remove)}개의 주식이 변동성 기준을 초과하여 제거됩니다.")
+    print(f"제거된 주식 목록: {list(stocks_to_remove)}")
+
+    # 3. 변동성이 높은 주식 제거
+    returns_cleaned = returns.drop(columns=stocks_to_remove, errors='ignore')
+    prices_cleaned = prices.drop(columns=stocks_to_remove, errors='ignore')
+
+    # 4. 극단치 처리 (조정할 날짜-주식 목록 저장)
+    to_adjust = []
+    for date in extreme_returns.index:
+        for stock_id in extreme_returns.columns[extreme_returns.loc[date].notnull()]:
+            if stock_id in stocks_to_remove:
+                continue  # 제거된 주식은 건너뜀
+
+            # 현재 날짜의 가격과 lookback 기간 가격 추적
+            current_price = prices_cleaned.at[date, stock_id]
+            start_idx = max(0, prices_cleaned.index.get_loc(date) - lookback)
+            end_idx = min(len(prices_cleaned) - 1, prices_cleaned.index.get_loc(date) + lookback)
+
+            price_window = prices_cleaned.iloc[start_idx:end_idx + 1][stock_id].dropna()
+            if len(price_window) < 2:
+                continue  # 데이터 부족 시 건너뜀
+
+            # 첫날과 마지막 날의 가격 차이 비율 계산
+            first_price = price_window.iloc[0]
+            last_price = price_window.iloc[-1]
+            price_change = abs(last_price - first_price) / first_price
+
+            # 가격 변동이 tolerance 이내이면 이상치로 간주
+            if price_change <= tolerance:
+                to_adjust.append((date, stock_id))
+
+    # 5. 수익률 조정 및 통계 출력
+    adjusted_count = len(to_adjust)
+    adjusted_stocks = len(set(stock_id for _, stock_id in to_adjust))
+
+    for date, stock_id in to_adjust:
+        returns_cleaned.at[date, stock_id] = 0
+
+    # 6. 기타 이상치에 대한 보간 처리
+    returns_cleaned = returns_cleaned.replace([np.inf, -np.inf], np.nan).fillna(method='ffill').fillna(0)
+
+    # 결과 출력
+    print(f"총 {adjusted_count}개의 이상치 수익률을 조정했습니다.")
+    print(f"총 {adjusted_stocks}개의 주식에 대해 수익률 조정을 수행했습니다.")
+
+    return returns_cleaned
+
+def load_benchmark_data():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, 'processed_data', 'snp500_index.csv')
+    snp500 = pd.read_csv(file_path, parse_dates=['Date'])
+    snp500.set_index('Date', inplace=True)
+    snp500.sort_index(inplace=True)
+    snp500 = snp500[snp500.index >= TRAIN]
+    # Use 'Adj Close' as adjusted closing price
+    snp500['Returns'] = snp500['Adj Close'].pct_change()
+    # Calculate cumulative returns
+    snp500['Cumulative Returns'] = (1 + snp500['Returns']).cumprod()
+    return snp500
 
 # 2. 앙상블 결과 처리
 def load_ensemble_results(folder_path):
@@ -44,7 +150,7 @@ def load_ensemble_results(folder_path):
             df.set_index(['investment_date', 'StockID'], inplace=True)
             
             all_data.append(df)
-    
+        
     if not all_data:
         raise ValueError(f"No CSV files found in {folder_path}")
     
@@ -69,7 +175,7 @@ def process_ensemble_results(base_folder):
             print(f'Processing Ensemble {model}{w}...   ', end='')
             try:
                 ensemble_results = load_ensemble_results(folder_path)
-                ensemble_results.to_feather(output_path)
+                ensemble_results.reset_index().to_feather(output_path)
                 print(f'Shape of the dataframe: {ensemble_results.shape}')
             except Exception as e:
                 print(f'Error processing {model}{w}: {str(e)}')
@@ -93,10 +199,9 @@ def load_and_process_ensemble_results(file_path, n_stocks, top=True):
     if isinstance(ensemble_results.index, pd.MultiIndex):
         ensemble_results = ensemble_results.reset_index()
     
-    print(ensemble_results.head())
-    
     # 날짜 변환
     ensemble_results['investment_date'] = pd.to_datetime(ensemble_results['investment_date'])
+    ensemble_results['ending_date'] = pd.to_datetime(ensemble_results['ending_date'])
     
     # StockID를 문자열로 변환
     ensemble_results['StockID'] = ensemble_results['StockID'].astype(str)
@@ -110,103 +215,239 @@ def load_and_process_ensemble_results(file_path, n_stocks, top=True):
     
     return selected_stocks
 
-def select_top_stocks(top_stocks, rebalance_dates, n):
+def select_top_stocks(selected_stocks, rebalance_dates, n):
     """
     리밸런싱 날짜별로 상위 또는 하위 N개 주식의 리스트를 반환합니다.
     """
-    selected_stocks = []
+    selected_stocks_list = []
     for date in rebalance_dates:
-        selected = top_stocks[top_stocks['ending_date'] == date]['StockID'].values
-        selected_stocks.append((date, selected))
-    return selected_stocks
+        stocks_at_date = selected_stocks[selected_stocks['investment_date'] == date]
+        selected = stocks_at_date['StockID'].values
+        selected_stocks_list.append((date, selected))
+    return selected_stocks_list
 
-def portfolio_optimization(returns, method='min_var'):
-    """
-    포트폴리오 최적화를 수행합니다. method는 'min_var' 또는 'max_sharpe'를 선택할 수 있습니다.
-    """
-    n = returns.shape[1]
-    mean_returns = returns.mean()
-    cov_matrix = returns.cov()
-    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})  # 제약 조건: 가중치의 합은 1
-    bounds = tuple((0, 1) for _ in range(n))  # 각 자산의 가중치는 0과 1 사이
-    initial_weights = np.array(n * [1. / n])  # 초기 가중치는 균등 분배
-    
-    if method == 'min_var':
-        # 포트폴리오 분산 최소화
-        def portfolio_variance(weights):
-            return weights.T @ cov_matrix @ weights
-        optimized = minimize(portfolio_variance, initial_weights, method='SLSQP', bounds=bounds, constraints=constraints)
-    elif method == 'max_sharpe':
-        # 샤프 비율 최대화 (음수의 샤프 비율을 최소화)
-        def negative_sharpe_ratio(weights):
-            portfolio_return = np.sum(mean_returns * weights)
-            portfolio_volatility = np.sqrt(weights.T @ cov_matrix @ weights)
-            if portfolio_volatility == 0:
-                return 0  # 변동성이 0인 경우 처리
-            sharpe_ratio = portfolio_return / portfolio_volatility
-            return -sharpe_ratio
-        optimized = minimize(negative_sharpe_ratio, initial_weights, method='SLSQP', bounds=bounds, constraints=constraints)
-    else:
-        raise ValueError("method should be 'min_var' or 'max_sharpe'")
-    
-    if optimized.success:
-        return optimized.x
-    else:
-        print(f"Optimization failed: {optimized.message}")
-        return initial_weights  # 최적화 실패 시 균등 가중치 반환
+def get_next_valid_date(date, date_index):
+    while date not in date_index and date <= date_index.max():
+        date += pd.Timedelta(days=1)
+    return date if date in date_index else None
 
-def calculate_portfolio_returns(us_ret, selected_stocks_list, method='min_var'):
-    portfolio_weights = {}
+def get_previous_valid_date(date, date_index):
+    while date not in date_index and date >= date_index.min():
+        date -= pd.Timedelta(days=1)
+    return date if date in date_index else None
+
+def filter_invalid_stocks(selected_stocks_list, valid_stock_ids):
+    """
+    이미 이상치로 걸러진 주식들을 선택된 포트폴리오에서 제외합니다.
+
+    Args:
+        selected_stocks_list (list): (rebalance_date, stock_ids)의 리스트.
+        valid_stock_ids (set): 유효한 주식 ID의 집합.
+
+    Returns:
+        list: 유효한 주식만 포함된 (rebalance_date, stock_ids)의 리스트.
+    """
+    filtered_list = []
+    for rebalance_date, stock_ids in selected_stocks_list:
+        # 유효한 주식만 필터링
+        filtered_stock_ids = [stock_id for stock_id in stock_ids if stock_id in valid_stock_ids]
+        if filtered_stock_ids:  # 유효한 주식이 있으면 추가
+            filtered_list.append((rebalance_date, filtered_stock_ids))
+    return filtered_list
+
+def calculate_portfolio_returns(us_ret, selected_stocks_list, valid_stock_ids, method='equal_weight'):
+    """
+    선택된 포트폴리오의 수익률을 계산합니다.
+    
+    Args:
+        us_ret (pd.DataFrame): 수익률 데이터.
+        selected_stocks_list (list): 선택된 (rebalance_date, stock_ids) 리스트.
+        valid_stock_ids (set): 유효한 주식 ID의 집합.
+        method (str): 'equal_weight'를 기본으로 사용하는 수익률 계산 방법.
+        
+    Returns:
+        pd.Series: 누적 수익률 시리즈.
+    """
+    # 선택된 주식 목록에서 유효한 주식만 필터링
+    selected_stocks_list = filter_invalid_stocks(selected_stocks_list, valid_stock_ids)
+
     portfolio_returns = pd.Series(dtype=float)
-    
+
     for i, (investment_date, stock_ids) in enumerate(selected_stocks_list):
-        # Determine the end date of the investment period
+        # 투자 시작일은 investment_date의 다음 거래일
+        start_date = get_next_valid_date(investment_date + pd.Timedelta(days=1), us_ret.index)
+        if start_date is None:
+            continue  # 유효한 시작 날짜가 없으면 건너뜀
+
+        # 투자 종료일 계산
         if i < len(selected_stocks_list) - 1:
-            end_date = selected_stocks_list[i + 1][0]
+            next_investment_date = selected_stocks_list[i + 1][0]
+            end_date = get_previous_valid_date(next_investment_date, us_ret.index)
+        else:
+            end_date = us_ret.index.max()
+
+        if end_date < start_date:
+            continue  # 유효하지 않은 날짜 범위 건너뜀
+
+        # 투자 기간의 수익률 가져오기
+        period_returns = us_ret.loc[start_date:end_date, stock_ids]
+        period_returns = period_returns.dropna(axis=1, how='any')
+        if period_returns.empty:
+            continue
+
+        # 포트폴리오 비중 결정
+        num_stocks = period_returns.shape[1]
+        weights = np.array([1 / num_stocks] * num_stocks)
+
+        # 일별 포트폴리오 수익률 계산
+        daily_portfolio_returns = period_returns.dot(weights)
+
+        # 결과를 포트폴리오 수익률 시리즈에 추가
+        portfolio_returns = portfolio_returns.add(daily_portfolio_returns, fill_value=0)
+
+    # 날짜별로 정렬
+    portfolio_returns = portfolio_returns.sort_index()
+
+    # 누적 수익률 계산
+    cumulative_returns = (1 + portfolio_returns).cumprod()
+
+    return cumulative_returns
+
+def calculate_confusion_matrix(selected_stocks, us_ret):
+    """
+    각 투자 기간에 대해 TP, TN, FP, FN을 계산합니다.
+    """
+    results = []
+    for date in selected_stocks['investment_date'].unique():
+        # 투자 시작일은 investment_date의 다음 거래일
+        start_date = get_next_valid_date(date + pd.Timedelta(days=1), us_ret.index)
+        if start_date is None:
+            continue  # No valid start date
+        
+        # 투자 종료일 계산
+        next_dates = selected_stocks[selected_stocks['investment_date'] > date]['investment_date']
+        if not next_dates.empty:
+            next_investment_date = next_dates.min()
+            end_date = get_previous_valid_date(next_investment_date, us_ret.index)
         else:
             end_date = us_ret.index.max()
         
-        # Get returns for the investment period
-        period_returns = us_ret.loc[investment_date:end_date, stock_ids]
-        
-        # Handle missing data
-        period_returns = period_returns.dropna(axis=0, how='any')
-        
-        if period_returns.empty:
+        if end_date < start_date:
+            print(f"경고: {date}에 대한 유효한 종료일을 찾을 수 없습니다.")
             continue
         
-        # Perform portfolio optimization
-        if method == 'equal_weight':
-            n = len(stock_ids)
-            weights = np.array(n * [1. / n])
-        else:
-            weights = portfolio_optimization(period_returns, method=method)
+        # 해당 기간의 실제 수익률 계산
+        stocks_at_date = selected_stocks[selected_stocks['investment_date'] == date]
+        stock_ids = stocks_at_date['StockID'].values
         
-        # Calculate daily portfolio returns
-        daily_portfolio_returns = period_returns.dot(weights)
-        portfolio_returns = portfolio_returns._append(daily_portfolio_returns)
-    
-    # Compute cumulative returns
-    cumulative_returns = (1 + portfolio_returns).cumprod()
-    
-    return cumulative_returns
+        # 투자 기간의 수익률 계산
+        period_returns = us_ret.loc[start_date:end_date, stock_ids]
+        if period_returns.empty:
+            continue
+        # Calculate total return over the period
+        total_returns = (1 + period_returns).prod() - 1
+        # Get sign of total returns
+        actual_labels = total_returns >= 0
 
+        predicted_labels = stocks_at_date['up_prob'] >= 0.5  # 임계값 0.5 사용
 
-def calculate_portfolio_up_prob(selected_stocks, rebalance_dates):
+        # Align actual_labels with predicted_labels
+        actual_labels = actual_labels.reindex(stocks_at_date['StockID'])
+        
+        # Ensure both series have the same index
+        common_index = actual_labels.index.intersection(predicted_labels.index)
+        actual_labels = actual_labels.loc[common_index]
+        predicted_labels = predicted_labels.loc[common_index]
+
+        # Remove any missing data
+        valid_indices = actual_labels.notnull() & predicted_labels.notnull()
+        predicted_labels = predicted_labels[valid_indices]
+        actual_labels = actual_labels[valid_indices]
+
+        tp = np.sum((predicted_labels == True) & (actual_labels == True))
+        tn = np.sum((predicted_labels == False) & (actual_labels == False))
+        fp = np.sum((predicted_labels == True) & (actual_labels == False))
+        fn = np.sum((predicted_labels == False) & (actual_labels == True))
+        
+        results.append({
+            'date': date,
+            'TP': tp,
+            'TN': tn,
+            'FP': fp,
+            'FN': fn
+        })
+    return pd.DataFrame(results)
+
+def calculate_portfolio_up_prob(selected_stocks, us_ret):
     """
-    선택된 주식들의 평균 up_prob를 계산합니다.
+    투자 기간 동안 평균 up_prob를 유지하여 시계열로 반환합니다.
     """
     up_prob_series = pd.Series(dtype=float)
-    for date in rebalance_dates:
-        stocks_at_date = selected_stocks[selected_stocks['ending_date'] == date]
-        avg_up_prob = stocks_at_date['up_prob'].mean()
-        up_prob_series[date] = avg_up_prob
+    for date in selected_stocks['investment_date'].unique():
+        avg_up_prob = selected_stocks[selected_stocks['investment_date'] == date]['up_prob'].mean()
+        
+        # 해당 투자 기간의 날짜들 가져오기
+        start_date = get_next_valid_date(date + pd.Timedelta(days=1), us_ret.index)
+        if start_date is None:
+            continue  # No valid start date
+        
+        next_dates = selected_stocks[selected_stocks['investment_date'] > date]['investment_date']
+        if not next_dates.empty:
+            end_date = get_previous_valid_date(next_dates.min(), us_ret.index)
+        else:
+            end_date = us_ret.index.max()
+        
+        if end_date < start_date:
+            continue
+        
+        date_range = us_ret.loc[start_date:end_date].index
+        temp_series = pd.Series(avg_up_prob, index=date_range)
+        if not temp_series.empty:
+            up_prob_series = pd.concat([up_prob_series, temp_series])
+    
+    up_prob_series = up_prob_series.sort_index()
     return up_prob_series
+
+def make_portfolio_plot(portfolio_ret, model, window_size, result_dir):
+    # 누적 로그 수익률 계산
+    log_ret_df = pd.DataFrame(index=portfolio_ret.index)
+    for column in portfolio_ret.columns:
+        log_ret_df[column] = _ret_to_cum_log_ret(portfolio_ret[column])
+    
+    # 모든 시리즈가 0부터 시작하도록 조정
+    prev_year = pd.to_datetime(log_ret_df.index[0]).year - 1
+    prev_day = pd.to_datetime(f"{prev_year}-12-31")
+    log_ret_df.loc[prev_day] = 0
+    log_ret_df = log_ret_df.sort_index()
+    
+    # 그래프 그리기
+    columns_to_plot = ["Top", "Bottom", "Top-Bottom", "Naive", "Benchmark"]
+    colors = {"Top": "b", "Bottom": "r", "Top-Bottom": "k", "Naive": "y", "Benchmark": "g"}
+    
+    plot = log_ret_df[columns_to_plot].plot(
+        style=colors,
+        lw=1,
+        title=f'{model} Model (Window Size: {window_size})',
+        figsize=(10, 6)
+    )
+    plot.legend(loc='best')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    
+    # 저장
+    save_path = os.path.join(result_dir, f'{model}_window{window_size}.png')
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Portfolio plot saved to {save_path}")
 
 def main():
     # 1. 데이터 로드 및 전처리
     us_ret = load_and_preprocess_data()
     print("Data loaded and preprocessed.")
+
+    # 벤치마크 데이터 로드
+    benchmark_data = load_benchmark_data()
+    print("Benchmark data loaded.")
 
     # 2. 앙상블 결과 처리
     process_ensemble_results(BASE_FOLDER)
@@ -217,8 +458,9 @@ def main():
     window_sizes = [5, 20, 60]
     
     # 포트폴리오 선택 방법
-    PORTFOLIO_N = [20, 50]
     NAIVE_N = us_ret.shape[1]  # 전체 주식 수
+    PORTFOLIO_N = [round(NAIVE_N / 40), round(NAIVE_N / 20), NAIVE_N / 2]
+    
     
     # 색상 설정
     colors = [
@@ -243,8 +485,6 @@ def main():
     portfolio_selections = {}
     for N in PORTFOLIO_N:
         portfolio_selections.update({
-            f'Top {N} (min_var)': {'n_stocks': N, 'top': True, 'method': 'min_var'},
-            f'Top {N} (max_sharpe)': {'n_stocks': N, 'top': True, 'method': 'max_sharpe'},
             f'Top {N} (Equal Weight)': {'n_stocks': N, 'top': True, 'method': 'equal_weight'},
             f'Bottom {N} (Equal Weight)': {'n_stocks': N, 'top': False, 'method': 'equal_weight'},
         })
@@ -263,7 +503,14 @@ def main():
             
             cumulative_returns_dict = {}  # 포트폴리오별 누적 수익률 저장
             up_prob_dict = {}  # 포트폴리오별 평균 up_prob 저장
-            
+
+            # 벤치마크 추가
+            cumulative_returns_dict['Benchmark'] = benchmark_data['Cumulative Returns']
+
+            # 폴더 생성
+            folder_name = os.path.join(BASE_FOLDER, f'{model}{window_size}')
+            os.makedirs(folder_name, exist_ok=True)
+
             for selection_name, selection_params in portfolio_selections.items():
                 n_stocks = selection_params['n_stocks']
                 top = selection_params['top']
@@ -279,15 +526,48 @@ def main():
                 # 포트폴리오 구성
                 selected_stocks_list = select_top_stocks(selected_stocks, rebalance_dates, n_stocks)
                 
-                # 포트폴리오 최적화 및 수익률 계산
-                cumulative_returns = calculate_portfolio_returns(us_ret, selected_stocks_list, method=method)
+                # 포트폴리오 수익률 계산
+                valid_stock_ids = set(us_ret.columns)  # 유효한 주식 ID 집합 생성
+                cumulative_returns = calculate_portfolio_returns(us_ret, selected_stocks_list, valid_stock_ids)
                 cumulative_returns_dict[selection_name] = cumulative_returns
                 
                 # 평균 up_prob 계산
-                up_prob_series = calculate_portfolio_up_prob(selected_stocks, rebalance_dates)
+                up_prob_series = calculate_portfolio_up_prob(selected_stocks, us_ret)
                 up_prob_dict[selection_name] = up_prob_series
+                
+                # TP, TN, FP, FN 계산
+                # confusion_df = calculate_confusion_matrix(selected_stocks, us_ret)
+                
+                # # 결과 저장
+                # confusion_df.to_csv(os.path.join(folder_name, f'confusion_matrix_{selection_name}_{model}{window_size}.csv'), index=False)
+                
+                # # TP, TN, FP, FN 시각화
+                # fig_conf, ax_conf = plt.subplots(figsize=(12, 8))
+                # ax_conf.plot(confusion_df['date'], confusion_df['TP'], label='TP', color='green')
+                # ax_conf.plot(confusion_df['date'], confusion_df['TN'], label='TN', color='blue')
+                # ax_conf.plot(confusion_df['date'], confusion_df['FP'], label='FP', color='red')
+                # ax_conf.plot(confusion_df['date'], confusion_df['FN'], label='FN', color='orange')
+                # ax_conf.set_title(f'Confusion Matrix - {selection_name} - Model: {model}, Window Size: {window_size}')
+                # ax_conf.set_xlabel('Date')
+                # ax_conf.set_ylabel('Count')
+                # ax_conf.legend()
+                # ax_conf.grid(True)
+                # fig_conf.tight_layout()
+                # fig_conf.savefig(os.path.join(folder_name, f'confusion_matrix_{selection_name}_{model}{window_size}.png'))
+                # plt.close(fig_conf)
 
-            
+            # 포트폴리오 수익률 계산 (기존 코드에서 가져옴)
+            portfolio_ret = pd.DataFrame({
+                'Top': cumulative_returns_dict[f'Top {PORTFOLIO_N[0]} (Equal Weight)'],
+                'Bottom': cumulative_returns_dict[f'Bottom {PORTFOLIO_N[0]} (Equal Weight)'],
+                'Naive': cumulative_returns_dict['Naive'],
+                'Benchmark': cumulative_returns_dict['Benchmark']
+            })
+            portfolio_ret['Top-Bottom'] = portfolio_ret['Top'] - portfolio_ret['Bottom']
+
+            # 그래프 생성
+            make_portfolio_plot(portfolio_ret, model, window_size, folder_name)
+
             # 누적 수익률을 하나의 데이터프레임으로 결합
             cumulative_returns_df = pd.DataFrame(cumulative_returns_dict)
             up_prob_df = pd.DataFrame(up_prob_dict)
@@ -301,12 +581,12 @@ def main():
             fig2, ax2 = plt.subplots(figsize=(12, 8))
             fig3, ax3 = plt.subplots(figsize=(12, 8))
 
-            # 누적 수익률 그래프 (로그 스케일)
+            # 누적 수익률 그래프
             color_index = 0
             for label, cumulative_returns in cumulative_returns_dict.items():
-                if label == 'Benchmark (Top 50 Optimized)':
+                if label == 'Benchmark':
                     color = benchmark_color
-                    linestyle = '-.'
+                    linestyle = '-'
                     linewidth = 2
                 elif 'Bottom' in label:
                     color = get_color(color_index, True)
@@ -322,25 +602,27 @@ def main():
                     linestyle = '-'
                     linewidth = 1
                 
-                if 'min_var' in label or 'max_sharpe' in label:
-                    linewidth = 1
+                ax1.plot(cumulative_returns.index, cumulative_returns.values, label=label, color=color, linestyle=linestyle, linewidth=linewidth)
                 
-                ax1.semilogy(cumulative_returns.index, cumulative_returns.values, label=label, color=color, linestyle=linestyle, linewidth=linewidth)
+                # 리밸런싱 날짜에 점 추가
+                if label != 'Benchmark':
+                    for date in cumulative_returns.index.intersection(rebalance_dates):
+                        ax1.plot(date, cumulative_returns.loc[date], marker='o', color=color)
 
-            ax1.set_title(f'Cumulative Returns (Log Scale) - Model: {model}, Window Size: {window_size}')
+            ax1.set_title(f'Cumulative Returns - Model: {model}, Window Size: {window_size}')
             ax1.set_xlabel('Date')
-            ax1.set_ylabel('Cumulative Returns (Log Scale)')
+            ax1.set_ylabel('Cumulative Returns')
             ax1.legend()
             ax1.grid(True)
             fig1.tight_layout()
 
             # 예측 편향 검증
-            benchmark = cumulative_returns_df.mean(axis=1)
+            benchmark = cumulative_returns_df['Naive']
             relative_performance = cumulative_returns_df.div(benchmark, axis=0)
 
             color_index = 0
             for label, rel_perf in relative_performance.items():
-                if label == 'Benchmark 1/N':
+                if label == 'Naive':
                     continue  # 벤치마크 자체는 그리지 않음
                 elif 'Bottom' in label:
                     color = get_color(color_index, True)
@@ -357,7 +639,7 @@ def main():
 
             ax2.set_title(f'Relative Performance (Prediction Bias Check) - Model: {model}, Window Size: {window_size}')
             ax2.set_xlabel('Date')
-            ax2.set_ylabel('Relative Performance to Benchmark')
+            ax2.set_ylabel('Relative Performance to Naive')
             ax2.legend()
             ax2.grid(True)
             ax2.axhline(y=1, color='black', linestyle='--')  # 벤치마크 라인
@@ -386,10 +668,6 @@ def main():
             ax3.grid(True)
             fig3.tight_layout()
 
-            # 폴더 생성
-            folder_name = os.path.join(BASE_FOLDER, f'{model}{window_size}')
-            os.makedirs(folder_name, exist_ok=True)
-
             # 그래프 저장
             fig1.savefig(os.path.join(folder_name, f'cumulative_returns_{model}{window_size}.png'))
             fig2.savefig(os.path.join(folder_name, f'relative_performance_{model}{window_size}.png'))
@@ -403,5 +681,4 @@ def main():
             up_prob_df.to_csv(os.path.join(folder_name, f'up_prob_{model}{window_size}.csv'), index=True)
             
 if __name__ == "__main__":
-
     main()

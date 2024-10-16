@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import pandas as pd
 import os.path as op
@@ -161,18 +160,27 @@ class EquityDataset(Dataset):
             assert len(self.images) == len(self.label_dict[k])
 
     def get_label_value(self):
-        print(f"Using {self.ret_val_name} as label")
-        print(f"Available labels: {list(self.label_dict.keys())}")
+        print(f"Attempting to use {self.ret_val_name} as label")
+        print(f"Available keys in label_dict: {list(self.label_dict.keys())}")
+        
+        # ret_val_name이 정확히 일치하지 않을 경우 유사한 키를 찾습니다.
         if self.ret_val_name not in self.label_dict:
-            raise KeyError(f"{self.ret_val_name} not found in label_dict")
+            if self.freq == 'month':
+                possible_keys = [key for key in self.label_dict.keys() if 'Ret_20d' in key or 'Ret_30d' in key]
+            elif self.freq == 'week':
+                possible_keys = [key for key in self.label_dict.keys() if 'Ret_5d' in key or 'Ret_7d' in key]
+            else:
+                possible_keys = [key for key in self.label_dict.keys() if 'Ret_' in key and key.split('_')[1].rstrip('d').isdigit()]
+            
+            if possible_keys:
+                self.ret_val_name = min(possible_keys, key=lambda x: int(x.split('_')[1].rstrip('d')))
+                print(f"Using {self.ret_val_name} instead of the original key")
+            else:
+                raise KeyError(f"No suitable return key found. Available keys: {list(self.label_dict.keys())}")
+        
         ret = self.label_dict[self.ret_val_name]
 
-        # ret를 NumPy 배열로 변환
-        ret = np.array(ret)
-
-        print(
-            f"Using {self.regression_label} regression label (None represents classification label)"
-        )
+        print(f"Using {self.regression_label} regression label (None represents classification label)")
         if self.regression_label == "raw_ret":
             label = np.nan_to_num(ret, nan=-99)
         elif self.regression_label == "vol_adjust_ret":
@@ -180,7 +188,6 @@ class EquityDataset(Dataset):
         else:
             label = np.where(ret > 0, 1, 0)
             label = np.nan_to_num(label, nan=-99)
-
         return label
 
     def _get_insample_mean_std(self):
@@ -316,11 +323,12 @@ class TS1DDataset(Dataset):
         assert self.ts_scale in ["image_scale", "ret_scale", "vol_scale"]
         self.regression_label = regression_label
         assert self.regression_label in [None, "raw_ret", "vol_adjust_ret"]
-        self.ret_val_name = f"Retx_{dcf.FREQ_DICT[self.pw]}"
+        self.ret_val_name = f"Ret_{dcf.FREQ_DICT[self.pw]}"
         self.images, self.label_dict = self.load_ts1d_data()
         self.label = self.get_label_value()
         self.demean = self._get_1d_mean_std()
         self.filter_data(self.remove_tail)
+        assert self.freq in ["week", "month", "quarter", "year"]
 
     def load_ts1d_data(self):
         dataset_name = self.__get_stock_dataset_name()
@@ -330,20 +338,51 @@ class TS1DDataset(Dataset):
             "{}_data_new.npz".format(dataset_name),
         )
         data = np.load(filename, mmap_mode="r", encoding="latin1", allow_pickle=True)
-        label_dict = data["data_dict"].item()
-        images = label_dict["predictor"].copy()
-        assert images[0].shape == (6, self.ohlc_len)
-        del label_dict["predictor"]
+        
+        print(f"Keys in {filename}: {list(data.keys())}")
+        
+        images = data["predictors"]
+        labels = data["labels"].item()
+        
+        print(f"Image shape: {images[0].shape}")
+        print(f"Available labels: {list(labels.keys())}")
+        
+        # 채널 수 확인 및 처리
+        num_channels = images[0].shape[0]
+        if num_channels == 5:
+            print("Warning: Only 5 channels detected. Adding a dummy channel for volume.")
+            dummy_volume = np.ones_like(images[:, 0, :])  # 모든 1로 채워진 더미 볼륨 채널
+            images = np.concatenate([images, dummy_volume[:, np.newaxis, :]], axis=1)
+        
+        assert images[0].shape == (6, self.ohlc_len), f"Unexpected image shape: {images[0].shape}, expected (6, {self.ohlc_len})"
+        
+        label_dict = {key: np.array(value) for key, value in labels.items()}
         label_dict["StockID"] = label_dict["StockID"].astype(str)
+        
         return images, label_dict
 
     def get_label_value(self):
-        print(f"Using {self.ret_val_name} as label")
+        print(f"Attempting to use {self.ret_val_name} as label")
+        print(f"Available keys in label_dict: {list(self.label_dict.keys())}")
+        
+        # ret_val_name이 정확히 일치하지 않을 경우 유사한 키를 찾습니다.
+        if self.ret_val_name not in self.label_dict:
+            if self.freq == 'month':
+                possible_keys = [key for key in self.label_dict.keys() if 'Ret_20d' in key or 'Ret_30d' in key]
+            elif self.freq == 'week':
+                possible_keys = [key for key in self.label_dict.keys() if 'Ret_5d' in key or 'Ret_7d' in key]
+            else:
+                possible_keys = [key for key in self.label_dict.keys() if 'Ret_' in key and key.split('_')[1].rstrip('d').isdigit()]
+            
+            if possible_keys:
+                self.ret_val_name = min(possible_keys, key=lambda x: int(x.split('_')[1].rstrip('d')))
+                print(f"Using {self.ret_val_name} instead of the original key")
+            else:
+                raise KeyError(f"No suitable return key found. Available keys: {list(self.label_dict.keys())}")
+        
         ret = self.label_dict[self.ret_val_name]
 
-        print(
-            f"Using {self.regression_label} regression label (None represents classification label)"
-        )
+        print(f"Using {self.regression_label} regression label (None represents classification label)")
         if self.regression_label == "raw_ret":
             label = np.nan_to_num(ret, nan=-99)
         elif self.regression_label == "vol_adjust_ret":
@@ -426,6 +465,13 @@ class TS1DDataset(Dataset):
             print(f"Loading mean and std from {mean_std_path}")
             x = np.load(mean_std_path, allow_pickle=True)
             demean = [x["mean"], x["std"]]
+            
+            # 채널 수 확인 및 처리
+            if len(demean[0]) == 5:
+                print("Warning: Only 5 channels detected in mean and std. Adding a dummy channel.")
+                demean[0] = np.append(demean[0], [0])  # 평균에 0 추가
+                demean[1] = np.append(demean[1], [1])  # 표준편차에 1 추가
+            
             return demean
 
         if self.ts_scale == "image_scale":
@@ -438,21 +484,29 @@ class TS1DDataset(Dataset):
                 )
 
         print(f"Calculating mean and std for {fname}")
-        mean, std = np.nanmean(self.images, axis=(0, 2)), np.nanstd(
-            self.images, axis=(0, 2)
-        )
+        mean = np.nanmean(self.images, axis=(0, 2))
+        std = np.nanstd(self.images, axis=(0, 2))
+        
+        # 채널 수 확인 및 처리
+        if len(mean) == 5:
+            print("Warning: Only 5 channels detected. Adding a dummy channel for mean and std.")
+            mean = np.append(mean, [0])  # 평균에 0 추가
+            std = np.append(std, [1])  # 표준편차에 1 추가
+        
         np.savez(mean_std_path, mean=mean, std=std)
         return [mean, std]
 
     def _minmax_scale_ts1d(self, image):
-        assert image.shape == (6, self.ohlc_len)
+        num_channels = image.shape[0]
+        if num_channels == 5:
+            print("Warning: Only 5 channels detected in _minmax_scale_ts1d. Adding a dummy channel.")
+            dummy_channel = np.ones((1, image.shape[1]))  # 모든 1로 채워진 더미 채널
+            image = np.vstack([image, dummy_channel])
+        
+        assert image.shape == (6, self.ohlc_len), f"Unexpected image shape: {image.shape}, expected (6, {self.ohlc_len})"
         ohlcma = image[:5]
-        image[:5] = (ohlcma - np.nanmin(ohlcma)) / (
-            np.nanmax(ohlcma) - np.nanmin(ohlcma)
-        )
-        image[5] = (image[5] - np.nanmin(image[5])) / (
-            np.nanmax(image[5]) - np.nanmin(image[5])
-        )
+        image[:5] = (ohlcma - np.nanmin(ohlcma)) / (np.nanmax(ohlcma) - np.nanmin(ohlcma) + 1e-8)
+        image[5] = (image[5] - np.nanmin(image[5])) / (np.nanmax(image[5]) - np.nanmin(image[5]) + 1e-8)
         return image
 
     def _vol_scale_ts1d(self, image):
@@ -473,6 +527,12 @@ class TS1DDataset(Dataset):
             image = self._vol_scale_ts1d(image) / np.sqrt(
                 self.label_dict["EWMA_vol"][idx]
             )
+
+        # 채널 수 확인 및 처리
+        if image.shape[0] == 5:
+            print("Warning: Only 5 channels detected in image. Adding a dummy channel.")
+            dummy_channel = np.ones((1, image.shape[1]))  # 모든 1로 채워진 더미 채널
+            image = np.vstack([image, dummy_channel])
 
         image = (image - self.demean[0].reshape(6, 1)) / self.demean[1].reshape(6, 1)
         image = np.nan_to_num(image, nan=0, posinf=0, neginf=0)
