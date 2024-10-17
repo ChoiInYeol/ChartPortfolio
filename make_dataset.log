@@ -1,0 +1,7 @@
+2024-10-17 07:06:25,478 - INFO - Processed data shape: (0, 0)
+2024-10-17 07:06:25,478 - ERROR - Error during data split: Data length (0) is smaller than the required length (80)
+2024-10-17 07:07:10,649 - INFO - Processed data shape: (0, 0)
+2024-10-17 07:07:10,650 - ERROR - Error during data split: Data length (0) is smaller than the required length (80)
+2024-10-17 07:08:58,823 - INFO - Processed data shape: (0, 0)
+2024-10-17 07:08:58,824 - ERROR - Error during data split: Data length (0) is smaller than the required length (80)
+

@@ -1,0 +1,59 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class GRU(nn.Module):
+    def __init__(self, n_layers, hidden_dim, n_stocks, n_output, dropout_p=0.3, bidirectional=False,
+                 lb=0, ub=0.1, multimodal=False):
+        super().__init__()
+        self.n_layers = n_layers
+        self.hidden_dim = hidden_dim
+        self.lb = lb
+        self.ub = ub
+        self.multimodal = multimodal
+
+        self.input_size = n_stocks    # 입력 크기 (4586)
+        self.output_size = n_output   # 출력 크기 (50)
+        
+        self.gru = nn.GRU(input_size=self.input_size, hidden_size=hidden_dim, num_layers=n_layers,
+                          batch_first=True, dropout=dropout_p, bidirectional=bidirectional)
+        num_directions = 2 if bidirectional else 1
+        
+        self.dropout = nn.Dropout(dropout_p)
+        self.scale = 2 if bidirectional else 1
+        self.fc = nn.Linear(hidden_dim * num_directions, self.output_size)
+        self.swish = nn.SiLU()
+
+    def forward(self, x):
+
+        init_h = torch.zeros(self.n_layers * self.scale, x.size(0), self.hidden_dim).to(x.device)
+        x, _ = self.gru(x, init_h)
+        h_t = x[:, -1, :]
+
+        logit = self.fc(self.dropout(h_t))
+
+        logit = self.swish(logit)
+        logit = F.softmax(logit, dim=-1)
+        logit = torch.stack([self.rebalance(batch, self.lb, self.ub) for batch in logit])
+
+        return logit
+
+    def rebalance(self, weight, lb, ub):
+        old = weight
+        weight_clamped = torch.clamp(old, lb, ub)
+        while True:
+            leftover = (old - weight_clamped).sum().item()
+            nominees = weight_clamped[torch.where(weight_clamped != ub)[0]]
+            gift = leftover * (nominees / nominees.sum())
+            weight_clamped[torch.where(weight_clamped != ub)[0]] += gift
+            old = weight_clamped
+            if len(torch.where(weight_clamped > ub)[0]) == 0:
+                break
+            else:
+                weight_clamped = torch.clamp(old, lb, ub)
+        return weight_clamped
+
+
+if __name__ == "__main__":
+    pass

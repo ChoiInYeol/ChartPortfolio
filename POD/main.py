@@ -28,7 +28,7 @@ def generate_model_configs(base_config):
         'MODEL': base_config.get('MODELS', ['TCN']),
         'MULTIMODAL': base_config.get('MULTIMODAL_OPTIONS', [False]),
         'LOSS_FUNCTION': base_config.get('LOSS_FUNCTIONS', ['max_sharpe']),
-        'TRAIN_LEN': base_config.get('TRAIN_LEN_OPTIONS', [60]),
+        'TRAIN_LEN': base_config.get('TRAIN_LEN_OPTIONS', [60, 20]),
         'PRED_LEN': base_config.get('PRED_LEN_OPTIONS', [20])
     }
     
@@ -61,8 +61,8 @@ def main():
 
     # If no arguments are given, run all steps
     if not any([args.train, args.inference, args.backtest]):
-        args.train = False
-        args.inference = False
+        args.train = True
+        args.inference = True
         args.backtest = True
 
     base_config = load_config("config/config.yaml")

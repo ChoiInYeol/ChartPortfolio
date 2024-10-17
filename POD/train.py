@@ -13,6 +13,7 @@ from model.loss import max_sharpe, equal_risk_parity, mean_variance, combined_lo
 from tqdm import tqdm
 import logging
 from typing import Dict, Tuple, Any
+import h5py
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -24,20 +25,19 @@ console_handler.setLevel(logging.INFO)
 logger.addHandler(console_handler)
 
 class PortfolioDataset(Dataset):
-    def __init__(self, x_data: np.ndarray, y_data: np.ndarray, img_data: np.ndarray = None, labels: np.ndarray = None):
-        self.x_data = torch.from_numpy(x_data).float()
-        self.y_data = torch.from_numpy(y_data).float()
-        self.img_data = torch.from_numpy(img_data).float() if img_data is not None else None
-        self.labels = torch.from_numpy(labels).float() if labels is not None else None
+    def __init__(self, h5_file: str):
+        self.h5_file = h5_file
+        with h5py.File(self.h5_file, 'r') as f:
+            self.length = f['x'].shape[0]
 
     def __len__(self) -> int:
-        return len(self.x_data)
+        return self.length
 
     def __getitem__(self, idx: int):
-        if self.img_data is not None:
-            return self.x_data[idx], self.y_data[idx], self.img_data[idx], self.labels[idx]
-        else:
-            return self.x_data[idx], self.y_data[idx]
+        with h5py.File(self.h5_file, 'r') as f:
+            x = torch.from_numpy(f['x'][idx]).float()
+            y = torch.from_numpy(f['y'][idx]).float()
+        return x, y
 
 class Trainer:
     def __init__(self, config: Dict[str, Any]):
@@ -160,42 +160,17 @@ class Trainer:
         else:
             raise ValueError(f"Unsupported TRAIN_LEN value: {self.len_train}")
 
-    def _load_and_process_data(self) -> Tuple[PortfolioDataset, PortfolioDataset]:
-        logger.info("Loading and processing data...")
+    def _load_data(self) -> Tuple[DataLoader, DataLoader]:
+        train_dataset = PortfolioDataset("data/train_dataset.h5")
+        val_dataset = PortfolioDataset("data/validation_dataset.h5")
 
-        with open("data/dataset.pkl", "rb") as f:
-            train_x_raw, train_y_raw, val_x_raw, val_y_raw, _, _ = pickle.load(f)
+        train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True, num_workers=4, pin_memory=True)
+        val_loader = DataLoader(val_dataset, batch_size=self.config['BATCH'], shuffle=False, num_workers=4, pin_memory=True)
 
-        with open("data/date.pkl", "rb") as f:
-            date_info = pickle.load(f)
-
-        if self.multimodal:
-            with open("data/dataset_img.pkl", "rb") as f:
-                train_img_data, val_img_data, _, _ = pickle.load(f)
-            train_img = train_img_data['images']
-            val_img = val_img_data['images']
-            train_labels = np.array(train_img_data['labels'])
-            val_labels = np.array(val_img_data['labels'])
-        else:
-            train_img = val_img = train_labels = val_labels = None
-
-        scale = self.len_pred
-        train_x = train_x_raw * scale
-        train_y = train_y_raw * scale
-        val_x = val_x_raw * scale
-        val_y = val_y_raw * scale
-
-        self.train_date = date_info['train']
-        self.val_date = date_info['val']
-        self.N_STOCK = self.config['N_STOCK']
-        self.LEN_PRED = train_y.shape[1]
-
-        train_dataset = PortfolioDataset(train_x, train_y, train_img, train_labels)
-        val_dataset = PortfolioDataset(val_x, val_y, val_img, val_labels)
-        return train_dataset, val_dataset
+        return train_loader, val_loader
 
     def train(self) -> None:
-        train_dataset, val_dataset = self._load_and_process_data()
+        train_dataset, val_dataset = self._load_data()
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True, num_workers=4, pin_memory=True)
         val_loader = DataLoader(val_dataset, batch_size=self.config['BATCH'], shuffle=False, num_workers=4, pin_memory=True)
 
@@ -253,21 +228,17 @@ class Trainer:
             self.model.eval()
         total_loss = 0.0
 
-        for data in tqdm(dataloader, desc="Training" if is_training else "Validation", leave=False):
+        for x, y in tqdm(dataloader, desc="Training" if is_training else "Validation", leave=False):
+            x, y = x.to(self.device), y.to(self.device)
             if is_training:
                 self.optimizer.zero_grad()
 
-            loss = self._compute_loss(data)
+            loss = self._compute_loss((x, y))
             total_loss += loss.item()
 
             if is_training:
                 loss.backward()
-                self.optimizer.first_step(zero_grad=True)
-
-                # Second forward-backward pass
-                loss = self._compute_loss(data)
-                loss.backward()
-                self.optimizer.second_step(zero_grad=True)
+                self.optimizer.step()
 
         average_loss = total_loss / len(dataloader)
         return average_loss

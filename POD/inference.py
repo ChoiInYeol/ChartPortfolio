@@ -9,6 +9,7 @@ from model.gru import GRU
 from model.transformer import Transformer
 from model.tcn import TCN
 from typing import Dict, Any, Tuple
+import h5py
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -115,21 +116,15 @@ class Inference:
     def _load_test_data(self):
         logger.info("Loading test data...")
 
-        with open("data/dataset.pkl", "rb") as f:
-            _, _, _, _, test_x_raw, _ = pickle.load(f)
+        with h5py.File("data/test_dataset.h5", "r") as f:
+            self.test_x = torch.from_numpy(f['x'][:]).float().to(self.device)
+            if self.multimodal:
+                self.test_img = torch.from_numpy(f['img'][:]).float().to(self.device)
+            else:
+                self.test_img = None
 
-        if self.multimodal:
-            with open("data/dataset_img.pkl", "rb") as f:
-                _, _, test_img_data, _ = pickle.load(f)
-            test_img = test_img_data['images']
-        else:
-            test_img = None
-
-        scale = self.len_pred
-        test_x = test_x_raw * scale
-
-        self.test_x = torch.from_numpy(test_x).float().to(self.device)
-        self.test_img = torch.from_numpy(test_img).float().to(self.device) if test_img is not None else None
+        with open("data/test_times.pkl", "rb") as f:
+            self.test_times = pickle.load(f)
 
     def infer(self):
         self._load_test_data()
