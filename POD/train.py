@@ -12,8 +12,7 @@ from model.sam import SAM
 from model.loss import max_sharpe, equal_risk_parity, mean_variance, combined_loss
 from tqdm import tqdm
 import logging
-from typing import Dict, Tuple, Any
-import h5py
+from typing import Dict, Tuple, Any, List
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -25,19 +24,28 @@ console_handler.setLevel(logging.INFO)
 logger.addHandler(console_handler)
 
 class PortfolioDataset(Dataset):
-    def __init__(self, h5_file: str):
-        self.h5_file = h5_file
-        with h5py.File(self.h5_file, 'r') as f:
-            self.length = f['x'].shape[0]
+    def __init__(self, x_data: np.ndarray, y_data: np.ndarray, selected_indices: List[np.ndarray],
+                 img_data: np.ndarray = None, labels: np.ndarray = None):
+        self.x_data = x_data  # Keep as numpy arrays
+        self.y_data = y_data
+        self.selected_indices = selected_indices  # List of arrays per sample
+        self.img_data = img_data
+        self.labels = labels
 
     def __len__(self) -> int:
-        return self.length
+        return len(self.x_data)
 
     def __getitem__(self, idx: int):
-        with h5py.File(self.h5_file, 'r') as f:
-            x = torch.from_numpy(f['x'][idx]).float()
-            y = torch.from_numpy(f['y'][idx]).float()
-        return x, y
+        indices = self.selected_indices[idx]
+        x_sample = torch.from_numpy(self.x_data[idx][:, indices]).float()
+        y_sample = torch.from_numpy(self.y_data[idx][:, indices]).float()
+
+        if self.img_data is not None:
+            img_sample = torch.from_numpy(self.img_data[idx][:, indices]).float()
+            label_sample = torch.from_numpy(self.labels[idx][:, indices]).float()
+            return x_sample, y_sample, img_sample, label_sample
+        else:
+            return x_sample, y_sample
 
 class Trainer:
     def __init__(self, config: Dict[str, Any]):
@@ -47,7 +55,7 @@ class Trainer:
         self.multimodal = config.get("MULTIMODAL", False)
         self.len_train = config['TRAIN_LEN']
         self.len_pred = config['PRED_LEN']
-        self.n_stock = config['N_STOCK']
+        self.n_stock = config['M']  # Use M instead of N_FEAT
         self.lb = config['LB']
         self.ub = config['UB']
         self.beta = config.get("BETA", 0.2)
@@ -112,7 +120,6 @@ class Trainer:
                 hidden_dim=gru_config['hidden_dim'],
                 dropout_p=gru_config['dropout_p'],
                 bidirectional=gru_config['bidirectional'],
-                n_output=gru_config['n_output'],
                 **common_params
             ).to(self.device)
         elif self.model_name == "transformer":
@@ -160,17 +167,57 @@ class Trainer:
         else:
             raise ValueError(f"Unsupported TRAIN_LEN value: {self.len_train}")
 
-    def _load_data(self) -> Tuple[DataLoader, DataLoader]:
-        train_dataset = PortfolioDataset("data/train_dataset.h5")
-        val_dataset = PortfolioDataset("data/validation_dataset.h5")
+    def _load_and_process_data(self) -> Tuple[PortfolioDataset, PortfolioDataset]:
+        logger.info("Loading and processing data...")
 
-        train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True, num_workers=4, pin_memory=True)
-        val_loader = DataLoader(val_dataset, batch_size=self.config['BATCH'], shuffle=False, num_workers=4, pin_memory=True)
+        with open("data/dataset.pkl", "rb") as f:
+            train_x_raw, train_y_raw, val_x_raw, val_y_raw, _, _ = pickle.load(f)
 
-        return train_loader, val_loader
+        with open("data/date.pkl", "rb") as f:
+            date_info = pickle.load(f)
+
+        # Load selected indices for training and validation
+        with open("data/selected_indices.pkl", "rb") as f:
+            selected_indices_data = pickle.load(f)
+        train_selected_indices = selected_indices_data['train']  # List of arrays per sample
+        val_selected_indices = selected_indices_data['val']
+
+        if self.multimodal:
+            with open("data/dataset_img.pkl", "rb") as f:
+                train_img_data, val_img_data, _, _ = pickle.load(f)
+            train_img = train_img_data['images']
+            val_img = val_img_data['images']
+            train_labels = np.array(train_img_data['labels'])
+            val_labels = np.array(val_img_data['labels'])
+        else:
+            train_img = val_img = train_labels = val_labels = None
+
+        scale = self.len_pred
+        train_x = train_x_raw * scale
+        train_y = train_y_raw * scale
+        val_x = val_x_raw * scale
+        val_y = val_y_raw * scale
+
+        self.train_date = date_info['train']
+        self.val_date = date_info['val']
+        self.N_STOCK = self.config['M']  # Update to M
+        self.LEN_PRED = train_y.shape[1]
+
+        # Create datasets with selected indices
+        train_dataset = PortfolioDataset(train_x, train_y, train_selected_indices, train_img, train_labels)
+        val_dataset = PortfolioDataset(val_x, val_y, val_selected_indices, val_img, val_labels)
+        
+        print("train_x_raw shape:", train_x_raw.shape)
+        print("train_y_raw shape:", train_y_raw.shape)
+        print("train_selected_indices shape:", train_selected_indices.shape)
+        print("val_x_raw shape:", val_x_raw.shape)
+        print("val_y_raw shape:", val_y_raw.shape)
+        print("val_selected_indices shape:", val_selected_indices.shape)
+        return train_dataset, val_dataset
+
 
     def train(self) -> None:
-        train_dataset, val_dataset = self._load_data()
+        train_dataset, val_dataset = self._load_and_process_data()
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH'], shuffle=True, num_workers=4, pin_memory=True)
         val_loader = DataLoader(val_dataset, batch_size=self.config['BATCH'], shuffle=False, num_workers=4, pin_memory=True)
 
@@ -228,17 +275,21 @@ class Trainer:
             self.model.eval()
         total_loss = 0.0
 
-        for x, y in tqdm(dataloader, desc="Training" if is_training else "Validation", leave=False):
-            x, y = x.to(self.device), y.to(self.device)
+        for data in tqdm(dataloader, desc="Training" if is_training else "Validation", leave=False):
             if is_training:
                 self.optimizer.zero_grad()
 
-            loss = self._compute_loss((x, y))
+            loss = self._compute_loss(data)
             total_loss += loss.item()
 
             if is_training:
                 loss.backward()
-                self.optimizer.step()
+                self.optimizer.first_step(zero_grad=True)
+
+                # Second forward-backward pass
+                loss = self._compute_loss(data)
+                loss.backward()
+                self.optimizer.second_step(zero_grad=True)
 
         average_loss = total_loss / len(dataloader)
         return average_loss

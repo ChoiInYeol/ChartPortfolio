@@ -8,7 +8,7 @@ from itertools import product
 import argparse
 from train import Trainer
 from inference import Inference
-from Figure.backtest import Backtester
+from backtest import Backtester
 
 def set_random_seed(seed: int):
     os.environ["PYTHONHASHSEED"] = str(seed)

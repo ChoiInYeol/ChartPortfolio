@@ -18,6 +18,7 @@ SIZE_DICT:
 
 # model parameter
 N_STOCK: 4231  # 입력 주식 수
+'M': 50
 TRAIN_LEN: 60
 PRED_LEN: 20
 
@@ -39,9 +40,9 @@ PRED_LEN_OPTIONS: [20]
 SEED: 42
 
 # learning parameter
-BATCH: 32
-EPOCHS: 500
-EARLY_STOP: 5
+BATCH: 128
+EPOCHS: 50
+EARLY_STOP: 2
 MIN_DELTA: 0.0001
 LR: 0.005
 MOMENTUM: 0.9

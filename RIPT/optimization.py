@@ -13,12 +13,12 @@ def _ret_to_cum_log_ret(rets):
 
 # 그래프 스타일 설정
 import scienceplots
-plt.style.use(['science', 'nature'])
+plt.style.use(['science'])
 
 # 설정 값들
 TRAIN = '2017-12-31'
-MODELS = ['CNN', 'TS']
-WINDOW_SIZES = [5, 20, 60]
+MODELS = ['CNN']
+WINDOW_SIZES = [5, 20]
 BASE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'WORK_DIR')
 
 # 1. 데이터 로드 및 전처리
@@ -313,71 +313,6 @@ def calculate_portfolio_returns(us_ret, selected_stocks_list, valid_stock_ids, m
 
     return cumulative_returns
 
-def calculate_confusion_matrix(selected_stocks, us_ret):
-    """
-    각 투자 기간에 대해 TP, TN, FP, FN을 계산합니다.
-    """
-    results = []
-    for date in selected_stocks['investment_date'].unique():
-        # 투자 시작일은 investment_date의 다음 거래일
-        start_date = get_next_valid_date(date + pd.Timedelta(days=1), us_ret.index)
-        if start_date is None:
-            continue  # No valid start date
-        
-        # 투자 종료일 계산
-        next_dates = selected_stocks[selected_stocks['investment_date'] > date]['investment_date']
-        if not next_dates.empty:
-            next_investment_date = next_dates.min()
-            end_date = get_previous_valid_date(next_investment_date, us_ret.index)
-        else:
-            end_date = us_ret.index.max()
-        
-        if end_date < start_date:
-            print(f"경고: {date}에 대한 유효한 종료일을 찾을 수 없습니다.")
-            continue
-        
-        # 해당 기간의 실제 수익률 계산
-        stocks_at_date = selected_stocks[selected_stocks['investment_date'] == date]
-        stock_ids = stocks_at_date['StockID'].values
-        
-        # 투자 기간의 수익률 계산
-        period_returns = us_ret.loc[start_date:end_date, stock_ids]
-        if period_returns.empty:
-            continue
-        # Calculate total return over the period
-        total_returns = (1 + period_returns).prod() - 1
-        # Get sign of total returns
-        actual_labels = total_returns >= 0
-
-        predicted_labels = stocks_at_date['up_prob'] >= 0.5  # 임계값 0.5 사용
-
-        # Align actual_labels with predicted_labels
-        actual_labels = actual_labels.reindex(stocks_at_date['StockID'])
-        
-        # Ensure both series have the same index
-        common_index = actual_labels.index.intersection(predicted_labels.index)
-        actual_labels = actual_labels.loc[common_index]
-        predicted_labels = predicted_labels.loc[common_index]
-
-        # Remove any missing data
-        valid_indices = actual_labels.notnull() & predicted_labels.notnull()
-        predicted_labels = predicted_labels[valid_indices]
-        actual_labels = actual_labels[valid_indices]
-
-        tp = np.sum((predicted_labels == True) & (actual_labels == True))
-        tn = np.sum((predicted_labels == False) & (actual_labels == False))
-        fp = np.sum((predicted_labels == True) & (actual_labels == False))
-        fn = np.sum((predicted_labels == False) & (actual_labels == True))
-        
-        results.append({
-            'date': date,
-            'TP': tp,
-            'TN': tn,
-            'FP': fp,
-            'FN': fn
-        })
-    return pd.DataFrame(results)
-
 def calculate_portfolio_up_prob(selected_stocks, us_ret):
     """
     투자 기간 동안 평균 up_prob를 유지하여 시계열로 반환합니다.
@@ -441,6 +376,13 @@ def make_portfolio_plot(portfolio_ret, model, window_size, result_dir):
     print(f"Portfolio plot saved to {save_path}")
 
 def main():
+    
+    # 설정 값들
+    TRAIN = '2017-12-31'
+    MODELS = ['CNN']
+    WINDOW_SIZES = [5, 20]
+    BASE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'WORK_DIR')
+    
     # 1. 데이터 로드 및 전처리
     us_ret = load_and_preprocess_data()
     print("Data loaded and preprocessed.")
@@ -454,12 +396,12 @@ def main():
     print("Ensemble results processed.")
     
     # 모델 및 윈도우 사이즈 설정
-    models = ['CNN', 'TS']
-    window_sizes = [5, 20, 60]
+    models = MODELS
+    window_sizes = WINDOW_SIZES
     
     # 포트폴리오 선택 방법
     NAIVE_N = us_ret.shape[1]  # 전체 주식 수
-    PORTFOLIO_N = [round(NAIVE_N / 40), round(NAIVE_N / 20), NAIVE_N / 2]
+    PORTFOLIO_N = [round(NAIVE_N / 40), round(NAIVE_N / 20), round(NAIVE_N / 2)]
     
     
     # 색상 설정
@@ -534,27 +476,6 @@ def main():
                 # 평균 up_prob 계산
                 up_prob_series = calculate_portfolio_up_prob(selected_stocks, us_ret)
                 up_prob_dict[selection_name] = up_prob_series
-                
-                # TP, TN, FP, FN 계산
-                # confusion_df = calculate_confusion_matrix(selected_stocks, us_ret)
-                
-                # # 결과 저장
-                # confusion_df.to_csv(os.path.join(folder_name, f'confusion_matrix_{selection_name}_{model}{window_size}.csv'), index=False)
-                
-                # # TP, TN, FP, FN 시각화
-                # fig_conf, ax_conf = plt.subplots(figsize=(12, 8))
-                # ax_conf.plot(confusion_df['date'], confusion_df['TP'], label='TP', color='green')
-                # ax_conf.plot(confusion_df['date'], confusion_df['TN'], label='TN', color='blue')
-                # ax_conf.plot(confusion_df['date'], confusion_df['FP'], label='FP', color='red')
-                # ax_conf.plot(confusion_df['date'], confusion_df['FN'], label='FN', color='orange')
-                # ax_conf.set_title(f'Confusion Matrix - {selection_name} - Model: {model}, Window Size: {window_size}')
-                # ax_conf.set_xlabel('Date')
-                # ax_conf.set_ylabel('Count')
-                # ax_conf.legend()
-                # ax_conf.grid(True)
-                # fig_conf.tight_layout()
-                # fig_conf.savefig(os.path.join(folder_name, f'confusion_matrix_{selection_name}_{model}{window_size}.png'))
-                # plt.close(fig_conf)
 
             # 포트폴리오 수익률 계산 (기존 코드에서 가져옴)
             portfolio_ret = pd.DataFrame({
@@ -576,10 +497,10 @@ def main():
             print(f"\nAverage up_prob for each portfolio - Model: {model}, Window Size: {window_size}")
             print(up_prob_df.mean())
             
-            # 그래프 그리기
-            fig1, ax1 = plt.subplots(figsize=(12, 8))
-            fig2, ax2 = plt.subplots(figsize=(12, 8))
-            fig3, ax3 = plt.subplots(figsize=(12, 8))
+            # 그래프 그리기 부분 수정
+            fig1, ax1 = plt.subplots(figsize=(8, 7), dpi=600)
+            fig2, ax2 = plt.subplots(figsize=(8, 7), dpi=600)
+            fig3, ax3 = plt.subplots(figsize=(8, 7), dpi=600)
 
             # 누적 수익률 그래프
             color_index = 0
@@ -587,7 +508,7 @@ def main():
                 if label == 'Benchmark':
                     color = benchmark_color
                     linestyle = '-'
-                    linewidth = 2
+                    linewidth = 1.5
                 elif 'Bottom' in label:
                     color = get_color(color_index, True)
                     linestyle = '--'
@@ -604,16 +525,17 @@ def main():
                 
                 ax1.plot(cumulative_returns.index, cumulative_returns.values, label=label, color=color, linestyle=linestyle, linewidth=linewidth)
                 
-                # 리밸런싱 날짜에 점 추가
+                # 리밸런싱 날짜에 점 추가 (마커 크기 축소)
                 if label != 'Benchmark':
                     for date in cumulative_returns.index.intersection(rebalance_dates):
-                        ax1.plot(date, cumulative_returns.loc[date], marker='o', color=color)
+                        ax1.plot(date, cumulative_returns.loc[date], marker='o', color=color, markersize=3)
 
-            ax1.set_title(f'Cumulative Returns - Model: {model}, Window Size: {window_size}')
-            ax1.set_xlabel('Date')
-            ax1.set_ylabel('Cumulative Returns')
-            ax1.legend()
-            ax1.grid(True)
+            ax1.set_title(f'Cumulative Returns - {model} {window_size}-day', fontsize=10)
+            ax1.set_xlabel('Date', fontsize=8)
+            ax1.set_ylabel('Cumulative Returns', fontsize=8)
+            ax1.legend(fontsize=6, ncol=2)
+            ax1.grid(True, alpha=0.3)
+            ax1.tick_params(axis='both', which='major', labelsize=6)
             fig1.tight_layout()
 
             # 예측 편향 검증
@@ -631,18 +553,19 @@ def main():
                     color = get_color(color_index, False)
                     linestyle = '-'
                     color_index += 1
-                else:  # Naive
-                    color = neutral_color
+                else:  # Benchmark
+                    color = benchmark_color
                     linestyle = '-'
                 
-                ax2.plot(rel_perf.index, rel_perf.values, label=label, color=color, linestyle=linestyle)
+                ax2.plot(rel_perf.index, rel_perf.values, label=label, color=color, linestyle=linestyle, linewidth=1)
 
-            ax2.set_title(f'Relative Performance (Prediction Bias Check) - Model: {model}, Window Size: {window_size}')
-            ax2.set_xlabel('Date')
-            ax2.set_ylabel('Relative Performance to Naive')
-            ax2.legend()
-            ax2.grid(True)
-            ax2.axhline(y=1, color='black', linestyle='--')  # 벤치마크 라인
+            ax2.set_title(f'Relative Performance - {model} {window_size}-day', fontsize=10)
+            ax2.set_xlabel('Date', fontsize=8)
+            ax2.set_ylabel('Relative Performance to Naive', fontsize=8)
+            ax2.legend(fontsize=6, ncol=2)
+            ax2.grid(True, alpha=0.3)
+            ax2.axhline(y=1, color='black', linestyle='--', linewidth=0.5)  # 벤치마크 라인
+            ax2.tick_params(axis='both', which='major', labelsize=6)
             fig2.tight_layout()
 
             # 평균 up_prob 그래프
@@ -659,19 +582,20 @@ def main():
                     color = neutral_color
                     linestyle = '-'
                 
-                ax3.plot(up_prob_series.index, up_prob_series.values, label=label, color=color, linestyle=linestyle)
+                ax3.plot(up_prob_series.index, up_prob_series.values, label=label, color=color, linestyle=linestyle, linewidth=1)
 
-            ax3.set_title(f'Average up_prob - Model: {model}, Window Size: {window_size}')
-            ax3.set_xlabel('Date')
-            ax3.set_ylabel('Average up_prob')
-            ax3.legend()
-            ax3.grid(True)
+            ax3.set_title(f'Average up_prob - {model} {window_size}-day', fontsize=10)
+            ax3.set_xlabel('Date', fontsize=8)
+            ax3.set_ylabel('Average up_prob', fontsize=8)
+            ax3.legend(fontsize=6, ncol=2)
+            ax3.grid(True, alpha=0.3)
+            ax3.tick_params(axis='both', which='major', labelsize=6)
             fig3.tight_layout()
 
             # 그래프 저장
-            fig1.savefig(os.path.join(folder_name, f'cumulative_returns_{model}{window_size}.png'))
-            fig2.savefig(os.path.join(folder_name, f'relative_performance_{model}{window_size}.png'))
-            fig3.savefig(os.path.join(folder_name, f'average_up_prob_{model}{window_size}.png'))
+            fig1.savefig(os.path.join(folder_name, f'cumulative_returns_{model}{window_size}.png'), dpi=600, bbox_inches='tight')
+            fig2.savefig(os.path.join(folder_name, f'relative_performance_{model}{window_size}.png'), dpi=600, bbox_inches='tight')
+            fig3.savefig(os.path.join(folder_name, f'average_up_prob_{model}{window_size}.png'), dpi=600, bbox_inches='tight')
 
             plt.close('all')
 

@@ -1,131 +1,147 @@
 import yaml
+import pickle
 import numpy as np
 import pandas as pd
 import logging
-import os
-import gc
-import h5py
-import pickle
 
+# 로깅 설정
 logging.basicConfig(filename='make_dataset.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-def load_ticker_mapping(file_path="data/ticker_stockid.csv"):
-    ticker_mapping = {}
-    df = pd.read_csv(file_path)
-    for _, row in df.iterrows():
-        ticker_mapping[row['TICKER']] = row['StockID']
-    return ticker_mapping
+def get_return_df(filtered_stock_path, ticker_stockid_path):
+    """
+    필터링된 주식 데이터와 티커-PERMNO 매핑을 사용하여 수익률 데이터프레임을 생성합니다.
 
-def get_return_df_generator(stock_dic, start_date, end_date, in_path="data/filtered_stock.csv", chunk_size=50000):
-    reader = pd.read_csv(in_path, usecols=['date', 'PERMNO', 'return'], chunksize=chunk_size, parse_dates=['date'])
-    for chunk in reader:
-        # 날짜 범위 필터링
-        chunk = chunk[(chunk['date'] >= start_date) & (chunk['date'] <= end_date)]
-        if chunk.empty:
-            del chunk
-            gc.collect()
-            continue
-        # 필요한 종목만 필터링
-        chunk_filtered = chunk[chunk['PERMNO'].isin(stock_dic.values())]
-        if chunk_filtered.empty:
-            del chunk, chunk_filtered
-            gc.collect()
-            continue
-        chunk_filtered.set_index(['date', 'PERMNO'], inplace=True)
-        return_df_chunk = chunk_filtered['return'].unstack(level='PERMNO')
-        return_df_chunk = return_df_chunk.sort_index()
-        return_df_chunk = return_df_chunk.fillna(-2)
-        yield return_df_chunk.astype('float32')
-        del chunk, chunk_filtered, return_df_chunk
-        gc.collect()
+    Args:
+        filtered_stock_path (str): 필터링된 주식 데이터 파일 경로
+        ticker_stockid_path (str): 티커-PERMNO 매핑 파일 경로
 
-def make_DL_dataset_hdf5(data_generator, train_len, pred_len, output_file):
+    Returns:
+        pd.DataFrame: 피벗된 수익률 데이터프레임
+    """
+    filtered_stock = pd.read_csv(filtered_stock_path, parse_dates=['date'])
+    filtered_stock = filtered_stock[['date', 'PERMNO', 'RET']]
+
+    ticker_stockid = pd.read_csv(ticker_stockid_path)
+    ticker_stockid = ticker_stockid[['TICKER', 'StockID']]
+    ticker_stockid = ticker_stockid.rename(columns={'StockID': 'PERMNO'})
+
+    merged_data = pd.merge(filtered_stock, ticker_stockid, on='PERMNO', how='inner')
+    pivot_data = merged_data.pivot(index='date', columns='TICKER', values='RET')
+
+    return pivot_data
+
+def make_DL_dataset(data, data_len, n_stock):
+    """
+    딥러닝 데이터셋을 생성합니다.
+
+    Args:
+        data (pd.DataFrame): 입력 데이터
+        data_len (int): 데이터 길이
+        n_stock (int): 주식 수
+
+    Returns:
+        tuple: (dataset, times)
+    """
     times = []
-    with h5py.File(output_file, 'w') as h5f:
-        x_dset = None
-        y_dset = None
-        count = 0
+    dataset = np.array(data.iloc[:data_len, :n_stock]).reshape(1, -1, n_stock)
+    times.append(data.iloc[:data_len, :].index)
 
-        buffer = []
-        for data_chunk in data_generator:
-            buffer.append(data_chunk)
-            combined_data = pd.concat(buffer)
-            num_rows = combined_data.shape[0]
+    for i in range(1, len(data) - data_len + 1):
+        addition = np.array(data.iloc[i:data_len+i, :n_stock]).reshape(1, -1, n_stock)
+        dataset = np.concatenate((dataset, addition))
+        times.append(data.iloc[i:data_len+i, :].index)
+    return dataset, times
 
-            while num_rows >= train_len + pred_len:
-                x_subset = combined_data.iloc[:train_len].values
-                y_subset = combined_data.iloc[train_len:train_len+pred_len].values
-                
-                # 고정된 열 크기 설정
-                if x_dset is None:
-                    fixed_shape = x_subset.shape[1]  # 첫 번째 배치의 열 크기로 고정
-                    x_dset = h5f.create_dataset('x', data=x_subset[np.newaxis, :], maxshape=(None, train_len, fixed_shape), chunks=True)
-                    y_dset = h5f.create_dataset('y', data=y_subset[np.newaxis, :], maxshape=(None, pred_len, fixed_shape), chunks=True)
-                else:
-                    # 현재 배치의 열 크기가 고정된 크기와 다르면 크기를 맞춤
-                    if x_subset.shape[1] != fixed_shape:
-                        if x_subset.shape[1] < fixed_shape:
-                            # 부족한 부분을 0으로 채움
-                            padding = np.zeros((x_subset.shape[0], fixed_shape - x_subset.shape[1]))
-                            x_subset = np.hstack((x_subset, padding))
-                            y_subset = np.hstack((y_subset, np.zeros((y_subset.shape[0], fixed_shape - y_subset.shape[1]))))
-                        else:
-                            # 넘치는 부분을 잘라냄
-                            x_subset = x_subset[:, :fixed_shape]
-                            y_subset = y_subset[:, :fixed_shape]
+def data_split(data, train_len, pred_len, train_start, train_end, val_ratio, test_start, test_end, n_stock):
+    """
+    데이터를 훈련, 검증, 테스트 세트로 분할합니다.
 
-                    x_dset.resize(x_dset.shape[0] + 1, axis=0)
-                    y_dset.resize(y_dset.shape[0] + 1, axis=0)
-                    x_dset[-1] = x_subset
-                    y_dset[-1] = y_subset
-                
-                times.append(combined_data.index[train_len+pred_len-1])
-                combined_data = combined_data.iloc[1:]
-                num_rows = combined_data.shape[0]
+    Args:
+        data (pd.DataFrame): 입력 데이터
+        train_len (int): 훈련 데이터 길이
+        pred_len (int): 예측 데이터 길이
+        train_start (str): 훈련 시작 날짜
+        train_end (str): 훈련 종료 날짜
+        val_ratio (float): 검증 세트 비율
+        test_start (str): 테스트 시작 날짜
+        test_end (str): 테스트 종료 날짜
+        n_stock (int): 주식 수
 
-            buffer = [combined_data]
-            del data_chunk
-            gc.collect()
+    Returns:
+        tuple: (x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te)
+    """
+    # 훈련 데이터 선택
+    train_data = data.loc[train_start:train_end]
+    
+    # 훈련 및 검증 데이터 분할
+    train_size = int(len(train_data) * (1 - val_ratio))
+    train_data, val_data = train_data.iloc[:train_size], train_data.iloc[train_size:]
+    
+    # 테스트 데이터 선택 (OOS)
+    test_data = data.loc[test_start:test_end]
 
-    return times
+    # 데이터셋 생성
+    return_train, times_train = make_DL_dataset(train_data, train_len + pred_len, n_stock)
+    return_val, times_val = make_DL_dataset(val_data, train_len + pred_len, n_stock)
+    return_test, times_test = make_DL_dataset(test_data, train_len + pred_len, n_stock)
 
+    # 입력과 라벨 분리
+    x_tr = np.array([x[:train_len] for x in return_train])
+    y_tr = np.array([x[-pred_len:] for x in return_train])
+    times_tr = np.unique(np.array([x[-pred_len:] for x in times_train]).flatten()).tolist()
+
+    x_val = np.array([x[:train_len] for x in return_val])
+    y_val = np.array([x[-pred_len:] for x in return_val])
+    times_val = np.unique(np.array([x[-pred_len:] for x in times_val]).flatten()).tolist()
+
+    x_te = np.array([x[:train_len] for x in return_test])
+    y_te = np.array([x[-pred_len:] for x in return_test])
+    times_te = np.unique(np.array([x[-pred_len:] for x in times_test]).flatten()).tolist()
+
+    return x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te
 
 if __name__ == "__main__":
     path = "data/"
+
+    # 설정 파일 로드
     with open("config/config.yaml", "r", encoding="utf8") as file:
         config = yaml.safe_load(file)
 
-    stock_dict_sp = load_ticker_mapping(path + "ticker_stockid.csv")
+    # 수익률 데이터프레임 생성
+    return_df = get_return_df(path + "filtered_stock.csv", path + "ticker_stockid.csv")
 
-    # 날짜 설정
-    train_start_date = config["TRAIN_START_DATE"]
-    train_end_date = config["TRAIN_END_DATE"]
-    validation_ratio = config.get("VALIDATION_RATIO", 0.2)
-    total_days = (pd.to_datetime(train_end_date) - pd.to_datetime(train_start_date)).days
-    validation_days = int(total_days * validation_ratio)
-    validation_start_date = (pd.to_datetime(train_end_date) - pd.Timedelta(days=validation_days)).strftime('%Y-%m-%d')
+    # NaN 값 처리 및 float32로 변환
+    data = return_df.fillna(-2).astype(np.float32)
 
-    test_start_date = config["TEST_START_DATE"]
-    test_end_date = config["TEST_END_DATE"]
+    # 데이터 분할
+    x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te = data_split(
+        data,
+        config["TRAIN_LEN"],
+        config["PRED_LEN"],
+        config["TRAIN_START_DATE"],
+        config["TRAIN_END_DATE"],
+        config["VALIDATION_RATIO"],
+        config["TEST_START_DATE"],
+        config["TEST_END_DATE"],
+        config["N_STOCK"],
+    )
 
-    # 제너레이터 생성
-    train_data_generator = get_return_df_generator(stock_dict_sp, train_start_date, validation_start_date)
-    validation_data_generator = get_return_df_generator(stock_dict_sp, validation_start_date, train_end_date)
-    test_data_generator = get_return_df_generator(stock_dict_sp, test_start_date, test_end_date)
+    # 데이터셋 정보 로깅
+    logging.info("데이터셋 검증:")
+    logging.info(f"Train images shape: {x_tr.shape}")
+    logging.info(f"Train labels shape: {y_tr.shape}")
+    logging.info(f"Validation images shape: {x_val.shape}")
+    logging.info(f"Validation labels shape: {y_val.shape}")
+    logging.info(f"Test images shape: {x_te.shape}")
+    logging.info(f"Test labels shape: {y_te.shape}")
 
-    # HDF5로 데이터셋 저장
-    train_times = make_DL_dataset_hdf5(train_data_generator, config["TRAIN_LEN"], config["PRED_LEN"], path + "train_dataset.h5")
-    validation_times = make_DL_dataset_hdf5(validation_data_generator, config["TRAIN_LEN"], config["PRED_LEN"], path + "validation_dataset.h5")
-    test_times = make_DL_dataset_hdf5(test_data_generator, config["TRAIN_LEN"], config["PRED_LEN"], path + "test_dataset.h5")
+    # 날짜 정보 저장
+    with open(path + "date.pkl", "wb") as f:
+        pickle.dump({'train': times_tr, 'val': times_val, 'test': times_te}, f)
 
-    # 시간 정보 저장
-    with open(path + "train_times.pkl", 'wb') as f:
-        pickle.dump(train_times, f)
-    with open(path + "validation_times.pkl", 'wb') as f:
-        pickle.dump(validation_times, f)
-    with open(path + "test_times.pkl", 'wb') as f:
-        pickle.dump(test_times, f)
+    # 데이터셋 저장
+    with open(path + "dataset.pkl", "wb") as f:
+        pickle.dump([x_tr, y_tr, x_val, y_val, x_te, y_te], f)
 
     logging.info("데이터셋 생성 완료")
-    print("Data preparation is completed.")

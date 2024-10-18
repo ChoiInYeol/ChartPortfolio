@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class GRU(nn.Module):
-    def __init__(self, n_layers, hidden_dim, n_stocks, n_output, dropout_p=0.3, bidirectional=False,
+    def __init__(self, n_layers, hidden_dim, n_stocks, dropout_p=0.3, bidirectional=False,
                  lb=0, ub=0.1, multimodal=False):
         super().__init__()
         self.n_layers = n_layers
@@ -13,16 +13,13 @@ class GRU(nn.Module):
         self.ub = ub
         self.multimodal = multimodal
 
-        self.input_size = n_stocks    # 입력 크기 (4586)
-        self.output_size = n_output   # 출력 크기 (50)
-        
-        self.gru = nn.GRU(input_size=self.input_size, hidden_size=hidden_dim, num_layers=n_layers,
-                          batch_first=True, dropout=dropout_p, bidirectional=bidirectional)
-        num_directions = 2 if bidirectional else 1
-        
+        input_dim = n_stocks
+        self.gru = nn.GRU(
+            input_dim, self.hidden_dim, num_layers=self.n_layers, batch_first=True, bidirectional=bidirectional
+        )
         self.dropout = nn.Dropout(dropout_p)
         self.scale = 2 if bidirectional else 1
-        self.fc = nn.Linear(hidden_dim * num_directions, self.output_size)
+        self.fc = nn.Linear(self.hidden_dim * self.scale, n_stocks)
         self.swish = nn.SiLU()
 
     def forward(self, x):
