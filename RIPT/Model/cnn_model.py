@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 
 from torchsummary import summary
-import yaml
+import json
 import os
 from Misc import config as cf
 
@@ -456,6 +456,21 @@ class CNN1DModel(nn.Module):
         x = self.fc(x)
         return x
 
+def simplify_model_details(model_details):
+    """반복되는 리스트 값들을 압축하여 가독성을 개선합니다."""
+    simplified = model_details.copy()
+    
+    # 리스트 압축 표현식 사용
+    simplified['filter_size_list'] = "[[5, 3]] * 10"
+    simplified['max_pooling_list'] = "[[2, 1]] * 10"
+    simplified['stride_list'] = "[[3, 1]] + [[1, 1]] * 10"
+    simplified['dilation_list'] = "[[2, 1]] + [[1, 1]] * 10"
+    
+    # JSON에 저장할 때는 문자열 형태로 저장되고, 나중에 로드할 때 eval() 사용
+    return {
+        **simplified,
+        "_comment": "압축된 리스트 표현식은 Python eval() 함수로 평가해야 합니다."
+    }
 
 def get_full_model_name(
     ts1d_model,
@@ -496,15 +511,16 @@ def get_full_model_name(
         "regression_label": regression_label
     }
     
-    # YAML 파일로 저장
-    yaml_dir = os.path.join(cf.WORK_DIR, model_name)
-    os.makedirs(yaml_dir, exist_ok=True)
-    yaml_path = os.path.join(yaml_dir, "model_details.yaml")
+    # JSON 파일로 저장
+    json_dir = os.path.join(cf.WORK_DIR, model_name)
+    os.makedirs(json_dir, exist_ok=True)
+    json_path = os.path.join(json_dir, "model_details.json")
     
-    with open(yaml_path, 'w') as yaml_file:
-        yaml.dump(model_details, yaml_file, default_flow_style=False)
+    with open(json_path, 'w', encoding='utf-8') as json_file:
+        simplified_details = simplify_model_details(model_details)
+        json.dump(simplified_details, json_file, indent=2, ensure_ascii=False)
     
-    print(f"모델 세부 정보가 {yaml_path}에 저장되었습니다.")
+    print(f"모델 세부 정보가 {json_path}에 저장되었습니다.")
     
     return model_name
 

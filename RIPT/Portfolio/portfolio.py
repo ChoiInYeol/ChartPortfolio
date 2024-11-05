@@ -187,13 +187,14 @@ class PortfolioManager(object):
                 )
                 turnover[i - 1] = turnover[i - 1] * 0.5
             prev_to_df = to_df
-
+            
+        pd.set_option('future.no_silent_downcasting', True)
         portfolio_ret = portfolio_ret.fillna(0)
         portfolio_ret["H-L"] = portfolio_ret[cut - 1] - portfolio_ret[0]
         print(
             f"Spearman Corr between Prob and Stock Return is {np.nanmean(prob_ret_corr):.4f}"
         )
-        print(
+        print(c
             f"Pearson Corr between Prob and Stock Return is {np.nanmean(prob_ret_pearson_corr):.4f}"
         )
         print(

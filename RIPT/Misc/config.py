@@ -48,7 +48,7 @@ START_YEAR_DICT = {
     "Sweden": 2001,
 }
 IS_YEARS = list(range(2001, 2018))
-OOS_YEARS = list(range(2018, 2024))
+OOS_YEARS = list(range(2018, 2025))
 
 BENCHMARK_MODEL_NAME_DICT = {
     5: "BM5L2",  # WS5

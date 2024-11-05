@@ -1,5 +1,10 @@
-from Experiments.cnn_experiment import train_us_model, train_my_model
 from Data.generate_chart import GenerateStockData
+from Misc import config as cf
+
+from Experiments.cnn_experiment import Experiment
+from Model import cnn_model
+
+from typing import Optional
 import torch
 import os
 
@@ -17,9 +22,6 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
         freq (str): 데이터 주기 ('month', 'week', 'day' 등)
         chart_type (str): 차트 타입 ('bar', 'line' 등)
         country (str): 국가 코드
-
-    이 함수는 지정된 연도, 윈도우 사이즈, 주기, 차트 타입, 국가에 대해
-    CNN2D와 CNN1D 모델에 필요한 데이터를 생성하고 저장합니다.
     """
     for year in year_list:
         for ws in ws_list:
@@ -33,7 +35,7 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
                 year,
                 ws,
                 freq='month',
-                chart_freq=1,  # 차트 주기 (I20/R20 to R5/R5의 경우, ws=20, chart_freq=4로 설정)
+                chart_freq=1,
                 ma_lags=ma_lags,
                 volume_bar=vb,
                 need_adjust_price=True,
@@ -41,74 +43,167 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
                 chart_type=chart_type,
             )
             
-            # CNN2D 데이터 생성
             dgp_obj.save_annual_data()
-            
-            # CNN1D 데이터 생성
             dgp_obj.save_annual_ts_data()
+
+def create_model_object(
+    ws: int,
+    ts1d_model: bool = False,
+    layer_number: Optional[int] = None,
+    inplanes: int = cf.TRUE_DATA_CNN_INPLANES,
+    drop_prob: float = 0.50,
+    batch_norm: bool = True,
+    xavier: bool = True,
+    lrelu: bool = True,
+    regression_label: Optional[str] = None
+) -> cnn_model.Model:
+    """
+    CNN 모델 객체를 생성합니다.
+
+    Args:
+        ws: 윈도우 사이즈
+        ts1d_model: 1D CNN 모델 여부
+        layer_number: 레이어 수 (None이면 기본값 사용)
+        inplanes: 초기 채널 수
+        drop_prob: 드롭아웃 확률
+        batch_norm: 배치 정규화 사용 여부
+        xavier: Xavier 초기화 사용 여부
+        lrelu: LeakyReLU 사용 여부
+        regression_label: 회귀 레이블 (옵션)
+
+    Returns:
+        Model 객체
+    """
+    # 기본 레이어 수 설정
+    if layer_number is None:
+        if ts1d_model:
+            layer_number = cf.TS1D_LAYERNUM_DICT[ws]
+        else:
+            layer_number = cf.BENCHMARK_MODEL_LAYERNUM_DICT[ws]
+    
+    # 필터 크기, 스트라이드, 팽창, 맥스풀링 설정
+    if ts1d_model:
+        setting = cf.EMP_CNN1d_BL_SETTING[ws]
+    else:
+        setting = cf.EMP_CNN_BL_SETTING[ws]
+    
+    filter_size_list, stride_list, dilation_list, max_pooling_list = setting
+    
+    # 모델 객체 생성
+    model_obj = cnn_model.Model(
+        ws=ws,
+        layer_number=layer_number,
+        inplanes=inplanes,
+        drop_prob=drop_prob,
+        filter_size_list=filter_size_list,
+        stride_list=stride_list,
+        dilation_list=dilation_list,
+        max_pooling_list=max_pooling_list,
+        batch_norm=batch_norm,
+        xavier=xavier,
+        lrelu=lrelu,
+        ts1d_model=ts1d_model,
+        bn_loc="bn_bf_relu",
+        regression_label=regression_label
+    )
+    
+    return model_obj
 
 if __name__ == "__main__":
     # 데이터 생성
-    year_list = list(range(2001, 2025))
+    year_list = cf.IS_YEARS + cf.OOS_YEARS
     ws_list = [5, 20]
     # generate_training_data(year_list, ws_list)
     
-    print(device)
+    print(f"Using device: {device}")
 
-    # # CNN2D 모델 훈련
-    # train_my_model(
-    #     ws_list=ws_list,
-    #     pw_list=[20],
-    #     drop_prob=0.50,
-    #     ensem=5,
-    #     total_worker=1,
-    #     is_ensem_res=True,
-    #     has_volume_bar=True,
-    #     has_ma=True,
-    #     chart_type="bar",
-    #     calculate_portfolio=True,
-    #     ts1d_model=False,
-    #     lr=1e-5,
-    # )
+    # CNN2D 모델 학습
+    print("\nTraining CNN2D model...")
+    ws = 20
+    pw = 20
     
-    # CNN1D 모델 훈련
-    train_my_model(
-        ws_list=ws_list,
-        pw_list=[20],
+    # 모델 객체 생성
+    model_obj = create_model_object(
+        ws=ws,
+        ts1d_model=False,  # CNN2D
         drop_prob=0.50,
-        ensem=5,
-        total_worker=1,
-        is_ensem_res=True,
-        has_volume_bar=True,
-        has_ma=True,
-        chart_type="bar",
-        calculate_portfolio=True,
-        ts1d_model=True,
-        lr=1e-5,
+        batch_norm=True,
+        xavier=True,
+        lrelu=True
     )
     
+    # 실험 객체 생성
+    exp = Experiment(
+        ws=ws,
+        pw=pw,
+        model_obj=model_obj,
+        train_freq="month",
+        ensem=5,
+        lr=1e-5,
+        drop_prob=0.50,
+        max_epoch=50,
+        enable_tqdm=True,
+        early_stop=True,
+        has_ma=True,
+        has_volume_bar=True,
+        is_years=cf.IS_YEARS,
+        oos_years=cf.OOS_YEARS,
+        country="USA",
+        chart_type="bar"
+    )
+
+    # 모델 학습
+    exp.train_empirical_ensem_model()
+
+    # 포트폴리오 계산
+    exp.calculate_portfolio(
+        load_saved_data=True,
+        delay_list=[0],
+        is_ensem_res=True,
+        cut=10
+    )
+
+    # CNN1D 모델 학습
+    print("\nTraining CNN1D model...")
     
-    # train_us_model(
-    #     [60],
-    #     [20],
-    #     total_worker=1,
-    #     calculate_portfolio=True,
-    #     ts1d_model=False,
-    #     ts_scale="image_scale",
-    #     regression_label=None,
-    #     pf_delay_list=[0],
-    #     lr=1e-4,
+    # 1D 모델 객체 생성
+    model_obj_1d = create_model_object(
+        ws=ws,
+        ts1d_model=True,  # CNN1D
+        drop_prob=0.50,
+        batch_norm=True,
+        xavier=True,
+        lrelu=True
+    )
+    
+    # # 1D 실험 객체 생성
+    # exp_1d = Experiment(
+    #     ws=ws,
+    #     pw=pw,
+    #     model_obj=model_obj_1d,
+    #     train_freq="month",
+    #     ensem=5,
+    #     lr=1e-5,
+    #     drop_prob=0.50,
+    #     max_epoch=50,
+    #     enable_tqdm=True,
+    #     early_stop=True,
+    #     has_ma=True,
+    #     has_volume_bar=True,
+    #     is_years=cf.IS_YEARS,
+    #     oos_years=cf.OOS_YEARS,
+    #     country="USA",
+    #     chart_type="bar",
+    #     ts_scale="image_scale"
     # )
-    
-    # # CNN1D
-    # train_us_model(
-    #     [60],
-    #     [20],
-    #     total_worker=1,
-    #     calculate_portfolio=True,
-    #     ts1d_model=True,
-    #     ts_scale="image_scale",
-    #     regression_label=None,
-    #     pf_delay_list=[0],
-    #     lr=1e-4,
+
+    # # 1D 모델 학습
+    # exp_1d.train_empirical_ensem_model()
+
+    # # 1D 포트폴리오 계산
+    # exp_1d.calculate_portfolio(
+    #     load_saved_data=True,
+    #     delay_list=[0],
+    #     is_ensem_res=True,
+    #     cut=10
     # )
