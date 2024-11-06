@@ -7,10 +7,22 @@ from Model import cnn_model
 from typing import Optional
 import torch
 import os
+import sys
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-torch.set_num_threads(1)
+def set_device(gpu_ids: str) -> torch.device:
+    """
+    GPU ID를 설정하고 디바이스를 반환합니다.
+
+    Args:
+        gpu_ids (str): 사용할 GPU ID 문자열 (예: "0,1,2,3")
+
+    Returns:
+        torch.device: 설정된 디바이스
+    """
+    os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.set_num_threads(1)
+    return device
 
 def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", country="USA"):
     """
@@ -27,8 +39,8 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
         for ws in ws_list:
             print(f"Generating data for {ws}D {freq} {chart_type} {year}")
             
-            ma_lags = None  # 윈도우 사이즈와 동일한 이동평균 기간 사용 or None
-            vb = False  # 거래량 바 포함 여부
+            ma_lags = [20]  # 윈도우 사이즈와 동일한 이동평균 기간 사용 or None
+            vb = True  # 거래량 바 포함 여부
             
             dgp_obj = GenerateStockData(
                 country,
@@ -44,7 +56,7 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
             )
             
             dgp_obj.save_annual_data()
-            dgp_obj.save_annual_ts_data()
+            # dgp_obj.save_annual_ts_data()
 
 def create_model_object(
     ws: int,
@@ -110,10 +122,18 @@ def create_model_object(
     return model_obj
 
 if __name__ == "__main__":
+    # GPU ID를 명령줄 인자로 받기
+    if len(sys.argv) < 2:
+        print("Usage: python sample_codes.py <GPU_IDS>")
+        sys.exit(1)
+    
+    gpu_ids = sys.argv[1]
+    device = set_device(gpu_ids)
+    
     # 데이터 생성
     year_list = cf.IS_YEARS + cf.OOS_YEARS
-    ws_list = [5, 20]
-    # generate_training_data(year_list, ws_list)
+    ws_list = [20]
+    generate_training_data(year_list, ws_list)
     
     print(f"Using device: {device}")
 
@@ -141,7 +161,7 @@ if __name__ == "__main__":
         ensem=5,
         lr=1e-5,
         drop_prob=0.50,
-        max_epoch=50,
+        max_epoch=500,
         enable_tqdm=True,
         early_stop=True,
         has_ma=True,
@@ -162,19 +182,62 @@ if __name__ == "__main__":
         is_ensem_res=True,
         cut=10
     )
-
-    # CNN1D 모델 학습
-    print("\nTraining CNN1D model...")
     
-    # 1D 모델 객체 생성
-    model_obj_1d = create_model_object(
-        ws=ws,
-        ts1d_model=True,  # CNN1D
-        drop_prob=0.50,
-        batch_norm=True,
-        xavier=True,
-        lrelu=True
-    )
+    # ws = 60
+    
+    # # 모델 객체 생성
+    # model_obj = create_model_object(
+    #     ws=ws,
+    #     ts1d_model=False,  # CNN2D
+    #     drop_prob=0.50,
+    #     batch_norm=True,
+    #     xavier=True,
+    #     lrelu=True
+    # )
+    
+    # # 실험 객체 생성
+    # exp = Experiment(
+    #     ws=ws,
+    #     pw=pw,
+    #     model_obj=model_obj,
+    #     train_freq="month",
+    #     ensem=5,
+    #     lr=1e-5,
+    #     drop_prob=0.50,
+    #     max_epoch=500,
+    #     enable_tqdm=True,
+    #     early_stop=True,
+    #     has_ma=True,
+    #     has_volume_bar=True,
+    #     is_years=cf.IS_YEARS,
+    #     oos_years=cf.OOS_YEARS,
+    #     country="USA",
+    #     chart_type="bar"
+    # )
+
+    # # 모델 학습
+    # exp.train_empirical_ensem_model()
+
+    # # 포트폴리오 계산
+    # exp.calculate_portfolio(
+    #     load_saved_data=True,
+    #     delay_list=[0],
+    #     is_ensem_res=True,
+    #     cut=10
+    # )
+
+    # # CNN1D 모델 학습
+    # print("\nTraining CNN1D model...")
+    
+    # # 1D 모델 객체 생성
+    # model_obj_1d = create_model_object(
+    #     ws=ws,
+    #     ts1d_model=True,  # CNN1D
+    #     drop_prob=0.50,
+    #     batch_norm=True,
+    #     xavier=True,
+    #     lrelu=True
+    # )
     
     # # 1D 실험 객체 생성
     # exp_1d = Experiment(

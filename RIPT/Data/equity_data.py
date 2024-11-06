@@ -10,21 +10,42 @@ def safe_exp(x):
     return np.exp(np.clip(x, -10, 10))
 
 def create_spy_returns():
-    spy = pd.read_csv('data/spy.csv', parse_dates=['Date'], index_col='Date')
+    spy = pd.read_csv(op.join(dcf.RAW_DATA_DIR, "snp500_index.csv"), parse_dates=['Date'], index_col='Date')
     spy['Return'] = spy['Adj Close'].pct_change()
-
+    
     for freq in ['week', 'month', 'quarter', 'year']:
         if freq == 'week':
-            returns = spy['Return'].resample('W').apply(lambda x: (1 + x).prod() - 1)
-        elif freq == 'month':
-            returns = spy['Return'].resample('ME').apply(lambda x: (1 + x).prod() - 1)
-        elif freq == 'quarter':
-            returns = spy['Return'].resample('QE').apply(lambda x: (1 + x).prod() - 1)
-        else:  # year
-            returns = spy['Return'].resample('YE').apply(lambda x: (1 + x).prod() - 1)
+            # 주별 마지막 거래일 찾기
+            week_ends = spy.groupby(pd.Grouper(freq='W')).apply(lambda x: x.index[-1] if not x.empty else None)
+            returns = pd.Series(index=week_ends, dtype=float)
+            
+            for week_end in week_ends:
+                if week_end is not None:
+                    week_data = spy.loc[:week_end].last('7D')  # 해당 주의 데이터
+                    returns[week_end] = (1 + week_data['Return']).prod() - 1
+                    
+        else:
+            # 월/분기/연도의 첫날과 마지막날 찾기
+            freq_map = {'month': 'ME', 'quarter': 'QE', 'year': 'YE'}
+            period_groups = spy.groupby(pd.Grouper(freq=freq_map[freq]))
+            
+            dates = []
+            rets = []
+            
+            for period, group in period_groups:
+                if not group.empty:
+                    last_day = group.index[-1]
+                    dates.append(last_day)
+                    rets.append((1 + group['Return']).prod() - 1)
+            
+            returns = pd.Series(rets, index=dates)
         
+        # 결과를 데이터프레임으로 변환
         returns = pd.DataFrame(returns, columns=['Return'])
-        returns['nxt_freq_ewret'] = returns['Return'].shift(-1)  # 다음 기간의 수익률 추가
+        returns.index.name = 'Date'
+        
+        # 다음 기간의 수익률 추가
+        returns['nxt_freq_ewret'] = returns['Return'].shift(-1)
         
         output_path = os.path.join(dcf.CACHE_DIR, f"spy_{freq}_ret.csv")
         returns.to_csv(output_path, index=True)
@@ -33,34 +54,49 @@ def create_spy_returns():
 def create_benchmark_returns():
     """
     벤치마크 수익률을 계산하고 저장합니다.
-    
-    0인 데이터를 제외하고 유효한 값만을 사용하여 1/N 방식으로 수익률을 계산합니다.
-    주간, 월간, 분기별, 연간 수익률을 계산하여 각각 CSV 파일로 저장합니다.
+    S&P 500의 거래일을 기준으로 벤치마크 수익률을 계산합니다.
     """
-    path = op.join(dcf.RAW_DATA_DIR, "filtered_stock_1985.csv")
+    # S&P 500 거래일 가져오기
+    spy = pd.read_csv(op.join(dcf.RAW_DATA_DIR, "snp500_index.csv"), parse_dates=['Date'], index_col='Date')
+    
+    # 벤치마크 데이터 로드
+    path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
     df = pd.read_csv(path, parse_dates=['date'])
-    df.set_index('date', inplace=True)
-    
-    # date 를 Date로 변경
-    df.index.name = 'Date'
-    
+    df = df.sort_values('date')  # 날짜순으로 정렬
     df['Return'] = df.groupby('PERMNO')['PRC'].pct_change()
     
+    # 고유한 거래일 목록 생성
+    trading_days = df['date'].unique()
+    trading_days.sort()
+    trading_day_dict = {d: i for i, d in enumerate(trading_days)}  # 거래일 인덱스 매핑
+    
     for freq in ['week', 'month', 'quarter', 'year']:
-        if freq == 'week':
-            returns = df.groupby([pd.Grouper(freq='W'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
-        elif freq == 'month':
-            returns = df.groupby([pd.Grouper(freq='ME'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
-        elif freq == 'quarter':
-            returns = df.groupby([pd.Grouper(freq='QE'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
-        else:  # year
-            returns = df.groupby([pd.Grouper(freq='YE'), 'PERMNO'])['Return'].apply(lambda x: (1 + x).prod() - 1)
+        # S&P 500의 기간별 마지막 거래일 가져오기
+        spy_returns = pd.read_csv(
+            os.path.join(dcf.CACHE_DIR, f"spy_{freq}_ret.csv"),
+            parse_dates=['Date'],
+            index_col='Date'
+        )
         
-        # 0이 아닌 유효한 값만 선택하여 1/N 방식으로 평균 계산
-        benchmark_returns = returns.groupby(level=0).apply(lambda x: x[x != 0].mean())
+        benchmark_returns = pd.DataFrame(index=spy_returns.index, columns=['Return'])
         
-        benchmark_returns = pd.DataFrame(benchmark_returns, columns=['Return'])
-        benchmark_returns['nxt_freq_ewret'] = benchmark_returns['Return'].shift(-1)  # 다음 기간의 수익률 추가
+        for date in benchmark_returns.index:
+            if freq == 'week':
+                # 해당 날짜의 거래일 인덱스
+                end_idx = trading_day_dict[pd.Timestamp(date)]
+                start_idx = max(0, end_idx - 5)  # 5 거래일 전
+                period_data = df[df['date'].isin(trading_days[start_idx:end_idx + 1])]
+            else:
+                # 해당 월/분기/연도의 첫날부터 마지막날까지의 데이터
+                period_start = date.replace(day=1)
+                period_data = df[(df['date'] >= period_start) & (df['date'] <= date)]
+            
+            # 해당 기간의 평균 수익률 계산
+            period_returns = period_data.groupby('PERMNO')['Return'].apply(lambda x: (1 + x).prod() - 1)
+            benchmark_returns.loc[date, 'Return'] = period_returns[period_returns != 0].mean()
+        
+        # 다음 기간의 수익률 추가
+        benchmark_returns['nxt_freq_ewret'] = benchmark_returns['Return'].shift(-1)
         
         output_path = os.path.join(dcf.CACHE_DIR, f"benchmark_{freq}_ret.csv")
         benchmark_returns.to_csv(output_path, index=True)
@@ -107,7 +143,7 @@ def processed_US_data():
         print(f"Finish loading processed data in {(time.time() - since) / 60:.2f} min")
         return df.copy()
 
-    raw_us_data_path = op.join(dcf.RAW_DATA_DIR, "filtered_stock_1985.csv")
+    raw_us_data_path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
     print("Reading raw data from {}".format(raw_us_data_path))
     since = time.time()
     df = pd.read_csv(

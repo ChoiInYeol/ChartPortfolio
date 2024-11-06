@@ -27,7 +27,10 @@ class CNNInference:
             device: 추론에 사용할 디바이스
             regression_label: 회귀 레이블 (옵션)
         """
-        self.model = model
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs for inference")
+            model = nn.DataParallel(model)
+        self.model = model.to(device)
         self.device = device
         self.regression_label = regression_label
         self.label_dtype = torch.float if regression_label else torch.long
@@ -49,16 +52,12 @@ class CNNInference:
         """
         print(f"Evaluating model on device: {self.device}")
         
-        if torch.cuda.device_count() > 1:
-            print(f"Using {torch.cuda.device_count()} GPUs for evaluation")
-            self.model = nn.DataParallel(self.model)
+        self.model.eval()
         
-        self.model.to(self.device)
         res_dict = {}
         
         for subset in dataloaders_dict.keys():
             running_metrics = self._init_running_metrics()
-            self.model.eval()
             
             with torch.no_grad():
                 for batch in dataloaders_dict[subset]:
@@ -137,8 +136,18 @@ class CNNInference:
             
         df = pd.concat(df_list)
         df["up_prob"] = df["up_prob"] / len(model_list)
-        df.reset_index(drop=True, inplace=True)
         
+        # 거래일 기준 월말로 보정
+        df["year_month"] = df["ending_date"].dt.to_period("M")
+        df = df.sort_values("ending_date")
+        
+        # 각 월의 마지막 거래일 찾기
+        last_trading_days = df.groupby("year_month")["ending_date"].last()
+        
+        # 월말 거래일에 해당하는 데이터만 필터링
+        df = df[df["ending_date"].isin(last_trading_days)]
+        
+        df.reset_index(drop=True, inplace=True)
         return df
 
     def load_ensemble_model(

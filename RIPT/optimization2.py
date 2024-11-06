@@ -11,6 +11,9 @@ from tqdm import tqdm
 import scienceplots
 plt.style.use(['science'])
 
+from Data import dgp_config as dcf
+import os.path as op
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 TRAIN = '2017-12-31'
@@ -31,80 +34,13 @@ def to_tensor(data):
 def to_numpy(tensor):
     return tensor.cpu().numpy() if tensor.is_cuda else tensor.numpy()
 
-def handle_outliers(returns, prices, lookback=5, tolerance=0.05, volatility_threshold=2.0):
+def load_and_preprocess_data():
     """
-    주가와 수익률 데이터를 사용해 이상치를 처리하고, 변동성이 극심한 주식은 제거합니다.
-    
-    Args:
-        returns (pd.DataFrame): 일별 수익률 데이터.
-        prices (pd.DataFrame): 일별 주가 데이터.
-        lookback (int): n일 동안 가격 변화를 추적합니다.
-        tolerance (float): 가격 변화 허용 오차율 (예: 0.05 = 5%).
-        volatility_threshold (float): 제거할 주식의 변동성 임계값 (예: 200% 이상 변동).
+    데이터를 로드하고 전처리합니다.
     
     Returns:
-        tuple: (이상치가 처리된 수익률 데이터, 제거된 주식 목록)
+        pd.DataFrame: 전처리된 수익률 데이터
     """
-    high_threshold = 0.75  # 75% 이상의 수익률   
-    low_threshold = -0.75  # -75% 이하의 수익률
-
-    # 1. 극단적인 수익률을 가진 주식 탐지
-    extreme_returns = returns[(returns > high_threshold) | (returns < low_threshold)]
-
-    # 2. 변동성이 높은 주식 식별 (최대 변동률이 volatility_threshold 이상인 주식)
-    max_daily_volatility = prices.pct_change().abs().max()
-    stocks_to_remove = max_daily_volatility[max_daily_volatility > volatility_threshold].index.tolist()
-
-    # 주식 제거 결과 출력
-    logging.info(f"총 {len(stocks_to_remove)}개의 주식이 변동성 기준을 초과하여 제거됩니다.")
-    logging.info(f"제거된 주식 목록: {stocks_to_remove}")
-
-    # 3. 변동성이 높은 주식 제거
-    returns_cleaned = returns.drop(columns=stocks_to_remove, errors='ignore')
-    prices_cleaned = prices.drop(columns=stocks_to_remove, errors='ignore')
-
-    # 4. 극단치 처리 (조정할 날짜-주식 목록 저장)
-    to_adjust = []
-    for date in extreme_returns.index:
-        for stock_id in extreme_returns.columns[extreme_returns.loc[date].notnull()]:
-            if stock_id in stocks_to_remove:
-                continue  # 제거된 주식은 건너뜀
-
-            # 현재 날짜의 가격과 lookback 기간 가격 추적
-            current_price = prices_cleaned.at[date, stock_id]
-            start_idx = max(0, prices_cleaned.index.get_loc(date) - lookback)
-            end_idx = min(len(prices_cleaned) - 1, prices_cleaned.index.get_loc(date) + lookback)
-
-            price_window = prices_cleaned.iloc[start_idx:end_idx + 1][stock_id].dropna()
-            if len(price_window) < 2:
-                continue  # 데이터 부족 시 건너뜀
-
-            # 첫날과 마지막 날의 가격 차이 비율 계산
-            first_price = price_window.iloc[0]
-            last_price = price_window.iloc[-1]
-            price_change = abs(last_price - first_price) / first_price
-
-            # 가격 변동이 tolerance 이내이면 이상치로 간주
-            if price_change <= tolerance:
-                to_adjust.append((date, stock_id))
-
-    # 5. 수익률 조정 및 통계 출력
-    adjusted_count = len(to_adjust)
-    adjusted_stocks = len(set(stock_id for _, stock_id in to_adjust))
-
-    for date, stock_id in to_adjust:
-        returns_cleaned.at[date, stock_id] = 0
-
-    # 6. 기타 이상치에 대한 보간 처리
-    returns_cleaned = returns_cleaned.replace([np.inf, -np.inf], np.nan).fillna(method='ffill').fillna(0)
-
-    # 결과 출력
-    logging.info(f"총 {adjusted_count}개의 이상치 수익률을 조정했습니다.")
-    logging.info(f"총 {adjusted_stocks}개의 주식에 대해 수익률 조정을 수행했습니다.")
-
-    return returns_cleaned, stocks_to_remove
-
-def load_and_preprocess_data():
     file_path = os.path.join(BASE_FOLDER, 'processed_data', 'us_ret.feather')
     us_ret = pd.read_feather(file_path)
     us_ret = us_ret[us_ret['Date'] >= TRAIN]
@@ -115,38 +51,93 @@ def load_and_preprocess_data():
         logging.info("Converting returns from percentages to decimals.")
         us_ret = us_ret / 100
 
-    stock_prices_path = os.path.join(BASE_FOLDER, 'processed_data', 'us_ret.feather')
-    stock_prices = pd.read_feather(stock_prices_path)
-    stock_prices = stock_prices.pivot(index='Date', columns='StockID', values='Close')
-    stock_prices.index = pd.to_datetime(stock_prices.index)
-    stock_prices = stock_prices.fillna(method='ffill')
+    # 결측치 처리
+    us_ret = us_ret.replace([np.inf, -np.inf], np.nan)
+    us_ret = us_ret.fillna(method='ffill').fillna(0)
 
-    us_ret_cleaned, removed_stocks = handle_outliers(us_ret, stock_prices)
-
-    return us_ret_cleaned, removed_stocks
+    return us_ret
 
 def load_benchmark_data():
-    file_path = os.path.join(BASE_FOLDER, 'processed_data', 'snp500_index.csv')
-    snp500 = pd.read_csv(file_path, parse_dates=['Date'])
-    snp500.set_index('Date', inplace=True)
+    snp500 = pd.read_csv(op.join(dcf.RAW_DATA_DIR, "snp500_index.csv"), parse_dates=['Date'], index_col='Date')
     snp500.sort_index(inplace=True)
     snp500 = snp500[snp500.index >= TRAIN]
     snp500['Returns'] = snp500['Adj Close'].pct_change()
     snp500['Cumulative Returns'] = (1 + snp500['Returns']).cumprod()
     return snp500
 
-def load_and_process_ensemble_results(file_path, removed_stocks):
+def load_ensemble_results(folder_path):
     """
-    앙상블 결과를 로드하고 처리합니다. 이상치로 제거된 주식은 처음부터 제외합니다.
+    폴더 내의 모든 앙상블 결과 파일을 로드하고 하나의 데이터프레임으로 병합합니다.
+    
+    Args:
+        folder_path (str): 앙상블 결과 파일들이 있는 폴더 경로
+    
+    Returns:
+        pd.DataFrame: 병합된 앙상블 결과 데이터프레임
+    """
+    all_data = []
+    for file in os.listdir(folder_path):
+        if file.endswith('.csv') and 'ensem' in file:
+            file_path = os.path.join(folder_path, file)
+            df = pd.read_csv(file_path)
+            
+            df['ending_date'] = pd.to_datetime(df['ending_date'])
+            df['investment_date'] = df['ending_date'] - pd.DateOffset(months=1)
+            df['StockID'] = df['StockID'].astype(str)
+            df.set_index(['investment_date', 'StockID'], inplace=True)
+            
+            all_data.append(df)
+        
+    if not all_data:
+        raise ValueError(f"No CSV files found in {folder_path}")
+    
+    combined_df = pd.concat(all_data)
+    combined_df.sort_index(inplace=True)
+    
+    # unnamed 컬럼 제거
+    combined_df = combined_df.loc[:, ~combined_df.columns.str.contains('^Unnamed')]
+    
+    # MarketCap 컬럼 제거
+    if 'MarketCap' in combined_df.columns:
+        combined_df.drop('MarketCap', axis=1, inplace=True)
+    
+    return combined_df
+
+def process_ensemble_results(base_folder):
+    """
+    모든 모델과 윈도우 크기에 대해 앙상블 결과를 처리합니다.
+    
+    Args:
+        base_folder (str): 기본 폴더 경로
+    """
+    for model in MODELS:
+        for w in WINDOW_SIZES:
+            folder_path = os.path.join(base_folder, f'{model}{w}', f'{w}D20P', 'ensem_res')
+            output_path = os.path.join(base_folder, f'ensemble_{model}{w}_res.csv')
+            
+            logging.info(f'Processing Ensemble {model}{w}...')
+            try:
+                ensemble_results = load_ensemble_results(folder_path)
+                ensemble_results.reset_index().to_csv(output_path)
+                logging.info(f'Shape of the dataframe: {ensemble_results.shape}')
+            except Exception as e:
+                logging.error(f'Error processing {model}{w}: {str(e)}')
+
+def load_and_process_ensemble_results(file_path):
+    """
+    앙상블 결과를 로드하고 처리합니다.
 
     Args:
         file_path (str): 앙상블 결과 파일 경로
-        removed_stocks (list): 이상치로 제거된 주식 목록
 
     Returns:
         pd.DataFrame: 처리된 앙상블 결과 데이터
     """
-    ensemble_results = pd.read_feather(file_path)
+    if not os.path.exists(file_path):
+        # 파일이 없으면 앙상블 결과 처리 실행
+        process_ensemble_results(os.path.dirname(file_path))
+    
+    ensemble_results = pd.read_csv(file_path)
     
     if isinstance(ensemble_results.index, pd.MultiIndex):
         ensemble_results = ensemble_results.reset_index()
@@ -154,9 +145,6 @@ def load_and_process_ensemble_results(file_path, removed_stocks):
     ensemble_results['investment_date'] = pd.to_datetime(ensemble_results['investment_date'])
     ensemble_results['ending_date'] = pd.to_datetime(ensemble_results['ending_date'])
     ensemble_results['StockID'] = ensemble_results['StockID'].astype(str)
-    
-    # 이상치로 제거된 주식 제외
-    ensemble_results = ensemble_results[~ensemble_results['StockID'].isin(removed_stocks)]
     
     return ensemble_results
 
@@ -392,7 +380,8 @@ def calculate_performance_metrics(combined_returns, portfolio_weights, selected_
         if column in ['Top 100', f'Top {n_stocks_10}', 'Bottom 100']:
             metrics[column_names[column]]['Turnover'] = calculate_stock_turnover(selected_stocks[column])
         elif column.startswith('Optimized_'):
-            metrics[column_names[column]]['Turnover'] = calculate_turnover(portfolio_weights[column.split('_')[1]])
+            print(column.split('_'))
+            metrics[column_names[column]]['Turnover'] = calculate_turnover(portfolio_weights[column.split('_')[1] + '_' + column.split('_')[2]])
         else:
             metrics[column_names[column]]['Turnover'] = np.nan
 
@@ -467,7 +456,7 @@ def calculate_portfolio_returns(us_ret, selected_stocks, valid_stock_ids):
     
     return cumulative_returns, rebalance_dates
 
-def process_model_window(model, window_size, us_ret, benchmark_data, removed_stocks):
+def process_model_window(model, window_size, us_ret, benchmark_data):
     """
     주어진 모델과 윈도우 크기에 대해 포트폴리오를 처리하고 최적화합니다.
 
@@ -476,12 +465,11 @@ def process_model_window(model, window_size, us_ret, benchmark_data, removed_sto
         window_size (int): 윈도우 크기
         us_ret (pd.DataFrame): 미국 주식 수익률 데이터
         benchmark_data (pd.DataFrame): 벤치마크 데이터
-        removed_stocks (list): 제거된 주식 목록
 
     Returns:
         str: 처리 완료 메시지 또는 None (처리 실패 시)
     """
-    file_path = os.path.join(BASE_FOLDER, 'WORK_DIR', f'ensemble_{model}{window_size}_res.feather')
+    file_path = os.path.join(BASE_FOLDER, 'WORK_DIR', f'ensemble_{model}{window_size}_res.csv')
     if not os.path.exists(file_path):
         logging.warning(f"File not found: {file_path}")
         return None
@@ -491,8 +479,8 @@ def process_model_window(model, window_size, us_ret, benchmark_data, removed_sto
     folder_name = os.path.join(BASE_FOLDER, 'WORK_DIR', f'{model}{window_size}')
     os.makedirs(folder_name, exist_ok=True)
 
-    ensemble_results = load_and_process_ensemble_results(file_path, removed_stocks)
-
+    ensemble_results = load_and_process_ensemble_results(file_path)
+    
     n_stocks_100 = 100  # 고정된 주식 수
     n_stocks_10 = round(us_ret.shape[1] / 10)  # TOP N/10 주식 수
     
@@ -556,7 +544,7 @@ def process_model_window(model, window_size, us_ret, benchmark_data, removed_sto
     return f"Completed processing for {model} with window size {window_size}"
 
 def main():
-    us_ret, removed_stocks = load_and_preprocess_data()
+    us_ret = load_and_preprocess_data()
     logging.info("Data loaded and preprocessed.")
 
     benchmark_data = load_benchmark_data()
@@ -564,7 +552,7 @@ def main():
 
     for model in MODELS:
         for window_size in WINDOW_SIZES:
-            result = process_model_window(model, window_size, us_ret, benchmark_data, removed_stocks)
+            result = process_model_window(model, window_size, us_ret, benchmark_data)
             if result:
                 logging.info(result)
 

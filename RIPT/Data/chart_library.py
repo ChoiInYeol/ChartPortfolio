@@ -59,6 +59,8 @@ class DrawOHLC(object):
     def __ret_to_yaxis(self, ret):
         pixels_per_unit = (self.ohlc_height - 1.0) / (self.maxp - self.minp)
         res = np.around((ret - self.minp) * pixels_per_unit)
+        # Handle invalid values before casting to int
+        res = np.where(np.isfinite(res), res, 0)
         return res.astype(int)
 
     def centered_prices(self, df):

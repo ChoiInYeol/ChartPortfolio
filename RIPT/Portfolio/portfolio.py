@@ -194,7 +194,7 @@ class PortfolioManager(object):
         print(
             f"Spearman Corr between Prob and Stock Return is {np.nanmean(prob_ret_corr):.4f}"
         )
-        print(c
+        print(
             f"Pearson Corr between Prob and Stock Return is {np.nanmean(prob_ret_pearson_corr):.4f}"
         )
         print(

@@ -22,7 +22,10 @@ class CNNTrainer:
             device: 학습에 사용할 디바이스
             loss_name: 손실 함수 이름
         """
-        self.model = model
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs for training")
+            model = nn.DataParallel(model)
+        self.model = model.to(device)  # 모델을 GPU로 이동
         self.device = device
         self.loss_name = loss_name
 
@@ -77,10 +80,19 @@ class CNNTrainer:
 
                 running_metrics = self._init_running_metrics()
                 
-                data_iterator = tqdm(dataloaders_dict[phase], leave=True, unit="batch") if enable_tqdm else dataloaders_dict[phase]
                 if enable_tqdm:
-                    data_iterator.set_description(f"Epoch {epoch}: {phase}")
+                    data_iterator = tqdm(
+                        dataloaders_dict[phase],
+                        leave=True,
+                        unit="batch",
+                        mininterval=1.0,  # 최소 업데이트 간격 (초)
+                        miniters=100,  # 100 iteration마다 업데이트
+                        desc=f"Epoch {epoch}: {phase}"
+                    )
+                else:
+                    data_iterator = dataloaders_dict[phase]
 
+                batch_count = 0
                 for batch in data_iterator:
                     inputs = batch["image"].to(self.device, dtype=torch.float)
                     labels = batch["label"].to(self.device, dtype=torch.long)
@@ -96,6 +108,21 @@ class CNNTrainer:
                             optimizer.step()
 
                     self._update_running_metrics(loss, labels, preds, running_metrics)
+                    
+                    if enable_tqdm and batch_count % 100 == 0:
+                        num_samples = (batch_count + 1) * len(labels)
+                        current_metrics = self._generate_epoch_stat(
+                            epoch,
+                            optimizer.param_groups[0]['lr'],
+                            num_samples,
+                            running_metrics
+                        )
+                        data_iterator.set_postfix({
+                            'loss': f"{current_metrics['loss']:.4f}",
+                            'MCC': f"{current_metrics['MCC']:.4f}"
+                        })
+                    
+                    batch_count += 1
                     del inputs, labels
 
                 num_samples = len(dataloaders_dict[phase].dataset)
@@ -108,7 +135,7 @@ class CNNTrainer:
                         best_model = copy.deepcopy(self.model.state_dict())
 
             # Early stopping check
-            if early_stop and (epoch - best_validate_metrics["epoch"]) >= 2:
+            if early_stop and (epoch - best_validate_metrics["epoch"]) >= 3:
                 break
 
         time_elapsed = time.time() - since

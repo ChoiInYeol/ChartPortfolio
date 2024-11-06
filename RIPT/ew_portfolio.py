@@ -78,12 +78,12 @@ def plot_portfolio_performance(data_dict, folder_name, resample_freq=None):
     plt.tight_layout()
     
     file_suffix = f"_resampled_{resample_freq}" if resample_freq else ""
-    save_path = os.path.join('WORK_DIR/portfolio', folder_name, f'cumulative_returns{file_suffix}.png')
+    save_path = os.path.join('RIPT/WORK_DIR/portfolio', folder_name, f'cumulative_returns{file_suffix}.png')
     plt.savefig(save_path, dpi=600, bbox_inches='tight')
     plt.close()
 
 def main():
-    portfolio_dir = 'WORK_DIR/portfolio'
+    portfolio_dir = 'RIPT/WORK_DIR/portfolio'
     
     # 폴더 리스트 portfolio_dir에서 모든 폴더를 가져옴
     folders = os.listdir(portfolio_dir)
@@ -96,7 +96,7 @@ def main():
         if os.path.exists(pf_data_path):
             df = load_portfolio_data(pf_data_path)
             columns = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'H-L']
-            labels = ['High', '9', '8', '7', '6', '5', '4', '3', '2', 'Low', 'H-L']
+            labels = ['Low', '2', '3', '4', '5', '6', '7', '8', '9', 'High', 'H-L']
             data_dict = {label: df[col] for col, label in zip(columns, labels)}
             
             # 원본 데이터 플롯 (월별)

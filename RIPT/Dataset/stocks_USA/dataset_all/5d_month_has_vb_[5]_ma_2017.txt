@@ -1,1 +1,0 @@
-total_dates:33761 total_missing:12931 type0:12680 type1:33 type2:0 type3:0 type4:0 type5:218 type6:0
