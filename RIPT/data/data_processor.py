@@ -9,6 +9,7 @@ from typing import Dict, List, Tuple, Set
 import logging
 from datetime import datetime
 import os
+import glob
 
 class DataProcessor:
     """
@@ -60,8 +61,8 @@ class DataProcessor:
         }
 
     def get_valid_dates(self, 
-                       date: datetime, 
-                       date_index: pd.DatetimeIndex) -> Tuple[datetime, datetime]:
+                    date: datetime, 
+                    date_index: pd.DatetimeIndex) -> Tuple[datetime, datetime]:
         """
         주어진 날짜에 대한 유효한 시작일과 종료일을 반환합니다.
         
@@ -75,8 +76,8 @@ class DataProcessor:
         future_dates = date_index[date_index > pd.Timestamp(date)]
         past_dates = date_index[date_index < pd.Timestamp(date)]
         
-        next_date = future_dates.min() if not future_dates.empty else None
-        prev_date = past_dates.max() if not past_dates.empty else None
+        next_date = future_dates[0] if len(future_dates) > 0 else None
+        prev_date = past_dates[-1] if len(past_dates) > 0 else None
         
         return next_date, prev_date
 
@@ -161,9 +162,10 @@ class DataProcessor:
         return cumulative_returns, rebalance_dates
 
     def process_ensemble_results(self, 
-                               base_folder: str, 
-                               model: str, 
-                               window_size: int) -> pd.DataFrame:
+                            base_folder: str, 
+                            model: str, 
+                            window_size: int,
+                            us_ret: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         앙상블 결과를 처리하고 저장합니다.
         
@@ -171,62 +173,92 @@ class DataProcessor:
             base_folder (str): 기본 폴더 경로
             model (str): 모델 이름
             window_size (int): 윈도우 크기
+            us_ret (pd.DataFrame): 인덱스 전달을 위한 실제 spy의 거래 데이터
             
         Returns:
-            pd.DataFrame: 처리된 앙상블 결과
+            Tuple[pd.DataFrame, pd.DataFrame]: 
+                - 처리된 앙상블 결과
+                - 혼동 행렬을 위한 성과 지표
         """
         work_folder = os.path.join(base_folder, 'WORK_DIR')
-        
-        folder_path = os.path.join(
-            work_folder, 
-            f'{model}{window_size}', 
-            f'{window_size}D20P', 
-            'ensem_res'
-        )
-        output_path = os.path.join(
-            work_folder, 
-            f'ensemble_{model}{window_size}_res.csv'
-        )
-        
-        self.logger.info(f'Processing Ensemble {model}{window_size}...')
+        folder_path = os.path.join(work_folder, f'{model}{window_size}', f'{window_size}D20P', 'ensem_res')
+        output_path = os.path.join(work_folder, f'ensemble_{model}{window_size}_res.csv')
+        metrics_path = os.path.join(work_folder, f'ensemble_{model}{window_size}_metrics.csv')
         
         try:
-            # 앙상블 결과 폴더에서 모든 CSV 파일 처리
-            all_data = []
-            for file in os.listdir(folder_path):
-                if file.endswith('.csv') and 'ensem' in file:
-                    file_path = os.path.join(folder_path, file)
-                    df = pd.read_csv(file_path)
+            # 1. 모든 CSV 파일 병합
+            dfs = []
+            for file in glob.glob(os.path.join(folder_path, '*ensem*.csv')):
+                df = pd.read_csv(file)
+                df['ending_date'] = pd.to_datetime(df['ending_date'])
+                df['StockID'] = df['StockID'].astype(str)
+                dfs.append(df)
+                
+            if not dfs:
+                self.logger.error(f"No CSV files found in {folder_path}")
+                return pd.DataFrame(), pd.DataFrame()
+                
+            combined_df = pd.concat(dfs, ignore_index=True)
+            
+            # 미래 시점 제외 (ret_val이 0인 행 제거)
+            combined_df = combined_df[combined_df['ret_val'] != 0]
+            
+            if combined_df.empty:
+                self.logger.error("No valid data after filtering")
+                return pd.DataFrame(), pd.DataFrame()
+                
+            combined_df.sort_values(['ending_date', 'StockID'], inplace=True)
+            
+            # 2. investment_date 설정
+            unique_dates = sorted(combined_df['ending_date'].unique())
+            date_mapping = {}
+            prev_end_date = None
+            
+            for end_date in unique_dates:
+                if prev_end_date is None:
+                    # 첫 투자일은 20 거래일 전
+                    end_idx = us_ret.index.get_indexer([end_date], method='nearest')[0]
+                    start_idx = max(0, end_idx - 20)
+                    inv_date = us_ret.index[start_idx]
+                else:
+                    # 이후 투자일은 이전 ending_date
+                    inv_date = prev_end_date
                     
-                    df['ending_date'] = pd.to_datetime(df['ending_date'])
-                    df['investment_date'] = df['ending_date'] - pd.DateOffset(months=1)
-                    df['StockID'] = df['StockID'].astype(str)
-                    
-                    all_data.append(df)
+                date_mapping[end_date] = inv_date
+                prev_end_date = end_date
+                
+            combined_df['investment_date'] = combined_df['ending_date'].map(date_mapping)
             
-            if not all_data:
-                raise ValueError(f"No CSV files found in {folder_path}")
+            # 3. 성과 지표 계산
+            combined_df['predicted_up'] = combined_df['up_prob'] > 0.5
+            combined_df['actual_up'] = combined_df['ret_val'] > 0
             
-            # 데이터 병합 및 정리
-            combined_df = pd.concat(all_data)
-            combined_df.sort_values(['investment_date', 'StockID'], inplace=True)
+            metrics_df = pd.DataFrame({'ending_date': unique_dates})
             
-            # 불필요한 컬럼 제거
+            for metric, condition in [
+                ('TP', lambda x: (x['predicted_up']) & (x['actual_up'])),
+                ('FP', lambda x: (x['predicted_up']) & (~x['actual_up'])),
+                ('TN', lambda x: (~x['predicted_up']) & (~x['actual_up'])),
+                ('FN', lambda x: (~x['predicted_up']) & (x['actual_up']))
+            ]:
+                metrics_df[metric] = combined_df.groupby('ending_date').apply(
+                    lambda x: condition(x).sum()
+                ).values
+            
+            # 4. 결과 정리 및 저장
+            combined_df = combined_df.drop(['predicted_up', 'actual_up'], axis=1)
             combined_df = combined_df.loc[:, ~combined_df.columns.str.contains('^Unnamed')]
             if 'MarketCap' in combined_df.columns:
                 combined_df.drop('MarketCap', axis=1, inplace=True)
+                
+            combined_df.to_csv(output_path, index=False)
+            metrics_df.to_csv(metrics_path, index=False)
             
-            # 결과 저장
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            combined_df.reset_index(drop=True).to_csv(output_path)
-            
-            self.logger.info(f'Ensemble results saved to {output_path}')
+            self.logger.info(f'Results saved to {output_path} and {metrics_path}')
             self.logger.info(f'Shape of the dataframe: {combined_df.shape}')
             
-            return combined_df
+            return combined_df, metrics_df
             
         except Exception as e:
             self.logger.error(f'Error processing {model}{window_size}: {str(e)}')
-            return pd.DataFrame()
-    
-    
+            return pd.DataFrame(), pd.DataFrame()

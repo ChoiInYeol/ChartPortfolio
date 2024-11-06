@@ -42,6 +42,17 @@ def detect_abnormal_stocks(returns, prices, price_jumps_threshold=0.5, recovery_
     """
     stocks_to_remove = set()
     
+    # 전체 기간 수익률이 -100% 이하인 종목 탐지
+    for stock in prices.columns:
+        price_series = prices[stock].dropna()
+        if len(price_series) < 2:  # 최소 2개 이상의 데이터 필요
+            continue
+            
+        total_return = (price_series.iloc[-1] / price_series.iloc[0]) - 1
+        if total_return <= -1.0:  # -100% 이하
+            stocks_to_remove.add(stock)
+            logging.info(f"PERMNO {stock}: 전체 기간 수익률 {total_return:.1%}로 제거 대상")
+    
     # 1. 급격한 가격 하락 후 빠른 회복 패턴 탐지
     for stock in prices.columns:
         price_series = prices[stock].dropna()
@@ -85,6 +96,7 @@ def detect_abnormal_stocks(returns, prices, price_jumps_threshold=0.5, recovery_
             stocks_to_remove.add(stock)
     
     logging.info(f"이상치 탐지 결과:")
+    logging.info(f"- 전체 기간 수익률 -100% 이하 종목 수: {len([s for s in stocks_to_remove if (prices[s].iloc[-1] / prices[s].iloc[0] - 1) <= -1.0])}개")
     logging.info(f"- 총 제거 대상 종목 수: {len(stocks_to_remove)}개")
     
     return list(stocks_to_remove)
@@ -94,7 +106,7 @@ def filter_stocks(
     output_file='filtered_stock.csv', 
     min_trading_days=1000,
     start_date='2001-01-01', 
-    end_date='2024-09-01',
+    end_date='2024-08-01',
     price_jumps_threshold=0.5,
     recovery_window=5,
     price_gap_threshold=10
@@ -172,7 +184,7 @@ if __name__ == "__main__":
             output_file='filtered_stock.csv', 
             min_trading_days=1000,
             start_date='2001-01-01',
-            end_date='2024-09-01',
+            end_date='2024-08-01',
             price_jumps_threshold=0.75,
             recovery_window=5,
             price_gap_threshold=10

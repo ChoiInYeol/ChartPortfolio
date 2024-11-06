@@ -87,11 +87,17 @@ class DataLoader:
             self.logger.warning(f"Ensemble results file not found: {file_path}")
             self.logger.info("Processing ensemble results...")
             
+            # 전체 거래 데이터 로드
+            us_ret = pd.read_csv(os.path.join(dcf.RAW_DATA_DIR, "snp500_index.csv"), parse_dates=['Date'], index_col='Date')
+            
             # DataProcessor 인스턴스 생성 및 앙상블 결과 처리
             from .data_processor import DataProcessor
             processor = DataProcessor()
-            ensemble_results = processor.process_ensemble_results(
-                self.base_folder, model, window_size
+            ensemble_results, _ = processor.process_ensemble_results(
+                base_folder=self.base_folder, 
+                model=model, 
+                window_size=window_size,
+                us_ret=us_ret  # 인덱스 전달을 위한 데이터
             )
             
             if ensemble_results.empty:

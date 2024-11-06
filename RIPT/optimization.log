@@ -1632,3 +1632,142 @@
 2024-11-06 13:56:07,432 - INFO - Performance metrics saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20
 2024-11-06 13:56:07,449 - INFO - Completed processing for CNN with model window size 20
 2024-11-06 13:56:07,449 - INFO - Portfolio optimization process completed
+2024-11-06 14:53:05,025 - INFO - Using device: cuda
+2024-11-06 14:53:05,026 - INFO - Starting portfolio optimization process
+2024-11-06 14:53:07,574 - INFO - Stock returns data loaded
+2024-11-06 14:53:07,581 - INFO - Benchmark data loaded
+2024-11-06 14:53:07,581 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 14:53:07,581 - WARNING - Ensemble results file not found: /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 14:53:07,581 - INFO - Processing ensemble results...
+2024-11-06 14:53:07,581 - ERROR - Error processing CNN20: DataProcessor.process_ensemble_results() missing 1 required positional argument: 'us_ret'
+2024-11-06 14:53:07,581 - INFO - Portfolio optimization process completed
+2024-11-06 14:53:50,312 - INFO - Using device: cuda
+2024-11-06 14:53:50,313 - INFO - Starting portfolio optimization process
+2024-11-06 14:53:52,719 - INFO - Stock returns data loaded
+2024-11-06 14:53:52,726 - INFO - Benchmark data loaded
+2024-11-06 14:53:52,726 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 14:53:52,726 - WARNING - Ensemble results file not found: /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 14:53:52,726 - INFO - Processing ensemble results...
+2024-11-06 14:53:54,654 - INFO - Processing Ensemble CNN20...
+2024-11-06 14:55:03,897 - INFO - Ensemble results saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 14:55:03,897 - INFO - Shape of the dataframe: (896924, 6)
+2024-11-06 14:55:04,976 - INFO - Total unique stocks: 4502
+2024-11-06 14:55:04,976 - INFO - Top 100 stocks: 912
+2024-11-06 14:55:04,976 - INFO - Bottom 100 stocks: 957
+2024-11-06 14:55:04,977 - INFO - Top 450 stocks: 2496
+2024-11-06 14:55:05,156 - INFO - Optimization results loaded from /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/optimization_results_max_sharpe.pkl
+2024-11-06 14:55:05,819 - INFO - Plot saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/portfolio_comparison_CNN20.png
+2024-11-06 14:55:05,906 - INFO - Performance metrics saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20
+2024-11-06 14:55:05,933 - INFO - Completed processing for CNN with model window size 20
+2024-11-06 14:55:05,934 - INFO - Portfolio optimization process completed
+2024-11-06 15:01:56,275 - INFO - Using device: cuda
+2024-11-06 15:01:56,275 - INFO - Starting portfolio optimization process
+2024-11-06 15:02:03,993 - INFO - Using device: cuda
+2024-11-06 15:02:03,994 - INFO - Starting portfolio optimization process
+2024-11-06 15:02:06,243 - INFO - Stock returns data loaded
+2024-11-06 15:02:06,251 - INFO - Benchmark data loaded
+2024-11-06 15:02:06,252 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 15:02:06,252 - WARNING - Ensemble results file not found: /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:02:06,252 - INFO - Processing ensemble results...
+2024-11-06 15:02:09,119 - INFO - Processing Ensemble CNN20...
+2024-11-06 15:04:38,947 - INFO - Ensemble results saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:04:38,947 - INFO - Shape of the dataframe: (896924, 6)
+2024-11-06 15:04:39,982 - INFO - Total unique stocks: 4502
+2024-11-06 15:04:39,982 - INFO - Top 100 stocks: 912
+2024-11-06 15:04:39,982 - INFO - Bottom 100 stocks: 957
+2024-11-06 15:04:39,983 - INFO - Top 450 stocks: 2496
+2024-11-06 15:04:40,068 - INFO - Optimization results loaded from /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/optimization_results_max_sharpe.pkl
+2024-11-06 15:04:40,639 - INFO - Plot saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/portfolio_comparison_CNN20.png
+2024-11-06 15:04:40,729 - INFO - Performance metrics saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20
+2024-11-06 15:04:40,757 - INFO - Completed processing for CNN with model window size 20
+2024-11-06 15:04:40,757 - INFO - Portfolio optimization process completed
+2024-11-06 15:14:31,418 - INFO - Using device: cuda
+2024-11-06 15:14:31,418 - INFO - Starting portfolio optimization process
+2024-11-06 15:14:34,017 - INFO - Stock returns data loaded
+2024-11-06 15:14:34,024 - INFO - Benchmark data loaded
+2024-11-06 15:14:34,024 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 15:14:34,024 - WARNING - Ensemble results file not found: /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:14:34,024 - INFO - Processing ensemble results...
+2024-11-06 15:14:34,028 - INFO - Processing Ensemble CNN20...
+2024-11-06 15:17:03,645 - INFO - Ensemble results saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:17:03,645 - INFO - Shape of the dataframe: (896924, 6)
+2024-11-06 15:17:04,712 - INFO - Total unique stocks: 4502
+2024-11-06 15:17:04,712 - INFO - Top 100 stocks: 912
+2024-11-06 15:17:04,712 - INFO - Bottom 100 stocks: 957
+2024-11-06 15:17:04,713 - INFO - Top 450 stocks: 2496
+2024-11-06 15:17:04,801 - INFO - Optimization results loaded from /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/optimization_results_max_sharpe.pkl
+2024-11-06 15:17:05,429 - INFO - Plot saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/portfolio_comparison_CNN20.png
+2024-11-06 15:17:05,514 - INFO - Performance metrics saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20
+2024-11-06 15:17:05,537 - INFO - Completed processing for CNN with model window size 20
+2024-11-06 15:17:05,537 - INFO - Portfolio optimization process completed
+2024-11-06 15:21:35,988 - INFO - Using device: cuda
+2024-11-06 15:21:35,988 - INFO - Starting portfolio optimization process
+2024-11-06 15:21:43,173 - INFO - Using device: cuda
+2024-11-06 15:21:43,173 - INFO - Starting portfolio optimization process
+2024-11-06 15:21:45,454 - INFO - Stock returns data loaded
+2024-11-06 15:21:45,462 - INFO - Benchmark data loaded
+2024-11-06 15:21:45,462 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 15:21:45,462 - WARNING - Ensemble results file not found: /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:21:45,462 - INFO - Processing ensemble results...
+2024-11-06 15:21:45,467 - INFO - Processing Ensemble CNN20...
+2024-11-06 15:23:24,525 - INFO - Ensemble results saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:23:24,525 - INFO - Shape of the dataframe: (896924, 6)
+2024-11-06 15:23:25,531 - INFO - Total unique stocks: 4502
+2024-11-06 15:23:25,534 - INFO - Top 100 stocks: 4052
+2024-11-06 15:23:25,537 - INFO - Bottom 100 stocks: 4261
+2024-11-06 15:23:25,550 - INFO - Top 450 stocks: 4483
+2024-11-06 15:23:26,499 - INFO - Optimization results loaded from /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/optimization_results_max_sharpe.pkl
+2024-11-06 15:23:27,492 - INFO - Plot saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/portfolio_comparison_CNN20.png
+2024-11-06 15:23:27,592 - INFO - Performance metrics saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20
+2024-11-06 15:23:27,619 - INFO - Completed processing for CNN with model window size 20
+2024-11-06 15:23:27,619 - INFO - Portfolio optimization process completed
+2024-11-06 15:34:26,345 - INFO - Using device: cuda
+2024-11-06 15:34:26,346 - INFO - Starting portfolio optimization process
+2024-11-06 15:34:28,831 - INFO - Stock returns data loaded
+2024-11-06 15:34:28,838 - INFO - Benchmark data loaded
+2024-11-06 15:34:28,838 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 15:34:28,838 - WARNING - Ensemble results file not found: /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:34:28,838 - INFO - Processing ensemble results...
+2024-11-06 15:34:32,703 - INFO - Results saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv and /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_metrics.csv
+2024-11-06 15:34:32,703 - INFO - Shape of the dataframe: (896924, 6)
+2024-11-06 15:34:32,708 - ERROR - Error processing CNN20: 'tuple' object has no attribute 'empty'
+2024-11-06 15:34:32,733 - INFO - Portfolio optimization process completed
+2024-11-06 15:35:58,397 - INFO - Using device: cuda
+2024-11-06 15:35:58,398 - INFO - Starting portfolio optimization process
+2024-11-06 15:36:00,837 - INFO - Stock returns data loaded
+2024-11-06 15:36:00,844 - INFO - Benchmark data loaded
+2024-11-06 15:36:00,844 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 15:36:02,062 - INFO - Total unique stocks: 4502
+2024-11-06 15:36:02,066 - INFO - Top 100 stocks: 4052
+2024-11-06 15:36:02,069 - INFO - Bottom 100 stocks: 4261
+2024-11-06 15:36:02,084 - INFO - Top 450 stocks: 4483
+2024-11-06 15:36:03,055 - INFO - Optimization results loaded from /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/optimization_results_max_sharpe.pkl
+2024-11-06 15:36:04,128 - INFO - Plot saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/portfolio_comparison_CNN20.png
+2024-11-06 15:36:04,222 - INFO - Performance metrics saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20
+2024-11-06 15:36:04,239 - INFO - Completed processing for CNN with model window size 20
+2024-11-06 15:36:04,239 - INFO - Portfolio optimization process completed
+2024-11-06 15:42:46,481 - INFO - Using device: cuda
+2024-11-06 15:42:46,481 - INFO - Starting portfolio optimization process
+2024-11-06 15:42:48,979 - INFO - Stock returns data loaded
+2024-11-06 15:42:48,986 - INFO - Benchmark data loaded
+2024-11-06 15:42:48,986 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 15:42:48,986 - WARNING - Ensemble results file not found: /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv
+2024-11-06 15:42:48,986 - INFO - Processing ensemble results...
+2024-11-06 15:42:52,889 - INFO - Results saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_res.csv and /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/ensemble_CNN20_metrics.csv
+2024-11-06 15:42:52,889 - INFO - Shape of the dataframe: (891091, 6)
+2024-11-06 15:42:52,894 - ERROR - Error processing CNN20: 'tuple' object has no attribute 'empty'
+2024-11-06 15:42:52,919 - INFO - Portfolio optimization process completed
+2024-11-06 15:44:54,943 - INFO - Using device: cuda
+2024-11-06 15:44:54,943 - INFO - Starting portfolio optimization process
+2024-11-06 15:44:57,370 - INFO - Stock returns data loaded
+2024-11-06 15:44:57,377 - INFO - Benchmark data loaded
+2024-11-06 15:44:57,378 - INFO - Processing model: CNN, model window size: 20
+2024-11-06 15:44:58,616 - INFO - Total unique stocks: 4502
+2024-11-06 15:44:58,618 - INFO - Top 100 stocks: 4047
+2024-11-06 15:44:58,620 - INFO - Bottom 100 stocks: 4258
+2024-11-06 15:44:58,632 - INFO - Top 450 stocks: 4482
+2024-11-06 15:44:59,580 - INFO - Optimization results loaded from /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/optimization_results_max_sharpe.pkl
+2024-11-06 15:45:00,669 - INFO - Plot saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20/portfolio_comparison_CNN20.png
+2024-11-06 15:45:00,764 - INFO - Performance metrics saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/RIPT/WORK_DIR/CNN20
+2024-11-06 15:45:00,782 - INFO - Completed processing for CNN with model window size 20
+2024-11-06 15:45:00,782 - INFO - Portfolio optimization process completed

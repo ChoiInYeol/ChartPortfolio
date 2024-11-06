@@ -28,7 +28,7 @@ def generate_model_configs(base_config):
         'MODEL': base_config.get('MODELS', ['TCN']),
         'MULTIMODAL': base_config.get('MULTIMODAL_OPTIONS', [False]),
         'LOSS_FUNCTION': base_config.get('LOSS_FUNCTIONS', ['max_sharpe']),
-        'TRAIN_LEN': base_config.get('TRAIN_LEN_OPTIONS', [60, 20]),
+        'TRAIN_LEN': base_config.get('TRAIN_LEN_OPTIONS', [20]),
         'PRED_LEN': base_config.get('PRED_LEN_OPTIONS', [20])
     }
     
