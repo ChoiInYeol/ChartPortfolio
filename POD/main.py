@@ -1,150 +1,159 @@
-# main.py
 import os
-import yaml
+import json
 import random
 import numpy as np
 import torch
-from itertools import product
-import argparse
+import yaml
+import logging
+import inquirer
 from train import Trainer
 from inference import Inference
 from backtest import Backtester
 
-def set_random_seed(seed: int):
+# Configure logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+logger.addHandler(console_handler)
+
+def set_seed(seed: int):
+    """시드 고정"""
     os.environ["PYTHONHASHSEED"] = str(seed)
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  # Use manual_seed_all for multiple GPUs
+    torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def load_config(config_path: str):
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)
+def load_config(config_path: str) -> dict:
+    """설정 파일 로드"""
+    if config_path.endswith('.json'):
+        with open(config_path, "r") as f:
+            return json.load(f)
+    else:
+        with open(config_path, "r") as f:
+            return yaml.safe_load(f)
 
-def generate_model_configs(base_config):
-    param_lists = {
-        'MODEL': base_config.get('MODELS', ['TCN']),
-        'MULTIMODAL': base_config.get('MULTIMODAL_OPTIONS', [False]),
-        'LOSS_FUNCTION': base_config.get('LOSS_FUNCTIONS', ['max_sharpe']),
-        'TRAIN_LEN': base_config.get('TRAIN_LEN_OPTIONS', [20]),
-        'PRED_LEN': base_config.get('PRED_LEN_OPTIONS', [20])
-    }
+def get_user_selections():
+    """사용자 선택 받기"""
+    questions = [
+        inquirer.Checkbox(
+            'modes',
+            message='실행할 모드를 선택하세요 (스페이스바로 선택)',
+            choices=['train', 'inference'],
+            default=['train']
+        ),
+        inquirer.Checkbox(
+            'models',
+            message='사용할 모델을 선택하세요 (스페이스바로 선택)',
+            choices=['GRU', 'TCN', 'TRANSFORMER'],
+            default=['GRU']
+        ),
+        inquirer.Checkbox(
+            'use_prob',
+            message='상승확률 데이터를 사용하시겠습니까?',
+            default=False
+        ),
+        inquirer.Path(
+            'config_path',
+            message='설정 파일 경로를 입력하세요',
+            default='config/config.yaml',
+            exists=True
+        )
+    ]
     
-    keys, values = zip(*param_lists.items())
-    for combination in product(*values):
-        config = base_config.copy()
-        config.update(dict(zip(keys, combination)))
-        yield config
+    answers = inquirer.prompt(questions)
+    
+    if not answers:
+        logger.error("사용자가 선택을 취소했습니다.")
+        exit(1)
+        
+    if not answers['modes']:
+        logger.error("최소한 하나의 모드를 선택해야 합니다.")
+        exit(1)
+        
+    if not answers['models']:
+        logger.error("최소한 하나의 모델을 선택해야 합니다.")
+        exit(1)
+        
+    return answers
 
-def get_model_identifier(config):
-    return f"{config['MODEL']}_{config['MULTIMODAL']}_{config['LOSS_FUNCTION']}_{config['TRAIN_LEN']}_{config['PRED_LEN']}"
+def work(config, selections):
+    """
+    학습, 추론 및 백테스트 실행
+    
+    Args:
+        config (dict): 설정 딕셔너리
+        selections (dict): 사용자 선택 옵션
+    """
+    try:
+        modes = selections['modes']
+        model_types = selections['models']
+        use_prob = selections['use_prob']
+        
+        for mode in modes:
+            for model_type in model_types:
+                config["MODEL"] = model_type
+                logger.info(f"\nExecuting {mode} for {model_type} (use_prob: {use_prob})")
+                
+                if mode == 'train':
+                    if not os.path.exists("data/dataset.pkl"):
+                        logger.error("dataset.pkl not found. Please run make_dataset.py first.")
+                        return
+                    
+                    worker = Trainer(config, use_prob=use_prob)
+                    worker.set_data()
+                    logger.info("Starting training...")
+                    worker.train()
+                    logger.info("Training completed")
+                
+                elif mode == 'inference':
+                    model_path = os.path.join(config['RESULT_DIR'], model_type)
+                    inference_worker = Inference(config, model_path, use_prob=use_prob)
+                    logger.info("Starting inference...")
+                    weights = inference_worker.infer()
+                    inference_worker.save_weights(weights)
+                    logger.info("Inference completed")
 
-def load_trained_models(results_file):
-    if os.path.exists(results_file):
-        with open(results_file, 'r') as f:
-            return yaml.safe_load(f) or []
-    return []
-
-def save_trained_models(results_file, trained_models):
-    with open(results_file, 'w') as f:
-        yaml.safe_dump(trained_models, f)
-
-def main():
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(description='Run training, inference, and backtesting.')
-    parser.add_argument('--train', action='store_true', help='Run the training step.')
-    parser.add_argument('--inference', action='store_true', help='Run the inference step.')
-    parser.add_argument('--backtest', action='store_true', help='Run the backtesting step.')
-    args = parser.parse_args()
-
-    # If no arguments are given, run all steps
-    if not any([args.train, args.inference, args.backtest]):
-        args.train = True
-        args.inference = True
-        args.backtest = True
-
-    base_config = load_config("config/config.yaml")
-    set_random_seed(base_config["SEED"])
-
-    results_dir = base_config['RESULT_DIR']
-    results_file = os.path.join(results_dir, 'results.yaml')
-    trained_models = load_trained_models(results_file)
-
-    model_configs = list(generate_model_configs(base_config))
-
-    print("Order in which models will be processed:")
-    for idx, config in enumerate(model_configs):
-        print(f"{idx+1}: {get_model_identifier(config)}")
-
-    if args.train:
-        # Train models
-        for config in model_configs:
-            model_identifier = get_model_identifier(config)
-            if model_identifier in trained_models:
-                print(f"Skipping already trained model: {model_identifier}")
-                continue
-
-            result_subdir = os.path.join(results_dir, model_identifier)
-            os.makedirs(result_subdir, exist_ok=True)
-            config['RESULT_DIR'] = result_subdir
-
-            print(f"Training model {model_identifier}")
-            trainer = Trainer(config)
-            trainer.run()
-            print(f"Model {model_identifier} trained and saved.")
-
-            trained_models.append(model_identifier)
-            save_trained_models(results_file, trained_models)
-
-    if args.inference:
-        # Perform inference
-        model_identifiers = []
-        for config in model_configs:
-            model_identifier = get_model_identifier(config)
-            model_dir = os.path.join(results_dir, model_identifier, 'models')
-            if os.path.exists(model_dir):
-                model_files = [f for f in os.listdir(model_dir) if f.startswith('best_model')]
-                if model_files:
-                    # Assuming the model with the lowest loss is desired
-                    model_file = min(model_files, key=lambda x: float(x.split('_loss_')[1].split('.pth')[0]))
-                    model_path = os.path.join(model_dir, model_file)
-                    print(f"Performing inference for model {model_identifier}")
-                    config['RESULT_DIR'] = os.path.join(results_dir, model_identifier)
-                    inference = Inference(config, model_path)
-                    weights = inference.infer()
-                    inference.save_weights(weights)
-                    model_identifiers.append(model_identifier)
-                else:
-                    print(f"No model files found for {model_identifier}")
-            else:
-                print(f"Model directory not found: {model_dir}")
-        # Save model_identifiers for backtesting
-        with open(os.path.join(results_dir, 'model_identifiers.yaml'), 'w') as f:
-            yaml.safe_dump(model_identifiers, f)
-
-    if args.backtest:
-        # Load model_identifiers if not defined
-        if not args.inference:
-            model_identifiers_file = os.path.join(results_dir, 'model_identifiers.yaml')
-            if os.path.exists(model_identifiers_file):
-                with open(model_identifiers_file, 'r') as f:
-                    model_identifiers = yaml.safe_load(f) or []
-            else:
-                # If model_identifiers.yaml does not exist, attempt to generate model_identifiers from existing result subdirectories
-                model_identifiers = []
-                for config in model_configs:
-                    model_identifier = get_model_identifier(config)
-                    weights_file = os.path.join(results_dir, model_identifier, 'weights.pkl')
-                    if os.path.exists(weights_file):
-                        model_identifiers.append(model_identifier)
-                if not model_identifiers:
-                    print("No model identifiers found for backtesting.")
-                    return
-        backtester = Backtester(base_config)
-        backtester.backtest(model_identifiers, visualize=True)
-        print("Backtesting completed for all models.")
+    except Exception as e:
+        logger.error(f"Error occurred: {str(e)}")
+        raise
 
 if __name__ == "__main__":
-    main()
+    try:
+        # 사용자 선택 받기
+        selections = get_user_selections()
+        
+        # 설정 파일 로드
+        config = load_config(selections['config_path'])
+        
+        # 결과 디렉토리 생성
+        os.makedirs(config['RESULT_DIR'], exist_ok=True)
+        
+        # 로그 파일 설정
+        log_file = os.path.join(config['RESULT_DIR'], 'main.log')
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(logging.INFO)
+        logger.addHandler(file_handler)
+        
+        logger.info("Configuration loaded successfully")
+        logger.info(f"Using config file: {selections['config_path']}")
+        
+        # 시드 고정
+        set_seed(config["SEED"])
+        logger.info(f"Random seed set to {config['SEED']}")
+        
+        # 선택 사항 로깅
+        logger.info("User selections:")
+        logger.info(f"- Modes: {selections['modes']}")
+        logger.info(f"- Models: {selections['models']}")
+        logger.info(f"- Use probability data: {selections['use_prob']}")
+        
+        # 실행
+        work(config, selections)
+        
+    except Exception as e:
+        logger.error(f"Program failed: {str(e)}")
+        raise

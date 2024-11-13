@@ -1,79 +1,63 @@
 # data
 START: '2001-01-01'
 END: '2024-08-01'
-LEN_DATA: 6000
-
-# make_image
-window_size: 60
-volume_bar: true
-ma_lags: [5, 20, 60]
-chart_type: "bar"
-year: 2024
-freq: "month"
-SIZE_DICT:
-  5: [32, 15]
-  20: [64, 60]
-  60: [96, 180]
-  120: [128, 360]
+LEN_DATA: 5000
 
 # model parameter
-N_STOCK: 4231  # 입력 주식 수
-'M': 50
+N_STOCK: 313
+N_SELECT: 50  # 실제 투자할 종목 수
 TRAIN_LEN: 60
 PRED_LEN: 20
 
 # 데이터 설정
 TRAIN_START_DATE: '2001-01-01' # In Sample
 TRAIN_END_DATE: '2017-12-31' # In Sample
-VALIDATION_RATIO: 0.2
+TRAIN_RATIO: 0.7
+VALIDATION_RATIO : 0.3
 
 TEST_START_DATE: '2018-01-01' # Out of Sample
 TEST_END_DATE: '2024-08-01' # Out of Sample
 RESULT_DIR: 'Result'
 
-# model parameter
-MODELS: ['GRU', 'TCN', 'TRANSFORMER']
-MULTIMODAL_OPTIONS: [false]
-LOSS_FUNCTIONS: ['max_sharpe']
-TRAIN_LEN_OPTIONS: [60]
-PRED_LEN_OPTIONS: [20]
-SEED: 42
+# model selection
+MODEL: 'GRU'  # 현재 선택된 모델
 
 # learning parameter
 BATCH: 128
-EPOCHS: 50
-EARLY_STOP: 2
-MIN_DELTA: 0.0001
-LR: 0.005
+EPOCHS: 500  # 500으로 수정
+EARLY_STOP: 50  # 50으로 수정
+LR: 0.001
 MOMENTUM: 0.9
 USE_CUDA: true
+SEED: 42
 
 # portfolio optimization function (loss)
 LB: 0
-UB: 0.2
-N_FEAT: 50 # Best 50 in N_STOCK
-BETA: 0.2
+UB: 0.5
 LOSS_FUNCTION: 'max_sharpe'
 
-# model parameter
+# GRU parameters
+N_LAYER: 1          # 레이어 수 증가
+HIDDEN_DIM: 128     # hidden dimension 증가 (n_stocks보다 크게)
+N_HEAD: 10
+N_FEAT: 313        # n_stocks와 동일하게 설정
+DROPOUT: 0.3
+BIDIRECTIONAL: false # bidirectional 사용으로 특성 추출 강화
+
+# TCN parameters
 TCN:
-  n_timestep: 60 # TRAIN_LEN
-  n_output: 50 # Best 50 in N_STOCK
+  n_timestep: 60
+  n_output: 313
   kernel_size: 4
   n_dropout: 0.1
   hidden_size: 64
   level: 3
+  channels: [64, 64, 64]
 
-GRU:
-  n_layers: 1
-  hidden_dim: 128
-  dropout_p: 0.3
-  bidirectional: false
-  n_output: 50 # Best 50 in N_STOCK
-
+# TRANSFORMER parameters
 TRANSFORMER:
-  n_timestep: 60 # TRAIN_LEN
-  n_output: 50 # Best 50 in N_STOCK
+  n_timestep: 60
+  n_output: 313  # N_STOCK과 동일하게 수정
   n_layer: 6
   n_head: 5
   n_dropout: 0.1

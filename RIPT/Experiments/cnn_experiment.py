@@ -238,7 +238,8 @@ class Experiment:
         load_saved_data: bool = True,
         delay_list: List[int] = [0],
         is_ensem_res: bool = True,
-        cut: int = 10
+        cut: int = 10,
+        freq: str = "day"  # 'day', 'week', 'month', 'quarter', 'year'
     ) -> None:
         """
         포트폴리오를 계산하고 결과를 저장합니다.
@@ -248,20 +249,16 @@ class Experiment:
             delay_list: 지연 기간 리스트
             is_ensem_res: 앙상블 결과 사용 여부
             cut: 포트폴리오 분할 수
+            freq: 예측 주기 ('day', 'week', 'month', 'quarter', 'year')
         """
         # 앙상블 결과 생성
-        ensem_res_year_list = (
-            list(self.is_years) + list(self.oos_years)
-            if is_ensem_res
-            else list(self.oos_years)
-        )
+        year_list = list(self.is_years) + list(self.oos_years) if is_ensem_res else list(self.oos_years)
         
-        # 각 연도별 앙상블 결과 생성
-        for year in ensem_res_year_list:
-            freq_surfix = f"_{self.pf_freq}" if self.pf_freq != dcf.FREQ_DICT[self.pw] else ""
+        for year in year_list:
+            freq_suffix = f"_{freq}"
             ensem_res_path = os.path.join(
                 self.ensem_res_dir,
-                f"ensem{self.ensem}_res_{year}{freq_surfix}.csv"
+                f"ensem{self.ensem}_res_{year}{freq_suffix}.csv"
             )
             
             if os.path.exists(ensem_res_path) and load_saved_data:
@@ -270,11 +267,11 @@ class Experiment:
                 
             print(f"Generating {self.ws}d{self.pw}p ensem results for year {year}")
             
-            # 데이터로더 생성
+            # 데이터로더 생성 (모든 거래일 포함)
             year_dataloader = get_dataloader_for_year(
                 ws=self.ws,
                 pw=self.pw,
-                freq=self.pf_freq,
+                freq="day",  # 일별 데이터 사용
                 year=year,
                 country=self.country,
                 has_volume_bar=self.has_volume_bar,
@@ -288,7 +285,7 @@ class Experiment:
                 ts1d_model=self.model_obj.ts1d_model,
                 ts_scale=self.ts_scale,
                 oos_start_year=self.oos_years[0],
-                remove_tail=(year == self.oos_years[0] - 1) and self.pf_freq != "year"
+                remove_tail=False  # 모든 데이터 포함
             )
             
             # 앙상블 모델 로드
@@ -299,8 +296,14 @@ class Experiment:
                 print(f"Skipping year {year} due to missing models")
                 continue
                 
-            # 앙상블 결과 생성
-            df = self.inferencer.ensemble_results(model_list, year_dataloader)
+            # 앙상블 결과 생성 (모든 거래일)
+            df = self.inferencer.ensemble_results(model_list, year_dataloader, freq=freq)
+            
+            # 필요한 경우 특정 주기(월말, 분기말 등)로 필터링
+            if freq != "day":
+                period_end_dates = eqd.get_period_end_dates(freq)
+                df = df[df["ending_date"].isin(period_end_dates)]
+            
             df.to_csv(ensem_res_path)
             
             # 메모리 정리

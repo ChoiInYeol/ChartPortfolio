@@ -7,6 +7,7 @@ from torch.autograd import Variable
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
 def creatMask(batch, sequence_length):
     mask = torch.zeros(batch, sequence_length, sequence_length)
     for i in range(sequence_length):
@@ -200,39 +201,59 @@ class Encoder(nn.Module):
 
 
 class Transformer(nn.Module):
-    def __init__(self, n_stocks, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub, multimodal=False):
+    def __init__(self, n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub, n_select=5):
         super().__init__()
+        self.encoder = Encoder(n_feature, n_timestep, n_layer, n_head, n_dropout)
+        
+        # 종목 선택을 위한 attention 레이어
+        self.attention = nn.Linear(n_feature, n_output)
+        self.out = nn.Linear(n_feature, n_output)
+        
+        self.tempmaxpool = nn.MaxPool1d(n_timestep)
         self.lb = lb
         self.ub = ub
-        self.multimodal = multimodal
-        
-        self.input_size = n_stocks   # 입력 크기 (4586)
-        self.output_size = n_output  # 출력 크기 (50)
-        
-        input_dim = self.input_size 
-        self.encoder = Encoder(input_dim, n_timestep, n_layer, n_head, n_dropout)
-        self.out = nn.Linear(input_dim, n_output)
-        self.tempmaxpool = nn.MaxPool1d(n_timestep)
+        self.n_select = n_select
 
     def forward(self, src, returnWeights=False):
         mask = creatMask(src.shape[0], src.shape[1]).to(device)
         
         if returnWeights:
-            e_outputs, weights = self.encoder(src, mask, returnWeights=returnWeights)
+            e_outputs, weights = self.encoder(src, mask, returnWeights=True)
         else:
             e_outputs = self.encoder(src, mask)
-        
+            
         e_outputs = self.tempmaxpool(e_outputs.transpose(1, 2)).squeeze(-1)
-
-        output = self.out(e_outputs)
         
-        output = F.softmax(output, dim=1)
-        output = torch.stack([self.rebalance(batch, self.lb, self.ub) for batch in output])
-
+        # 종목 선택
+        attention_scores = self.attention(e_outputs)
+        attention_weights = torch.sigmoid(attention_scores)
+        
+        # Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
+        
+        # 마스크 생성
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
+        
+        # 선택된 종목에 대한 비중 계산
+        logits = self.out(e_outputs)
+        weights = F.softmax(logits, dim=1)
+        
+        # 선택되지 않은 종목은 0으로 마스킹
+        masked_weights = weights * mask
+        
+        # 비중 재조정
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
+        
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(batch, self.lb, self.ub) 
+            for batch in normalized_weights
+        ])
+        
         if returnWeights:
-            return output, weights
+            return final_weights, weights
         else:
-            return output
+            return final_weights
 
     def rebalance(self, weight, lb, ub):
         old = weight
@@ -248,3 +269,67 @@ class Transformer(nn.Module):
             else:
                 weight_clamped = torch.clamp(old, lb, ub)
         return weight_clamped
+
+
+class TransformerWithProb(Transformer):
+    def __init__(self, n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub, n_select=5):
+        super().__init__(n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub, n_select)
+        
+        # 상승확률 인코딩을 위한 레이어
+        self.prob_encoder = nn.Sequential(
+            nn.Linear(n_output, n_feature),
+            nn.SiLU(),
+            nn.Dropout(n_dropout)
+        )
+        
+        # 결합된 특성을 처리하기 위한 레이어 수정
+        self.attention = nn.Linear(n_feature * 2, n_output)
+        self.out = nn.Linear(n_feature * 2, n_output)
+
+    def forward(self, src, x_probs=None, returnWeights=False):
+        mask = creatMask(src.shape[0], src.shape[1]).to(device)
+        
+        # Transformer로 수익률 시퀀스 처리
+        if returnWeights:
+            e_outputs, weights = self.encoder(src, mask, returnWeights=True)
+        else:
+            e_outputs = self.encoder(src, mask)
+            
+        e_outputs = self.tempmaxpool(e_outputs.transpose(1, 2)).squeeze(-1)
+        
+        # 상승확률 처리
+        prob_features = self.prob_encoder(x_probs[:, 0, :])
+        
+        # 특성 결합
+        combined = torch.cat([e_outputs, prob_features], dim=1)
+        
+        # 종목 선택
+        attention_scores = self.attention(combined)
+        attention_weights = torch.sigmoid(attention_scores)
+        
+        # Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
+        
+        # 마스크 생성
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
+        
+        # 선택된 종목에 대한 비중 계산
+        logits = self.out(combined)
+        weights = F.softmax(logits, dim=1)
+        
+        # 선택되지 않은 종목은 0으로 마스킹
+        masked_weights = weights * mask
+        
+        # 비중 재조정
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
+        
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(batch, self.lb, self.ub) 
+            for batch in normalized_weights
+        ])
+        
+        if returnWeights:
+            return final_weights, weights
+        else:
+            return final_weights

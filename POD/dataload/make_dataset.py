@@ -2,146 +2,191 @@ import yaml
 import pickle
 import numpy as np
 import pandas as pd
+from pathlib import Path
 import logging
+from typing import Tuple, List
 
-# 로깅 설정
-logging.basicConfig(filename='make_dataset.log', level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-
-def get_return_df(filtered_stock_path, ticker_stockid_path):
+def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    필터링된 주식 데이터와 티커-PERMNO 매핑을 사용하여 수익률 데이터프레임을 생성합니다.
-
-    Args:
-        filtered_stock_path (str): 필터링된 주식 데이터 파일 경로
-        ticker_stockid_path (str): 티커-PERMNO 매핑 파일 경로
-
-    Returns:
-        pd.DataFrame: 피벗된 수익률 데이터프레임
-    """
-    filtered_stock = pd.read_csv(filtered_stock_path, parse_dates=['date'])
-    filtered_stock = filtered_stock[['date', 'PERMNO', 'RET']]
-
-    ticker_stockid = pd.read_csv(ticker_stockid_path)
-    ticker_stockid = ticker_stockid[['TICKER', 'StockID']]
-    ticker_stockid = ticker_stockid.rename(columns={'StockID': 'PERMNO'})
-
-    merged_data = pd.merge(filtered_stock, ticker_stockid, on='PERMNO', how='inner')
-    pivot_data = merged_data.pivot(index='date', columns='TICKER', values='RET')
-
-    return pivot_data
-
-def make_DL_dataset(data, data_len, n_stock):
-    """
-    딥러닝 데이터셋을 생성합니다.
-
-    Args:
-        data (pd.DataFrame): 입력 데이터
-        data_len (int): 데이터 길이
-        n_stock (int): 주식 수
-
-    Returns:
-        tuple: (dataset, times)
-    """
-    times = []
-    dataset = np.array(data.iloc[:data_len, :n_stock]).reshape(1, -1, n_stock)
-    times.append(data.iloc[:data_len, :].index)
-
-    for i in range(1, len(data) - data_len + 1):
-        addition = np.array(data.iloc[i:data_len+i, :n_stock]).reshape(1, -1, n_stock)
-        dataset = np.concatenate((dataset, addition))
-        times.append(data.iloc[i:data_len+i, :].index)
-    return dataset, times
-
-def data_split(data, train_len, pred_len, train_start, train_end, val_ratio, test_start, test_end, n_stock):
-    """
-    데이터를 훈련, 검증, 테스트 세트로 분할합니다.
-
-    Args:
-        data (pd.DataFrame): 입력 데이터
-        train_len (int): 훈련 데이터 길이
-        pred_len (int): 예측 데이터 길이
-        train_start (str): 훈련 시작 날짜
-        train_end (str): 훈련 종료 날짜
-        val_ratio (float): 검증 세트 비율
-        test_start (str): 테스트 시작 날짜
-        test_end (str): 테스트 종료 날짜
-        n_stock (int): 주식 수
-
-    Returns:
-        tuple: (x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te)
-    """
-    # 훈련 데이터 선택
-    train_data = data.loc[train_start:train_end]
+    전처리된 수익률(일별)과 상승확률(월별) 데이터를 로드
     
-    # 훈련 및 검증 데이터 분할
-    train_size = int(len(train_data) * (1 - val_ratio))
-    train_data, val_data = train_data.iloc[:train_size], train_data.iloc[train_size:]
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: (수익률 데이터, 상승확률 데이터)
+    """
+    logging.info("데이터 로드 시작")
     
-    # 테스트 데이터 선택 (OOS)
-    test_data = data.loc[test_start:test_end]
+    # 전처리된 데이터 로드
+    return_df = pd.read_csv("data/return_df.csv", index_col=0, parse_dates=True)
+    up_prob_df = pd.read_csv("data/CNN_20D_20P_up_prob_df.csv", index_col=0, parse_dates=True)
+    
+    # 데이터 정합성 체크
+    assert set(return_df.columns) == set(up_prob_df.columns), "수익률과 상승확률 데이터의 종목이 일치하지 않습니다."
+    
+    # 상승확률 데이터를 수익률 데이터의 인덱스로 확장
+    expanded_prob_df = pd.DataFrame(0.5, 
+                                  index=return_df.index, 
+                                  columns=up_prob_df.columns)
+    
+    # 월별 상승확률 데이터 채우기
+    for date in up_prob_df.index:
+        if date in expanded_prob_df.index:
+            expanded_prob_df.loc[date] = up_prob_df.loc[date]
+    
+    logging.info(f"데이터 로드 완료")
+    logging.info(f"수익률 데이터(일별): {return_df.shape}")
+    logging.info(f"원본 상승확률(월별): {up_prob_df.shape}")
+    logging.info(f"확장된 상승확률(일별): {expanded_prob_df.shape}")
+    
+    return return_df, expanded_prob_df
 
+def make_DL_dataset(data: pd.DataFrame, 
+                   prob_data: pd.DataFrame,
+                   train_len: int, 
+                   pred_len: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray, List]:
+    """
+    딥러닝 모델용 데이터셋 생성
+    
+    Args:
+        data: 일별 수익률 데이터
+        prob_data: 확장된 상승확률 데이터 (일별, 기본값 0.5)
+        train_len: 학습 기간 (일)
+        pred_len: 예측 기간 (일)
+    """
+    sequences = []
+    labels = []
+    probs = []
+    dates = []
+    
+    total_len = train_len + pred_len
+    
+    for i in range(len(data) - total_len + 1):
+        # 수익률 데이터 추출
+        seq = data.iloc[i:i+train_len].values
+        label = data.iloc[i+train_len:i+total_len].values
+        date = data.iloc[i+train_len:i+total_len].index.tolist()
+        
+        # 상승확률 추출 (이미 0.5로 채워져 있음)
+        prob = prob_data.iloc[i+train_len:i+total_len].values
+        
+        sequences.append(seq)
+        labels.append(label)
+        probs.append(prob)
+        dates.append(date)
+    
+    return (np.array(sequences), 
+            np.array(labels), 
+            np.array(probs), 
+            dates)
+
+def split_data(return_df: pd.DataFrame, 
+              up_prob_df: pd.DataFrame, 
+              config: dict,
+              train_len: int,
+              pred_len: int) -> Tuple:
+    """
+    날짜 기준으로 데이터를 학습/검증/테스트 세트로 분할
+    """
+    # In-sample 기간 데이터 필터링
+    in_sample_mask = (return_df.index >= config['TRAIN_START_DATE']) & \
+                    (return_df.index <= config['TRAIN_END_DATE'])
+    in_sample_data = return_df[in_sample_mask]
+    in_sample_prob = up_prob_df[in_sample_mask]
+    
+    # In-sample 데이터를 학습/검증 세트로 분할
+    train_end_idx = int(len(in_sample_data) * config['TRAIN_RATIO'])
+    
+    train_data = in_sample_data.iloc[:train_end_idx]
+    train_prob = in_sample_prob.iloc[:train_end_idx]
+    
+    val_data = in_sample_data.iloc[train_end_idx:]
+    val_prob = in_sample_prob.iloc[train_end_idx:]
+    
+    # Out-of-sample 테스트 데이터
+    test_mask = (return_df.index >= config['TEST_START_DATE']) & \
+                (return_df.index <= config['TEST_END_DATE'])
+    test_data = return_df[test_mask]
+    test_prob = up_prob_df[test_mask]
+    
+    # 데이터 크기 검증
+    if len(train_data) < (train_len + pred_len) or \
+       len(val_data) < (train_len + pred_len) or \
+       len(test_data) < (train_len + pred_len):
+        raise ValueError(
+            f"데이터 길이가 부족합니다.\n"
+            f"필요한 최소 길이: {train_len + pred_len}\n"
+            f"실제 길이 - Train: {len(train_data)}, Val: {len(val_data)}, Test: {len(test_data)}"
+        )
+    
+    logging.info(f"데이터 분할 완료")
+    logging.info(f"학습 데이터: {train_data.index[0]} ~ {train_data.index[-1]} ({len(train_data)}개)")
+    logging.info(f"검증 데이터: {val_data.index[0]} ~ {val_data.index[-1]} ({len(val_data)}개)")
+    logging.info(f"테스트 데이터: {test_data.index[0]} ~ {test_data.index[-1]} ({len(test_data)}개)")
+    
     # 데이터셋 생성
-    return_train, times_train = make_DL_dataset(train_data, train_len + pred_len, n_stock)
-    return_val, times_val = make_DL_dataset(val_data, train_len + pred_len, n_stock)
-    return_test, times_test = make_DL_dataset(test_data, train_len + pred_len, n_stock)
-
-    # 입력과 라벨 분리
-    x_tr = np.array([x[:train_len] for x in return_train])
-    y_tr = np.array([x[-pred_len:] for x in return_train])
-    times_tr = np.unique(np.array([x[-pred_len:] for x in times_train]).flatten()).tolist()
-
-    x_val = np.array([x[:train_len] for x in return_val])
-    y_val = np.array([x[-pred_len:] for x in return_val])
-    times_val = np.unique(np.array([x[-pred_len:] for x in times_val]).flatten()).tolist()
-
-    x_te = np.array([x[:train_len] for x in return_test])
-    y_te = np.array([x[-pred_len:] for x in return_test])
-    times_te = np.unique(np.array([x[-pred_len:] for x in times_test]).flatten()).tolist()
-
-    return x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te
+    train_x, train_y, train_prob, train_dates = make_DL_dataset(
+        train_data, train_prob, train_len, pred_len)
+    val_x, val_y, val_prob, val_dates = make_DL_dataset(
+        val_data, val_prob, train_len, pred_len)
+    test_x, test_y, test_prob, test_dates = make_DL_dataset(
+        test_data, test_prob, train_len, pred_len)
+    
+    # 데이터셋 크기 검증
+    logging.info(f"최종 데이터셋 크기:")
+    logging.info(f"Train - X: {train_x.shape}, Y: {train_y.shape}, Prob: {train_prob.shape}")
+    logging.info(f"Val - X: {val_x.shape}, Y: {val_y.shape}, Prob: {val_prob.shape}")
+    logging.info(f"Test - X: {test_x.shape}, Y: {test_y.shape}, Prob: {test_prob.shape}")
+    
+    if train_x.shape[0] == 0 or val_x.shape[0] == 0 or test_x.shape[0] == 0:
+        raise ValueError(
+            f"빈 데이터셋이 있습니다.\n"
+            f"Train: {train_x.shape}, Val: {val_x.shape}, Test: {test_x.shape}"
+        )
+    
+    return (train_x, train_y, train_prob, train_dates,
+            val_x, val_y, val_prob, val_dates,
+            test_x, test_y, test_prob, test_dates)
 
 if __name__ == "__main__":
-    path = "data/"
-
     # 설정 파일 로드
-    with open("config/config.yaml", "r", encoding="utf8") as file:
-        config = yaml.safe_load(file)
-
-    # 수익률 데이터프레임 생성
-    return_df = get_return_df(path + "filtered_stock.csv", path + "ticker_stockid.csv")
-
-    # NaN 값 처리 및 float32로 변환
-    data = return_df.fillna(-2).astype(np.float32)
-
-    # 데이터 분할
-    x_tr, y_tr, x_val, y_val, x_te, y_te, times_tr, times_val, times_te = data_split(
-        data,
-        config["TRAIN_LEN"],
-        config["PRED_LEN"],
-        config["TRAIN_START_DATE"],
-        config["TRAIN_END_DATE"],
-        config["VALIDATION_RATIO"],
-        config["TEST_START_DATE"],
-        config["TEST_END_DATE"],
-        config["N_STOCK"],
+    with open("config/config.yaml", "r", encoding="utf8") as f:
+        config = yaml.safe_load(f)
+    
+    # 로깅 설정
+    logging.basicConfig(
+        filename='make_dataset.log',
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
     )
-
-    # 데이터셋 정보 로깅
-    logging.info("데이터셋 검증:")
-    logging.info(f"Train images shape: {x_tr.shape}")
-    logging.info(f"Train labels shape: {y_tr.shape}")
-    logging.info(f"Validation images shape: {x_val.shape}")
-    logging.info(f"Validation labels shape: {y_val.shape}")
-    logging.info(f"Test images shape: {x_te.shape}")
-    logging.info(f"Test labels shape: {y_te.shape}")
-
-    # 날짜 정보 저장
-    with open(path + "date.pkl", "wb") as f:
-        pickle.dump({'train': times_tr, 'val': times_val, 'test': times_te}, f)
-
-    # 데이터셋 저장
-    with open(path + "dataset.pkl", "wb") as f:
-        pickle.dump([x_tr, y_tr, x_val, y_val, x_te, y_te], f)
-
+    
+    logging.info("데이터셋 생성 시작")
+    
+    # 데이터 로드
+    return_df, up_prob_df = load_data()
+    
+    # 데이터 분할 및 데이터셋 생성
+    train_x, train_y, train_prob, train_dates, \
+    val_x, val_y, val_prob, val_dates, \
+    test_x, test_y, test_prob, test_dates = split_data(
+        return_df,
+        up_prob_df,
+        config=config,
+        train_len=config['TRAIN_LEN'],
+        pred_len=config['PRED_LEN']
+    )
+    
+    # 데이터 저장
+    with open("data/dataset.pkl", "wb") as f:
+        pickle.dump({
+            'train': (train_x, train_y, train_prob),
+            'val': (val_x, val_y, val_prob),
+            'test': (test_x, test_y, test_prob)
+        }, f)
+    
+    with open("data/date.pkl", "wb") as f:
+        pickle.dump({
+            'train': train_dates,
+            'val': val_dates,
+            'test': test_dates
+        }, f)
+    
     logging.info("데이터셋 생성 완료")

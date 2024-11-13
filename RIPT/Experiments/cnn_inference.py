@@ -85,7 +85,8 @@ class CNNInference:
     def ensemble_results(
         self,
         model_list: List[nn.Module],
-        dataloader: DataLoader
+        dataloader: DataLoader,
+        freq: str = "day"  # 'day', 'week', 'month', 'quarter', 'year'
     ) -> pd.DataFrame:
         """
         앙상블 모델의 결과를 생성합니다.
@@ -93,6 +94,7 @@ class CNNInference:
         Args:
             model_list: 앙상블할 모델 리스트
             dataloader: 데이터로더
+            freq: 예측 주기 ('day', 'week', 'month', 'quarter', 'year')
 
         Returns:
             앙상블 결과가 담긴 데이터프레임
@@ -103,7 +105,7 @@ class CNNInference:
         df_dtypes = [object, "datetime64[ns]", np.float64, np.float64, np.float64]
         df_list = []
         
-        for batch in dataloader:
+        for batch in tqdm(dataloader, desc="Generating predictions"):
             image = batch["image"].to(self.device, dtype=torch.float)
             
             if self.regression_label is None:
@@ -137,17 +139,10 @@ class CNNInference:
         df = pd.concat(df_list)
         df["up_prob"] = df["up_prob"] / len(model_list)
         
-        # 거래일 기준 월말로 보정
-        df["year_month"] = df["ending_date"].dt.to_period("M")
-        df = df.sort_values("ending_date")
-        
-        # 각 월의 마지막 거래일 찾기
-        last_trading_days = df.groupby("year_month")["ending_date"].last()
-        
-        # 월말 거래일에 해당하는 데이터만 필터링
-        df = df[df["ending_date"].isin(last_trading_days)]
-        
+        # 거래일 기준으로 정렬
+        df = df.sort_values(["ending_date", "StockID"])
         df.reset_index(drop=True, inplace=True)
+        
         return df
 
     def load_ensemble_model(

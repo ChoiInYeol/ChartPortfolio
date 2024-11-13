@@ -1,0 +1,306 @@
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference']
+Selected models: ['GRU']
+Selected options: []
+
+Executing inference for GRU (use_prob: False)
+Error occurred: No matching model found for current configuration:
+Model: GRU
+N_SELECT: 50
+use_prob: False
+Available files: ['True_GRU_50_2_loss_-0.1564.pth', 'True_GRU_50_6_loss_-0.1624.pth', 'False_GRU_50_1_loss_-0.2139.pth', 'False_GRU_50_0_loss_-0.2122.pth', 'True_GRU_50_0_loss_-0.1390.pth', 'False_GRU_50_5_loss_-0.2278.pth', 'True_GRU_50_8_loss_-0.1981.pth', 'True_GRU_50_10_loss_-0.2380.pth', 'True_GRU_50_1_loss_-0.1463.pth', 'False_GRU_50_4_loss_-0.2169.pth', 'True_GRU_50_7_loss_-0.1821.pth', 'True_GRU_50_5_loss_-0.1613.pth', 'True_GRU_50_9_loss_-0.2027.pth']
+Program failed: No matching model found for current configuration:
+Model: GRU
+N_SELECT: 50
+use_prob: False
+Available files: ['True_GRU_50_2_loss_-0.1564.pth', 'True_GRU_50_6_loss_-0.1624.pth', 'False_GRU_50_1_loss_-0.2139.pth', 'False_GRU_50_0_loss_-0.2122.pth', 'True_GRU_50_0_loss_-0.1390.pth', 'False_GRU_50_5_loss_-0.2278.pth', 'True_GRU_50_8_loss_-0.1981.pth', 'True_GRU_50_10_loss_-0.2380.pth', 'True_GRU_50_1_loss_-0.1463.pth', 'False_GRU_50_4_loss_-0.2169.pth', 'True_GRU_50_7_loss_-0.1821.pth', 'True_GRU_50_5_loss_-0.1613.pth', 'True_GRU_50_9_loss_-0.2027.pth']
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference']
+Selected models: ['GRU']
+Selected options: ['use_prob']
+
+Executing inference for GRU (use_prob: True)
+Error occurred: No matching model found for current configuration:
+Model: GRU
+N_SELECT: 50
+use_prob: True
+Available files: ['True_GRU_50_2_loss_-0.1564.pth', 'True_GRU_50_6_loss_-0.1624.pth', 'False_GRU_50_1_loss_-0.2139.pth', 'False_GRU_50_0_loss_-0.2122.pth', 'True_GRU_50_0_loss_-0.1390.pth', 'False_GRU_50_5_loss_-0.2278.pth', 'True_GRU_50_8_loss_-0.1981.pth', 'True_GRU_50_10_loss_-0.2380.pth', 'True_GRU_50_1_loss_-0.1463.pth', 'False_GRU_50_4_loss_-0.2169.pth', 'True_GRU_50_7_loss_-0.1821.pth', 'True_GRU_50_5_loss_-0.1613.pth', 'True_GRU_50_9_loss_-0.2027.pth']
+Program failed: No matching model found for current configuration:
+Model: GRU
+N_SELECT: 50
+use_prob: True
+Available files: ['True_GRU_50_2_loss_-0.1564.pth', 'True_GRU_50_6_loss_-0.1624.pth', 'False_GRU_50_1_loss_-0.2139.pth', 'False_GRU_50_0_loss_-0.2122.pth', 'True_GRU_50_0_loss_-0.1390.pth', 'False_GRU_50_5_loss_-0.2278.pth', 'True_GRU_50_8_loss_-0.1981.pth', 'True_GRU_50_10_loss_-0.2380.pth', 'True_GRU_50_1_loss_-0.1463.pth', 'False_GRU_50_4_loss_-0.2169.pth', 'True_GRU_50_7_loss_-0.1821.pth', 'True_GRU_50_5_loss_-0.1613.pth', 'True_GRU_50_9_loss_-0.2027.pth']
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference']
+Selected models: ['GRU']
+Selected options: ['use_prob']
+
+Executing inference for GRU (use_prob: True)
+Error occurred: No matching model found for current configuration:
+Model: GRU
+N_SELECT: 50
+use_prob: True
+Available files: ['True_GRU_50_2_loss_-0.1564.pth', 'True_GRU_50_6_loss_-0.1624.pth', 'False_GRU_50_1_loss_-0.2139.pth', 'False_GRU_50_0_loss_-0.2122.pth', 'True_GRU_50_0_loss_-0.1390.pth', 'False_GRU_50_5_loss_-0.2278.pth', 'True_GRU_50_8_loss_-0.1981.pth', 'True_GRU_50_10_loss_-0.2380.pth', 'True_GRU_50_1_loss_-0.1463.pth', 'False_GRU_50_4_loss_-0.2169.pth', 'True_GRU_50_7_loss_-0.1821.pth', 'True_GRU_50_5_loss_-0.1613.pth', 'True_GRU_50_9_loss_-0.2027.pth']
+Program failed: No matching model found for current configuration:
+Model: GRU
+N_SELECT: 50
+use_prob: True
+Available files: ['True_GRU_50_2_loss_-0.1564.pth', 'True_GRU_50_6_loss_-0.1624.pth', 'False_GRU_50_1_loss_-0.2139.pth', 'False_GRU_50_0_loss_-0.2122.pth', 'True_GRU_50_0_loss_-0.1390.pth', 'False_GRU_50_5_loss_-0.2278.pth', 'True_GRU_50_8_loss_-0.1981.pth', 'True_GRU_50_10_loss_-0.2380.pth', 'True_GRU_50_1_loss_-0.1463.pth', 'False_GRU_50_4_loss_-0.2169.pth', 'True_GRU_50_7_loss_-0.1821.pth', 'True_GRU_50_5_loss_-0.1613.pth', 'True_GRU_50_9_loss_-0.2027.pth']
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference']
+Selected models: ['GRU']
+Selected options: ['use_prob']
+
+Executing inference for GRU (use_prob: True)
+Starting inference...
+Error occurred: Empty data passed with indices specified.
+Program failed: Empty data passed with indices specified.
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference']
+Selected models: ['GRU']
+Selected options: ['use_prob']
+
+Executing inference for GRU (use_prob: True)
+Starting inference...
+Inference completed
+Configuration loaded successfully
+Random seed set to 42
+At least one mode and one model must be selected
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference']
+Selected models: ['GRU']
+Selected options: ['use_prob']
+
+Executing inference for GRU (use_prob: True)
+Starting inference...
+Inference completed
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['GRU', 'TCN', 'TRANSFORMER']
+Selected options: ['use_prob']
+
+Executing train for GRU (use_prob: True)
+Starting training...
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN', 'TRANSFORMER']
+Selected options: ['use_prob']
+
+Executing train for TCN (use_prob: True)
+Starting training...
+Error occurred: stack expects a non-empty TensorList
+Program failed: stack expects a non-empty TensorList
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: TCN.forward() takes 2 positional arguments but 3 were given
+Program failed: TCN.forward() takes 2 positional arguments but 3 were given
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: 'TCN' object has no attribute 'rebalance'
+Program failed: 'TCN' object has no attribute 'rebalance'
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: stack expects a non-empty TensorList
+Program failed: stack expects a non-empty TensorList
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference', 'train']
+Selected models: ['TCN']
+Selected options: []
+
+Executing inference for TCN (use_prob: False)
+Starting inference...
+Inference completed
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: TCN.forward() takes 2 positional arguments but 3 were given
+Program failed: TCN.forward() takes 2 positional arguments but 3 were given
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: stack expects a non-empty TensorList
+Program failed: stack expects a non-empty TensorList
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: stack expects a non-empty TensorList
+Program failed: stack expects a non-empty TensorList
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: TCN.forward() takes 2 positional arguments but 3 were given
+Program failed: TCN.forward() takes 2 positional arguments but 3 were given
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Error occurred: stack expects a non-empty TensorList
+Program failed: stack expects a non-empty TensorList
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Configuration loaded successfully
+Random seed set to 42
+Program failed: 'NoneType' object is not subscriptable
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train']
+Selected models: ['TCN']
+Selected options: []
+
+Executing train for TCN (use_prob: False)
+Starting training...
+Training completed
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['inference']
+Selected models: ['TCN']
+Selected options: []
+
+Executing inference for TCN (use_prob: False)
+Starting inference...
+Inference completed
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: ['use_prob']
+
+Executing train for TCN (use_prob: True)
+Error occurred: 'Trainer' object has no attribute 'model_dir'
+Program failed: 'Trainer' object has no attribute 'model_dir'
+Configuration loaded successfully
+Random seed set to 42
+Selected modes: ['train', 'inference']
+Selected models: ['TCN']
+Selected options: ['use_prob']
+
+Executing train for TCN (use_prob: True)
+Starting training...
+Training completed
+
+Executing inference for TCN (use_prob: True)
+Error occurred: Error(s) in loading state_dict for TCNWithProb:
+	Missing key(s) in state_dict: "tcn.network.2.downsample.weight", "tcn.network.2.downsample.bias". 
+	size mismatch for tcn.network.2.conv1.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.conv1.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.conv1.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 64, 4]).
+	size mismatch for tcn.network.2.conv2.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.conv2.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.conv2.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 60, 4]).
+	size mismatch for tcn.network.2.net.0.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.net.0.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.net.0.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 64, 4]).
+	size mismatch for tcn.network.2.net.4.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.net.4.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.net.4.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 60, 4]).
+	size mismatch for proj.0.weight: copying a param with shape torch.Size([64, 64]) from checkpoint, the shape in current model is torch.Size([60, 60]).
+	size mismatch for proj.0.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for attention.weight: copying a param with shape torch.Size([313, 128]) from checkpoint, the shape in current model is torch.Size([313, 120]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([313, 128]) from checkpoint, the shape in current model is torch.Size([313, 120]).
+	size mismatch for prob_encoder.0.weight: copying a param with shape torch.Size([64, 313]) from checkpoint, the shape in current model is torch.Size([60, 313]).
+	size mismatch for prob_encoder.0.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+Program failed: Error(s) in loading state_dict for TCNWithProb:
+	Missing key(s) in state_dict: "tcn.network.2.downsample.weight", "tcn.network.2.downsample.bias". 
+	size mismatch for tcn.network.2.conv1.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.conv1.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.conv1.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 64, 4]).
+	size mismatch for tcn.network.2.conv2.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.conv2.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.conv2.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 60, 4]).
+	size mismatch for tcn.network.2.net.0.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.net.0.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.net.0.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 64, 4]).
+	size mismatch for tcn.network.2.net.4.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for tcn.network.2.net.4.weight_g: copying a param with shape torch.Size([64, 1, 1]) from checkpoint, the shape in current model is torch.Size([60, 1, 1]).
+	size mismatch for tcn.network.2.net.4.weight_v: copying a param with shape torch.Size([64, 64, 4]) from checkpoint, the shape in current model is torch.Size([60, 60, 4]).
+	size mismatch for proj.0.weight: copying a param with shape torch.Size([64, 64]) from checkpoint, the shape in current model is torch.Size([60, 60]).
+	size mismatch for proj.0.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+	size mismatch for attention.weight: copying a param with shape torch.Size([313, 128]) from checkpoint, the shape in current model is torch.Size([313, 120]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([313, 128]) from checkpoint, the shape in current model is torch.Size([313, 120]).
+	size mismatch for prob_encoder.0.weight: copying a param with shape torch.Size([64, 313]) from checkpoint, the shape in current model is torch.Size([60, 313]).
+	size mismatch for prob_encoder.0.bias: copying a param with shape torch.Size([64]) from checkpoint, the shape in current model is torch.Size([60]).
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+
+Executing train for GRU (use_prob: False)
+Starting training...
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['inference']
+- Models: ['TCN']
+- Use probability data: True
+
+Executing inference for TCN (use_prob: True)
+Starting inference...
+Inference completed
