@@ -13,6 +13,8 @@ import cProfile
 import pstats
 import io
 import random
+import gc
+from PIL import Image
 
 from Data import equity_data as eqd
 from Data import chart_library as cl
@@ -385,6 +387,29 @@ def process_stock_ts(stock_id, df, freq, year, window_size, ma_lags, ret_len_lis
     return results
 
 
+def process_stock_chunk(chunk_stocks, df, freq, year, window_size, ma_lags, chart_freq, chart_len, volume_bar, chart_type, need_adjust_price, ret_len_list):
+    """청크 위로 주식 데이터를 처리하는 함수"""
+    chunk_results = []
+    
+    for stock_id in chunk_stocks:
+        try:
+            stock_results = process_stock(
+                stock_id, df, freq, year, window_size, ma_lags,
+                chart_freq, chart_len, volume_bar, chart_type,
+                need_adjust_price, ret_len_list
+            )
+            chunk_results.extend(stock_results)
+            
+        except Exception as e:
+            print(f"Error processing stock {stock_id}: {str(e)}")
+            continue
+            
+        # 청크 처리 후 메모리 정리
+        gc.collect()
+    
+    return chunk_results
+
+
 class GenerateStockData(object):
     """주식 차트 이미지와 시계열 데이터를 생성하고 저장하는 클래스
     
@@ -410,7 +435,7 @@ class GenerateStockData(object):
         save_dir (str): 이미지 데이터 저장 경로
         save_dir_ts (str): 시계열 데이터 저장 경로
         image_save_dir (str): 샘플 이미지 저장 경로
-        file_name (str): 생성될 파일의 기본 이름
+        file_name (str): 생될 파일의 기본 이름
         log_file_name (str): 로그 파일 경로
         labels_filename (str): 레이블 데이터 파일 경로
         images_filename (str): 이미지 데이터 파일 경로
@@ -532,6 +557,7 @@ class GenerateStockData(object):
         ):
             print("Found pregenerated file {}".format(self.file_name))
             return
+            
         print(f"Generating {self.file_name}")
 
         # 기존 파일 삭제
@@ -550,90 +576,92 @@ class GenerateStockData(object):
             print(f"Loaded data for year {self.year} and cached it")
 
         self.stock_id_list = np.unique(self.df.index.get_level_values("StockID"))
-        dtype_dict, feature_list = self._get_feature_and_dtype_list()
+        
+        # CPU 코어 수에 맞춰 청크 크기 조정
+        num_processes = mp.cpu_count()
+        # 2019년 이후 데이터는 더 작은 청크 사이즈 사용
+        chunk_size = max(5, len(self.stock_id_list) // (num_processes * 8)) if self.year >= 2019 else max(10, len(self.stock_id_list) // (num_processes * 4))
+        
+        # 주식 리스트를 청크로 분할
+        chunks = [
+            self.stock_id_list[i:i + chunk_size]
+            for i in range(0, len(self.stock_id_list), chunk_size)
+        ]
+        
+        print(f"Processing {len(self.stock_id_list)} stocks with {num_processes} processes")
+        print(f"Number of chunks: {len(chunks)}, chunk size: {chunk_size}")
+        
+        all_results = []
         data_miss = np.zeros(7)
-        sample_num = 0
-        samples = []
-
-        # 멀티프로세싱 실행
-        process_stock_partial = partial(
-            process_stock,
-            df=self.df,
-            freq=self.freq,
-            year=self.year,
-            window_size=self.window_size,
-            ma_lags=self.ma_lags,
-            chart_freq=self.chart_freq,
-            chart_len=self.chart_len,
-            volume_bar=self.volume_bar,
-            chart_type=self.chart_type,
-            need_adjust_price=self.need_adjust_price,
-            ret_len_list=self.ret_len_list
-        )
         
-        chunksize = max(1, len(self.stock_id_list) // (mp.cpu_count() * 4))
-        with mp.Pool(processes=mp.cpu_count()) as pool:
-            all_results = list(tqdm(
-                pool.imap(process_stock_partial, self.stock_id_list, chunksize=chunksize),
-                total=len(self.stock_id_list), disable=not self.allow_tqdm))
-
-        # 결과 처리
-        for stock_results in all_results:
-            for result in stock_results:
-                if isinstance(result, dict):
-                    samples.append(result)
-                    sample_num += 1
-                elif isinstance(result, tuple) and result[0] == "miss":
-                    data_miss[result[1]] += 1
-
-        if sample_num == 0:
-            print("No valid samples generated. Skipping saving.")
-            return
-
-        # 데이터프레임 생성
-        df = pd.DataFrame(samples)
-        # 이미지 데이터를 별도 컬럼으로 추출
-        images = df.pop('image').tolist()
-        # 이미지를 numpy 배열로 변환
-        images_array = np.array([np.array(img).flatten() for img in images], dtype=np.uint8)
-
-        # 이미지와 라벨을 함께 저장
-        np.savez_compressed(self.images_filename, images=images_array, labels=df.to_dict('list'))
-
-        print(f"Save data to {self.images_filename}")
-        
-        # 로그 파일 작성 수정
-        log_file = open(self.log_file_name, "w+")
-        log_file.write(
-            "total_dates:%d total_missing:%d type0:%d type1:%d type2:%d type3:%d type4:%d type5:%d type6:%d"
-            % (
-                sample_num,
-                int(np.sum(data_miss)),
-                int(data_miss[0]),
-                int(data_miss[1]),
-                int(data_miss[2]),
-                int(data_miss[3]),
-                int(data_miss[4]),
-                int(data_miss[5]),
-                int(data_miss[6]),
-            )
-        )
-        log_file.close()
-        print(f"Save log file to {self.log_file_name}")
-
-        # 랜덤하게 샘플 이미지 선택 및 저장
-        if images:
-            random_index = random.randint(0, len(images) - 1)
-            stock_id = df.iloc[random_index]['StockID']
-            date = df.iloc[random_index]['Date']
-            image = images[random_index]
-            image_pil = image  # 이미지는 PIL 이미지 객체로 저장되어 있음
-            image_pil.save(
-                op.join(
-                    self.image_save_dir,
-                    f"{self.file_name}_{stock_id}_{date.strftime('%Y%m%d')}.png",
+        # 프로세스 풀 생성 - 메모리 관리 개선
+        with mp.Pool(processes=num_processes) as pool:
+            try:
+                # imap으로 병렬 처리
+                process_func = partial(
+                    process_stock_chunk,
+                    df=self.df,
+                    freq=self.freq,
+                    year=self.year,
+                    window_size=self.window_size,
+                    ma_lags=self.ma_lags,
+                    chart_freq=self.chart_freq,
+                    chart_len=self.chart_len,
+                    volume_bar=self.volume_bar,
+                    chart_type=self.chart_type,
+                    need_adjust_price=self.need_adjust_price,
+                    ret_len_list=self.ret_len_list
                 )
-            )
+                
+                # 더 자주 중간 저장
+                save_threshold = 5000 if self.year >= 2019 else 10000
+                
+                for chunk_results in tqdm(
+                    pool.imap_unordered(process_func, chunks),
+                    total=len(chunks),
+                    desc="Processing chunks"
+                ):
+                    # 결과 처리
+                    for result in chunk_results:
+                        if isinstance(result, dict):
+                            all_results.append(result)
+                        elif isinstance(result, tuple) and result[0] == "miss":
+                            data_miss[result[1]] += 1
+                
+                    # 더 자주 중간 결과 저장
+                    if len(all_results) >= save_threshold:
+                        temp_filename = f"{self.images_filename}.temp_{len(os.listdir(os.path.dirname(self.images_filename)))}"
+                        self._save_chunk_results(all_results, temp_filename)
+                        all_results = []
+                        gc.collect()
+                        
+                        # 명시적으로 메모리 해제 요청
+                        if self.year >= 2019:
+                            import psutil
+                            process = psutil.Process()
+                            if process.memory_percent() > 75:  # 메모리 사용량이 75%를 넘으면
+                                pool.close()
+                                pool.join()
+                                gc.collect()
+                                pool = mp.Pool(processes=num_processes)  # 새로운 풀 생성
+                
+            except Exception as e:
+                print(f"Error during processing: {str(e)}")
+                pool.close()
+                pool.join()
+                raise
+            
+            finally:
+                # 남은 결과 저장
+                if all_results:
+                    temp_filename = f"{self.images_filename}.temp_{len(os.listdir(os.path.dirname(self.images_filename)))}"
+                    self._save_chunk_results(all_results, temp_filename)
+                
+                # 메모리 정리
+                gc.collect()
+        
+        # 최종 결과 병합 및 저장
+        self._merge_and_save_results()
 
     def get_ts_feature_and_dtype_list(self):
         float32_features = [
@@ -751,6 +779,105 @@ class GenerateStockData(object):
         )
         log_file.close()
         print(f"Save log file to {log_file_name}")
+
+    def _save_chunk_results(self, results, filename):
+        """청크 결과를 임시 파일로 저장"""
+        if not results:
+            return
+            
+        # 이미지와 레이블 분리
+        df = pd.DataFrame(results)
+        images = df.pop('image').tolist()
+        images_array = np.array([np.array(img).flatten() for img in images], dtype=np.uint8)
+        
+        # 압축하여 저장
+        np.savez_compressed(filename, 
+                          images=images_array, 
+                          labels=df.to_dict('list'))
+        
+        print(f"Saved {len(results)} samples to {filename}")
+
+    def _merge_and_save_results(self):
+        """임시 파일들을 병합하여 최종 결과 저장"""
+        # 임시 파일 찾기
+        temp_files = sorted([f for f in os.listdir(os.path.dirname(self.images_filename))
+                           if f.startswith(os.path.basename(self.images_filename) + '.temp_')])
+        
+        if not temp_files:
+            print("No temporary files found")
+            return
+            
+        all_images = []
+        all_labels = []
+        data_miss = np.zeros(7)
+        
+        # 임시 파일들을 순차적으로 로드하여 병합
+        for temp_file in tqdm(temp_files, desc="Merging results"):
+            temp_path = os.path.join(os.path.dirname(self.images_filename), temp_file)
+            try:
+                data = np.load(temp_path, allow_pickle=True)
+                
+                # 이미지 데이터 병합
+                all_images.append(data['images'])
+                
+                # 레이블 데이터 병합
+                labels_dict = data['labels'].item()
+                all_labels.append(pd.DataFrame(labels_dict))
+                
+                # 임시 파일 삭제
+                os.remove(temp_path)
+                
+            except Exception as e:
+                print(f"Error processing {temp_file}: {str(e)}")
+                continue
+                
+            # 메모리 관리
+            gc.collect()
+        
+        if not all_images or not all_labels:
+            print("No valid results to save")
+            return
+            
+        # 전체 결과 병합
+        final_images = np.concatenate(all_images, axis=0)
+        final_labels = pd.concat(all_labels, ignore_index=True)
+        
+        # 최종 결과 저장
+        np.savez_compressed(self.images_filename,
+                          images=final_images,
+                          labels=final_labels.to_dict('list'))
+        
+        print(f"Saved {len(final_images)} samples to {self.images_filename}")
+        
+        # 로그 파일 작성
+        total_samples = len(final_images)
+        log_file = open(self.log_file_name, "w+")
+        log_file.write(
+            "total_dates:%d total_missing:%d type0:%d type1:%d type2:%d type3:%d type4:%d type5:%d type6:%d"
+            % (
+                total_samples,
+                int(np.sum(data_miss)),
+                int(data_miss[0]),
+                int(data_miss[1]),
+                int(data_miss[2]),
+                int(data_miss[3]),
+                int(data_miss[4]),
+                int(data_miss[5]),
+                int(data_miss[6]),
+            )
+        )
+        log_file.close()
+        
+        # 샘플 이미지 저장
+        if final_images.size > 0:
+            random_index = random.randint(0, len(final_images) - 1)
+            sample_image = final_images[random_index].reshape(self.height, self.width)
+            image_pil = Image.fromarray(sample_image, mode='L')
+            sample_filename = os.path.join(
+                self.image_save_dir,
+                f"{self.file_name}_sample.png"
+            )
+            image_pil.save(sample_filename)
 
 
 def profile_function(func):

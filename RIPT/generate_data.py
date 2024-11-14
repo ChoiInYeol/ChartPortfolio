@@ -64,7 +64,7 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
 
 if __name__ == "__main__":
     # 테스트를 위한 작은 데이터셋으로 시작
-    test_years = [2003]  # 테스트용 연도
+    test_years = [2005]  # 테스트용 연도
     test_ws = [20]      # 테스트용 윈도우 사이즈
     
     print("\nGenerating test data...")
@@ -74,3 +74,12 @@ if __name__ == "__main__":
         freq='day',     # 일별 데이터 생성
         chart_type='bar'
     ) 
+    
+    # 테스트가 성공하면 전체 데이터 생성
+    print("\nGenerating full dataset...")
+    generate_training_data(
+        year_list=cf.IS_YEARS + cf.OOS_YEARS,
+        ws_list=[20],
+        freq='day',
+        chart_type='bar',
+    )
