@@ -1,18 +1,15 @@
 import os
-
+import os.path as op
 
 def get_dir(dir):
     if not os.path.exists(dir):
         os.makedirs(dir, exist_ok=True)
     return dir
 
-WORK_DIR = get_dir("RIPT_WORK_SPACE")
-
-EXP_DIR = get_dir(os.path.join(WORK_DIR, "new_model_res"))
-PORTFOLIO_DIR = get_dir(os.path.join(EXP_DIR, "portfolio"))
-LOG_DIR = get_dir(os.path.join(EXP_DIR, "log"))
-LATEX_DIR = get_dir(os.path.join(EXP_DIR, "latex"))
-LIGHT_CSV_RES_DIR = get_dir(os.path.join(WORK_DIR, "torch_ta/ta/csv_res/"))
+WORK_DIR = op.join(os.getcwd(), "RIPT/WORK_DIR")
+PORTFOLIO_DIR = get_dir(os.path.join(WORK_DIR, "portfolio"))
+LOG_DIR = get_dir(os.path.join(WORK_DIR, "log"))
+LATEX_DIR = get_dir(os.path.join(WORK_DIR, "latex"))
 
 BATCH_SIZE = 128
 TRUE_DATA_CNN_INPLANES = 64
@@ -51,7 +48,7 @@ START_YEAR_DICT = {
     "Sweden": 2001,
 }
 IS_YEARS = list(range(2001, 2018))
-OOS_YEARS = list(range(2018, 2024))
+OOS_YEARS = list(range(2018, 2025))
 
 BENCHMARK_MODEL_NAME_DICT = {
     5: "BM5L2",  # WS5

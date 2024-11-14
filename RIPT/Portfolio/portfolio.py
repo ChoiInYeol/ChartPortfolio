@@ -17,7 +17,7 @@ class PortfolioManager(object):
         signal_df: pd.DataFrame,
         freq: str,
         portfolio_dir: str,
-        start_year=2009,
+        start_year=2018,
         end_year=2024,
         country="USA",
         delay_list=None,
@@ -187,7 +187,8 @@ class PortfolioManager(object):
                 )
                 turnover[i - 1] = turnover[i - 1] * 0.5
             prev_to_df = to_df
-
+            
+        pd.set_option('future.no_silent_downcasting', True)
         portfolio_ret = portfolio_ret.fillna(0)
         portfolio_ret["H-L"] = portfolio_ret[cut - 1] - portfolio_ret[0]
         print(

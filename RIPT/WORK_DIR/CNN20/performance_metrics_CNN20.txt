@@ -1,0 +1,6 @@
+	Return	Std	SR	Turnover
+Naive	0.134	0.208	0.644	nan
+SPY	0.130	0.200	0.652	nan
+Top 100	0.222	0.216	1.029	0.979
+Bottom 100	0.114	0.248	0.462	0.972
+Max sharpe	0.267	0.206	1.296	1.960

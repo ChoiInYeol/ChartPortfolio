@@ -1,0 +1,741 @@
+2024-11-08 04:56:26,644 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 04:56:26,649 - INFO - Creating benchmark portfolios...
+2024-11-08 04:56:26,649 - ERROR - Error during backtest: OptimizationManager.create_benchmark_portfolios() got an unexpected keyword argument 'returns'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 106, in run
+    benchmark_portfolios = self.optimizer.create_benchmark_portfolios(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: OptimizationManager.create_benchmark_portfolios() got an unexpected keyword argument 'returns'
+2024-11-08 04:56:53,325 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 04:56:53,330 - INFO - Creating benchmark portfolios...
+2024-11-08 04:56:53,331 - ERROR - Error during backtest: 'investment_date'
+Traceback (most recent call last):
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'investment_date'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 106, in run
+    benchmark_portfolios = self.optimizer.create_benchmark_portfolios(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/optimization/optimizer.py", line 328, in create_benchmark_portfolios
+    for date in tqdm(up_prob['investment_date'].unique(), desc="Creating benchmarks"):
+                     ~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'investment_date'
+2024-11-08 04:57:29,896 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 04:57:29,899 - INFO - Creating benchmark portfolios...
+2024-11-08 04:57:29,901 - ERROR - Error during backtest: 'up_prob'
+Traceback (most recent call last):
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'up_prob'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 106, in run
+    benchmark_portfolios = self.optimizer.create_benchmark_portfolios(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/optimization/optimizer.py", line 333, in create_benchmark_portfolios
+    top50 = date_results.nlargest(50, 'up_prob')['StockID']
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/frame.py", line 7644, in nlargest
+    return selectn.SelectNFrame(self, n=n, keep=keep, columns=columns).nlargest()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/methods/selectn.py", line 57, in nlargest
+    return self.compute("nlargest")
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/methods/selectn.py", line 199, in compute
+    dtype = frame[column].dtype
+            ~~~~~^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'up_prob'
+2024-11-08 05:00:16,470 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:00:16,475 - INFO - Creating benchmark portfolios...
+2024-11-08 05:00:16,475 - ERROR - Error during backtest: 'OptimizationManager' object has no attribute 'create_benchmark_portfolios'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 106, in run
+    benchmark_portfolios = self.optimizer.create_benchmark_portfolios(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'OptimizationManager' object has no attribute 'create_benchmark_portfolios'
+2024-11-08 05:00:45,168 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:00:45,173 - INFO - Creating benchmark portfolios...
+2024-11-08 05:00:45,175 - ERROR - Error during backtest: 'numpy.float64' object has no attribute 'items'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 106, in run
+    benchmark_portfolios = self.optimizer.create_benchmark_portfolios(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/optimization/optimizer.py", line 354, in create_benchmark_portfolios
+    (period_returns[top100_stocks] * weights_top100).sum(axis=0).items()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.float64' object has no attribute 'items'
+2024-11-08 05:01:03,732 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:01:03,737 - INFO - Creating benchmark portfolios...
+2024-11-08 05:01:03,738 - ERROR - Error during backtest: 'float' object is not iterable
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 106, in run
+    benchmark_portfolios = self.optimizer.create_benchmark_portfolios(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/optimization/optimizer.py", line 353, in create_benchmark_portfolios
+    benchmark_returns['top100_equal'].extend(
+TypeError: 'float' object is not iterable
+2024-11-08 05:02:32,521 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:02:32,526 - INFO - Creating benchmark portfolios...
+2024-11-08 05:02:32,574 - ERROR - Error during backtest: 'DataProcessor' object has no attribute 'calculate_net_returns'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 115, in run
+    net_returns = self.data_processor.calculate_net_returns(bench_returns)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DataProcessor' object has no attribute 'calculate_net_returns'
+2024-11-08 05:05:24,233 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:05:24,237 - INFO - Creating benchmark portfolios...
+2024-11-08 05:05:24,288 - ERROR - Error during backtest: DataProcessor.calculate_portfolio_returns() missing 1 required positional argument: 'weights'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 115, in run
+    _, net_returns = self.data_processor.calculate_portfolio_returns(bench_returns)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: DataProcessor.calculate_portfolio_returns() missing 1 required positional argument: 'weights'
+2024-11-08 05:08:50,957 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:08:50,965 - INFO - Creating benchmark portfolios...
+2024-11-08 05:08:51,003 - INFO - Processing model: GRU
+2024-11-08 05:09:11,499 - INFO - Processing model: TCN
+2024-11-08 05:09:32,686 - ERROR - Error during backtest: 'PortfolioVisualizer' object has no attribute 'plot_portfolio_comparison'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 154, in run
+    self.visualizer.plot_portfolio_comparison(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PortfolioVisualizer' object has no attribute 'plot_portfolio_comparison'
+2024-11-08 05:12:47,397 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:12:47,403 - INFO - Creating benchmark portfolios...
+2024-11-08 05:12:47,441 - INFO - Processing model: GRU
+2024-11-08 05:13:07,874 - INFO - Processing model: TCN
+2024-11-08 05:14:34,960 - INFO - Backtest completed successfully
+2024-11-08 05:31:29,535 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:31:29,541 - INFO - Creating benchmark portfolios...
+2024-11-08 05:32:13,190 - INFO - Processing model: GRU
+2024-11-08 05:32:13,692 - INFO - Processing model: TCN
+2024-11-08 05:32:24,226 - INFO - Backtest completed successfully
+2024-11-08 05:37:12,968 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:37:12,975 - INFO - Creating benchmark portfolios...
+2024-11-08 05:37:56,836 - INFO - Processing model: GRU
+2024-11-08 05:37:57,348 - INFO - Processing model: TCN
+2024-11-08 05:38:05,311 - INFO - Backtest completed successfully
+2024-11-08 05:57:27,695 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:57:27,702 - INFO - Creating benchmark portfolios...
+2024-11-08 05:58:11,401 - INFO - Processing model: GRU
+2024-11-08 05:58:11,907 - INFO - Processing model: TCN
+2024-11-08 05:58:14,312 - ERROR - Error during backtest: PortfolioVisualizer.plot_turnover_analysis() takes 3 positional arguments but 5 were given
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 190, in run
+    self.visualizer.plot_turnover_analysis(
+TypeError: PortfolioVisualizer.plot_turnover_analysis() takes 3 positional arguments but 5 were given
+2024-11-08 05:59:54,740 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 05:59:54,747 - INFO - Creating benchmark portfolios...
+2024-11-08 06:00:37,533 - INFO - Processing model: GRU
+2024-11-08 06:00:38,012 - INFO - Processing model: TCN
+2024-11-08 06:00:41,145 - INFO - Backtest completed successfully
+2024-11-08 06:05:57,412 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:05:57,417 - INFO - Creating benchmark portfolios...
+2024-11-08 06:06:39,528 - INFO - Processing model: GRU
+2024-11-08 06:06:42,329 - INFO - Processing model: TCN
+2024-11-08 06:06:55,856 - INFO - Backtest completed successfully
+2024-11-08 06:13:21,192 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:13:21,199 - INFO - Creating benchmark portfolios...
+2024-11-08 06:14:06,019 - INFO - Processing model: GRU
+2024-11-08 06:14:06,355 - ERROR - Error during backtest: 'PortfolioVisualizer' object has no attribute 'model_names'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 153, in run
+    self.visualizer.plot_weight_evolution(
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/utils/visualization.py", line 341, in plot_weight_evolution
+    display_name = self.model_names.get(model_name, model_name)
+                   ^^^^^^^^^^^^^^^^
+AttributeError: 'PortfolioVisualizer' object has no attribute 'model_names'
+2024-11-08 06:18:33,697 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:18:33,703 - INFO - Creating benchmark portfolios...
+2024-11-08 06:19:18,263 - INFO - Processing model: GRU
+2024-11-08 06:19:20,771 - INFO - Processing model: TCN
+2024-11-08 06:19:22,391 - ERROR - Error during backtest: 'dict' object has no attribute 'columns'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 173, in run
+    int(name.split('Top ')[-1]) for name in portfolio_returns.columns
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'columns'
+2024-11-08 06:20:36,931 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:20:36,938 - INFO - Creating benchmark portfolios...
+2024-11-08 06:21:19,495 - INFO - Processing model: GRU
+2024-11-08 06:21:21,976 - INFO - Processing model: TCN
+2024-11-08 06:21:33,294 - INFO - Backtest completed successfully
+2024-11-08 06:29:33,243 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:29:33,251 - INFO - Creating benchmark portfolios...
+2024-11-08 06:30:21,038 - INFO - Processing model: GRU
+2024-11-08 06:30:23,609 - INFO - Processing model: TCN
+2024-11-08 06:30:38,842 - INFO - Backtest completed successfully
+2024-11-08 06:35:05,792 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:35:05,800 - INFO - Creating benchmark portfolios...
+2024-11-08 06:37:25,817 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:37:25,824 - INFO - Creating benchmark portfolios...
+2024-11-08 06:38:08,263 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 06:38:08,265 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 06:38:08,267 - INFO - Successfully processed benchmark portfolio: max_sharpe
+2024-11-08 06:38:08,267 - INFO - Processing model: GRU
+2024-11-08 06:38:10,953 - INFO - Processing model: TCN
+2024-11-08 06:38:26,327 - INFO - Backtest completed successfully
+2024-11-08 06:41:18,379 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:41:18,388 - INFO - Creating benchmark portfolios...
+2024-11-08 06:42:00,651 - ERROR - Error during backtest: 'dict' object has no attribute 'to_csv'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 106, in run
+    benchmark_weights = self.optimizer.create_benchmark_portfolios(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/optimization/optimizer.py", line 380, in create_benchmark_portfolios
+    benchmark_weights.to_csv("data/benchmark_weights.csv")
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'to_csv'
+2024-11-08 06:43:43,763 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:43:43,770 - INFO - Creating benchmark portfolios...
+2024-11-08 06:44:15,317 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 06:44:15,358 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 06:44:15,392 - INFO - Successfully processed benchmark portfolio: max_sharpe
+2024-11-08 06:44:15,393 - INFO - Processing model: GRU
+2024-11-08 06:44:17,964 - INFO - Processing model: TCN
+2024-11-08 06:44:32,852 - INFO - Backtest completed successfully
+2024-11-08 06:49:28,852 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:49:28,859 - INFO - Creating benchmark portfolios...
+2024-11-08 06:50:02,646 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 06:50:02,687 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 06:50:02,723 - INFO - Successfully processed benchmark portfolio: max_sharpe
+2024-11-08 06:50:02,723 - INFO - Processing model: GRU
+2024-11-08 06:50:05,161 - INFO - Processing model: TCN
+2024-11-08 06:50:18,889 - INFO - Backtest completed successfully
+2024-11-08 06:53:34,384 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 06:53:34,391 - INFO - Creating benchmark portfolios...
+2024-11-08 06:53:34,448 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 06:53:34,448 - INFO - Portfolio top100_equal returns shape: (78,)
+2024-11-08 06:53:34,448 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 06:53:34,448 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 06:53:34,450 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 06:53:34,450 - INFO - Portfolio bottom100_equal returns shape: (78,)
+2024-11-08 06:53:34,450 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 06:53:34,450 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 06:53:34,450 - INFO - Processing model: GRU
+2024-11-08 06:53:38,456 - INFO - Processing model: TCN
+2024-11-08 06:53:52,204 - INFO - Backtest completed successfully
+2024-11-08 07:42:06,708 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 07:42:07,041 - INFO - Creating benchmark portfolios...
+2024-11-08 07:42:07,188 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 07:42:07,188 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 07:42:07,188 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 07:42:07,188 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 07:42:07,281 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 07:42:07,282 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 07:42:07,282 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 07:42:07,282 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 07:42:07,282 - INFO - Processing model: GRU
+2024-11-08 07:42:09,354 - INFO - Processing model: TCN
+2024-11-08 07:42:15,506 - INFO - Backtest completed successfully
+2024-11-08 08:05:43,333 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 08:05:43,658 - INFO - Creating benchmark portfolios...
+2024-11-08 08:06:16,176 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 08:06:16,176 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 08:06:16,176 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:06:16,176 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:06:16,265 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 08:06:16,265 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 08:06:16,265 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:06:16,266 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:06:16,355 - INFO - Successfully processed benchmark portfolio: max_sharpe
+2024-11-08 08:06:16,355 - INFO - Portfolio max_sharpe returns shape: (1613,)
+2024-11-08 08:06:16,356 - INFO - Portfolio max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 08:06:16,356 - INFO - Portfolio max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 08:06:16,356 - INFO - Processing model: GRU
+2024-11-08 08:06:20,801 - INFO - Processing model: TCN
+2024-11-08 08:06:32,521 - INFO - Backtest completed successfully
+2024-11-08 08:09:40,561 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 08:09:40,892 - INFO - Creating benchmark portfolios...
+2024-11-08 08:10:12,572 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 08:10:12,572 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 08:10:12,572 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:10:12,572 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:10:12,663 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 08:10:12,664 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 08:10:12,664 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:10:12,664 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:10:12,756 - INFO - Successfully processed benchmark portfolio: max_sharpe
+2024-11-08 08:10:12,756 - INFO - Portfolio max_sharpe returns shape: (1613,)
+2024-11-08 08:10:12,756 - INFO - Portfolio max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 08:10:12,756 - INFO - Portfolio max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 08:10:12,756 - INFO - Processing model: GRU
+2024-11-08 08:10:15,117 - INFO - Processing model: TCN
+2024-11-08 08:10:23,616 - INFO - Backtest completed successfully
+2024-11-08 08:31:35,563 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 08:31:35,890 - INFO - Creating benchmark portfolios...
+2024-11-08 08:33:17,436 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 08:33:17,436 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 08:33:17,436 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:33:17,436 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:33:17,526 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 08:33:17,526 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 08:33:17,526 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:33:17,526 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:33:17,615 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 08:33:17,615 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 08:33:17,615 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 08:33:17,615 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 08:33:17,704 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 08:33:17,704 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 08:33:17,704 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 08:33:17,704 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 08:33:17,794 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 08:33:17,794 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 08:33:17,794 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 08:33:17,794 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 08:33:17,794 - INFO - Processing model: GRU
+2024-11-08 08:33:20,138 - INFO - Processing model: TCN
+2024-11-08 08:33:29,867 - INFO - Backtest completed successfully
+2024-11-08 08:43:57,429 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 08:43:57,769 - INFO - Creating benchmark portfolios...
+2024-11-08 08:46:52,627 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_top100_equal.csv
+2024-11-08 08:46:52,627 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 08:46:52,627 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 08:46:52,627 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:46:52,627 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:46:52,723 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_bottom100_equal.csv
+2024-11-08 08:46:52,723 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 08:46:52,723 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 08:46:52,723 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:46:52,723 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:46:52,820 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_max_sharpe.csv
+2024-11-08 08:46:52,820 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 08:46:52,820 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 08:46:52,820 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 08:46:52,820 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 08:46:52,918 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_variance.csv
+2024-11-08 08:46:52,918 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 08:46:52,918 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 08:46:52,918 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 08:46:52,918 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 08:46:53,015 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_cvar.csv
+2024-11-08 08:46:53,015 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 08:46:53,015 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 08:46:53,015 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 08:46:53,015 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 08:46:53,015 - INFO - Processing model: GRU
+2024-11-08 08:46:53,506 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_GRU Top 50.csv
+2024-11-08 08:46:59,436 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + GRU Top 50.csv
+2024-11-08 08:47:04,315 - INFO - Processing model: TCN
+2024-11-08 08:47:04,809 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_TCN Top 50.csv
+2024-11-08 08:47:07,966 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + TCN Top 50.csv
+2024-11-08 08:47:11,869 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights.csv
+2024-11-08 08:47:25,753 - INFO - Backtest completed successfully
+2024-11-08 08:50:14,506 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 08:50:14,827 - INFO - Creating benchmark portfolios...
+2024-11-08 08:53:09,764 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_top100_equal.csv
+2024-11-08 08:53:09,764 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 08:53:09,764 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 08:53:09,764 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:53:09,765 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:53:09,861 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_bottom100_equal.csv
+2024-11-08 08:53:09,861 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 08:53:09,861 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 08:53:09,861 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:53:09,861 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:53:09,958 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_max_sharpe.csv
+2024-11-08 08:53:09,959 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 08:53:09,959 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 08:53:09,959 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 08:53:09,959 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 08:53:10,054 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_variance.csv
+2024-11-08 08:53:10,054 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 08:53:10,054 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 08:53:10,054 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 08:53:10,054 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 08:53:10,151 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_cvar.csv
+2024-11-08 08:53:10,151 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 08:53:10,151 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 08:53:10,151 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 08:53:10,151 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 08:53:10,151 - INFO - Processing model: GRU
+2024-11-08 08:53:10,638 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_GRU Top 50.csv
+2024-11-08 08:53:16,077 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + GRU Top 50.csv
+2024-11-08 08:53:20,885 - INFO - Processing model: TCN
+2024-11-08 08:53:21,400 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_TCN Top 50.csv
+2024-11-08 08:53:24,543 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + TCN Top 50.csv
+2024-11-08 08:53:28,561 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights.csv
+2024-11-08 08:53:28,561 - ERROR - Error during backtest: invalid literal for int() with base 10: '50 (Net)'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 234, in run
+    'CNN Top 50 + Min CVaR'
+                           
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 235, in <listcomp>
+    ]
+      
+ValueError: invalid literal for int() with base 10: '50 (Net)'
+2024-11-08 08:55:50,500 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 08:55:50,831 - INFO - Creating benchmark portfolios...
+2024-11-08 08:58:46,350 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_top100_equal.csv
+2024-11-08 08:58:46,350 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 08:58:46,351 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 08:58:46,351 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:58:46,351 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:58:46,445 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_bottom100_equal.csv
+2024-11-08 08:58:46,445 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 08:58:46,445 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 08:58:46,445 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 08:58:46,445 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 08:58:46,544 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_max_sharpe.csv
+2024-11-08 08:58:46,544 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 08:58:46,544 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 08:58:46,544 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 08:58:46,544 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 08:58:46,642 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_variance.csv
+2024-11-08 08:58:46,642 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 08:58:46,642 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 08:58:46,642 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 08:58:46,642 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 08:58:46,737 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_cvar.csv
+2024-11-08 08:58:46,737 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 08:58:46,737 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 08:58:46,737 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 08:58:46,737 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 08:58:46,737 - INFO - Processing model: GRU
+2024-11-08 08:58:47,269 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_GRU Top 50_with_net.csv
+2024-11-08 08:58:52,866 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + GRU Top 50_with_net.csv
+2024-11-08 08:58:57,834 - INFO - Processing model: TCN
+2024-11-08 08:58:58,360 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_TCN Top 50_with_net.csv
+2024-11-08 08:59:01,684 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + TCN Top 50_with_net.csv
+2024-11-08 08:59:06,018 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights_with_net.csv
+2024-11-08 08:59:06,018 - INFO - Final column order:
+2024-11-08 08:59:06,018 - INFO - - Naive
+2024-11-08 08:59:06,018 - INFO - - CNN Top 100
+2024-11-08 08:59:06,018 - INFO - - CNN Bottom 100
+2024-11-08 08:59:06,018 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-08 08:59:06,018 - INFO - - CNN Top 50 + Min Variance
+2024-11-08 08:59:06,018 - INFO - - CNN Top 50 + Min CVaR
+2024-11-08 08:59:06,019 - INFO - - GRU Top 50
+2024-11-08 08:59:06,019 - INFO - - GRU Top 50 (Net)
+2024-11-08 08:59:06,019 - INFO - - TCN Top 50
+2024-11-08 08:59:06,019 - INFO - - TCN Top 50 (Net)
+2024-11-08 08:59:06,019 - INFO - - CNN + GRU Top 50
+2024-11-08 08:59:06,019 - INFO - - CNN + GRU Top 50 (Net)
+2024-11-08 08:59:06,019 - INFO - - CNN + TCN Top 50
+2024-11-08 08:59:06,019 - INFO - - CNN + TCN Top 50 (Net)
+2024-11-08 09:00:45,021 - INFO - Backtest completed successfully
+2024-11-08 09:10:24,008 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 09:10:24,346 - INFO - Creating benchmark portfolios...
+2024-11-08 09:13:59,926 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_top100_equal.csv
+2024-11-08 09:13:59,927 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 09:13:59,927 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 09:13:59,927 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:13:59,927 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:14:00,025 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_bottom100_equal.csv
+2024-11-08 09:14:00,025 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 09:14:00,025 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 09:14:00,025 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:14:00,025 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:14:00,121 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_max_sharpe.csv
+2024-11-08 09:14:00,121 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 09:14:00,121 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 09:14:00,121 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 09:14:00,121 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 09:14:00,221 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_variance.csv
+2024-11-08 09:14:00,221 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 09:14:00,221 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 09:14:00,221 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 09:14:00,221 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 09:14:00,323 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_cvar.csv
+2024-11-08 09:14:00,323 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 09:14:00,323 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 09:14:00,323 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 09:14:00,324 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 09:14:00,324 - INFO - Processing model: GRU
+2024-11-08 09:14:00,790 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_GRU Top 50.csv
+2024-11-08 09:14:06,553 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + GRU Top 50.csv
+2024-11-08 09:14:11,434 - INFO - Processing model: TCN
+2024-11-08 09:14:11,969 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_TCN Top 50.csv
+2024-11-08 09:14:15,180 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_CNN + TCN Top 50.csv
+2024-11-08 09:14:19,438 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights.csv
+2024-11-08 09:14:19,438 - INFO - Final column order:
+2024-11-08 09:14:19,438 - INFO - - Naive
+2024-11-08 09:14:19,438 - INFO - - CNN Top 100
+2024-11-08 09:14:19,439 - INFO - - CNN Bottom 100
+2024-11-08 09:14:19,439 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-08 09:14:19,439 - INFO - - CNN Top 50 + Min Variance
+2024-11-08 09:14:19,439 - INFO - - CNN Top 50 + Min CVaR
+2024-11-08 09:14:19,439 - INFO - - GRU Top 50
+2024-11-08 09:14:19,439 - INFO - - TCN Top 50
+2024-11-08 09:14:19,439 - INFO - - CNN + GRU Top 50
+2024-11-08 09:14:19,439 - INFO - - CNN + TCN Top 50
+2024-11-08 09:14:19,444 - ERROR - Error during backtest: 'PortfolioOptimizationPipeline' object has no attribute 'portfolio_weights'
+Traceback (most recent call last):
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 290, in run
+    self.visualizer.plot_rolling_metrics(
+  File "/home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/main.py", line 375, in _analyze_performance
+    inquirer.Checkbox('models',
+                    ^^^^^^^^^^^^
+AttributeError: 'PortfolioOptimizationPipeline' object has no attribute 'portfolio_weights'
+2024-11-08 09:16:42,759 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 09:16:43,096 - INFO - Creating benchmark portfolios...
+2024-11-08 09:16:43,196 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_top100_equal.csv
+2024-11-08 09:16:43,196 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 09:16:43,196 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 09:16:43,196 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:16:43,196 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:16:43,295 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_bottom100_equal.csv
+2024-11-08 09:16:43,295 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 09:16:43,295 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 09:16:43,296 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:16:43,296 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:16:43,397 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_max_sharpe.csv
+2024-11-08 09:16:43,397 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 09:16:43,397 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 09:16:43,397 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 09:16:43,397 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 09:16:43,497 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_variance.csv
+2024-11-08 09:16:43,498 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 09:16:43,498 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 09:16:43,498 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 09:16:43,498 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 09:16:43,599 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_cvar.csv
+2024-11-08 09:16:43,599 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 09:16:43,599 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 09:16:43,599 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 09:16:43,599 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 09:16:43,599 - INFO - Processing model: GRU
+2024-11-08 09:16:45,166 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights.csv
+2024-11-08 09:16:45,166 - INFO - Final column order:
+2024-11-08 09:16:45,166 - INFO - - Naive
+2024-11-08 09:16:45,166 - INFO - - CNN Top 100
+2024-11-08 09:16:45,166 - INFO - - CNN Bottom 100
+2024-11-08 09:16:45,166 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-08 09:16:45,166 - INFO - - CNN Top 50 + Min Variance
+2024-11-08 09:16:45,166 - INFO - - CNN Top 50 + Min CVaR
+2024-11-08 09:16:45,166 - INFO - - GRU Top 50
+2024-11-08 09:16:45,166 - INFO - - CNN + GRU Top 50
+2024-11-08 09:18:20,050 - INFO - Backtest completed successfully
+2024-11-08 09:23:07,666 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 09:23:07,991 - INFO - Creating benchmark portfolios...
+2024-11-08 09:23:08,090 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_top100_equal.csv
+2024-11-08 09:23:08,091 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 09:23:08,091 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 09:23:08,091 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:23:08,091 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:23:08,188 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_bottom100_equal.csv
+2024-11-08 09:23:08,188 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 09:23:08,188 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 09:23:08,188 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:23:08,188 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:23:08,287 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_max_sharpe.csv
+2024-11-08 09:23:08,287 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 09:23:08,287 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 09:23:08,287 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 09:23:08,287 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 09:23:08,385 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_variance.csv
+2024-11-08 09:23:08,385 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 09:23:08,385 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 09:23:08,385 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 09:23:08,385 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 09:23:08,487 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_cvar.csv
+2024-11-08 09:23:08,487 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 09:23:08,487 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 09:23:08,487 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 09:23:08,487 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 09:23:08,487 - INFO - Processing model: GRU
+2024-11-08 09:23:09,281 - INFO - Processing model: TCN
+2024-11-08 09:23:10,993 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights.csv
+2024-11-08 09:23:10,993 - INFO - Final column order:
+2024-11-08 09:23:10,993 - INFO - - Naive
+2024-11-08 09:23:10,993 - INFO - - CNN Top 100
+2024-11-08 09:23:10,993 - INFO - - CNN Bottom 100
+2024-11-08 09:23:10,993 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-08 09:23:10,993 - INFO - - CNN Top 50 + Min Variance
+2024-11-08 09:23:10,993 - INFO - - CNN Top 50 + Min CVaR
+2024-11-08 09:23:10,993 - INFO - - GRU Top 50
+2024-11-08 09:23:10,993 - INFO - - TCN Top 50
+2024-11-08 09:23:10,993 - INFO - - CNN + GRU Top 50
+2024-11-08 09:23:10,993 - INFO - - CNN + TCN Top 50
+2024-11-08 09:24:48,665 - INFO - Backtest completed successfully
+2024-11-08 09:25:10,177 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 09:25:10,501 - INFO - Creating benchmark portfolios...
+2024-11-08 09:25:10,598 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_top100_equal.csv
+2024-11-08 09:25:10,598 - INFO - Successfully processed benchmark portfolio: top100_equal
+2024-11-08 09:25:10,598 - INFO - Portfolio top100_equal returns shape: (1613,)
+2024-11-08 09:25:10,598 - INFO - Portfolio top100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:25:10,598 - INFO - Portfolio top100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:25:10,693 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_bottom100_equal.csv
+2024-11-08 09:25:10,693 - INFO - Successfully processed benchmark portfolio: bottom100_equal
+2024-11-08 09:25:10,693 - INFO - Portfolio bottom100_equal returns shape: (1613,)
+2024-11-08 09:25:10,693 - INFO - Portfolio bottom100_equal first valid index: 2018-01-31 00:00:00
+2024-11-08 09:25:10,693 - INFO - Portfolio bottom100_equal last valid index: 2024-06-28 00:00:00
+2024-11-08 09:25:10,791 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_max_sharpe.csv
+2024-11-08 09:25:10,791 - INFO - Successfully processed benchmark portfolio: optimized_max_sharpe
+2024-11-08 09:25:10,791 - INFO - Portfolio optimized_max_sharpe returns shape: (1613,)
+2024-11-08 09:25:10,791 - INFO - Portfolio optimized_max_sharpe first valid index: 2018-01-31 00:00:00
+2024-11-08 09:25:10,791 - INFO - Portfolio optimized_max_sharpe last valid index: 2024-06-28 00:00:00
+2024-11-08 09:25:10,888 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_variance.csv
+2024-11-08 09:25:10,888 - INFO - Successfully processed benchmark portfolio: optimized_min_variance
+2024-11-08 09:25:10,888 - INFO - Portfolio optimized_min_variance returns shape: (1613,)
+2024-11-08 09:25:10,888 - INFO - Portfolio optimized_min_variance first valid index: 2018-01-31 00:00:00
+2024-11-08 09:25:10,888 - INFO - Portfolio optimized_min_variance last valid index: 2024-06-28 00:00:00
+2024-11-08 09:25:10,984 - INFO - Weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/weights_optimized_min_cvar.csv
+2024-11-08 09:25:10,984 - INFO - Successfully processed benchmark portfolio: optimized_min_cvar
+2024-11-08 09:25:10,984 - INFO - Portfolio optimized_min_cvar returns shape: (1613,)
+2024-11-08 09:25:10,984 - INFO - Portfolio optimized_min_cvar first valid index: 2018-01-31 00:00:00
+2024-11-08 09:25:10,985 - INFO - Portfolio optimized_min_cvar last valid index: 2024-06-28 00:00:00
+2024-11-08 09:25:10,985 - INFO - Processing model: GRU
+2024-11-08 09:25:11,751 - INFO - Processing model: TCN
+2024-11-08 09:25:14,330 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights_with_net.csv
+2024-11-08 09:25:14,331 - INFO - Final column order:
+2024-11-08 09:25:14,331 - INFO - - Naive
+2024-11-08 09:25:14,331 - INFO - - CNN Top 100
+2024-11-08 09:25:14,331 - INFO - - CNN Bottom 100
+2024-11-08 09:25:14,331 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-08 09:25:14,331 - INFO - - CNN Top 50 + Min Variance
+2024-11-08 09:25:14,331 - INFO - - CNN Top 50 + Min CVaR
+2024-11-08 09:25:14,331 - INFO - - GRU Top 50
+2024-11-08 09:25:14,331 - INFO - - GRU Top 50 (Net)
+2024-11-08 09:25:14,331 - INFO - - TCN Top 50
+2024-11-08 09:25:14,331 - INFO - - TCN Top 50 (Net)
+2024-11-08 09:25:14,331 - INFO - - CNN + GRU Top 50
+2024-11-08 09:25:14,331 - INFO - - CNN + GRU Top 50 (Net)
+2024-11-08 09:25:14,331 - INFO - - CNN + TCN Top 50
+2024-11-08 09:25:14,331 - INFO - - CNN + TCN Top 50 (Net)
+2024-11-08 09:28:05,834 - INFO - Backtest completed successfully
+2024-11-08 09:33:52,453 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 09:33:52,799 - INFO - Creating CNN benchmark portfolios...
+2024-11-08 09:33:52,897 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-08 09:33:52,994 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-08 09:33:53,086 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-08 09:33:53,177 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-08 09:33:53,270 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-08 09:33:53,271 - INFO - Processing model: GRU
+2024-11-08 09:33:54,040 - INFO - Processing model: TCN
+2024-11-08 09:33:55,634 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights.csv
+2024-11-08 09:33:55,634 - INFO - Final column order:
+2024-11-08 09:33:55,634 - INFO - - Naive
+2024-11-08 09:33:55,634 - INFO - - CNN Top 100
+2024-11-08 09:33:55,634 - INFO - - CNN Bottom 100
+2024-11-08 09:33:55,634 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-08 09:33:55,634 - INFO - - CNN Top 50 + Min Variance
+2024-11-08 09:33:55,634 - INFO - - CNN Top 50 + Min CVaR
+2024-11-08 09:35:33,413 - INFO - Backtest completed successfully
+2024-11-08 09:38:21,099 - INFO - Data loaded - Returns: (1677, 313), Up prob: (78, 313)
+2024-11-08 09:38:21,100 - INFO - Naive portfolio rebalancing at 2018-01-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,100 - INFO - Naive portfolio rebalancing at 2018-02-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,101 - INFO - Naive portfolio rebalancing at 2018-03-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,101 - INFO - Naive portfolio rebalancing at 2018-04-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,101 - INFO - Naive portfolio rebalancing at 2018-05-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,101 - INFO - Naive portfolio rebalancing at 2018-06-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,102 - INFO - Naive portfolio rebalancing at 2018-07-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,102 - INFO - Naive portfolio rebalancing at 2018-08-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,102 - INFO - Naive portfolio rebalancing at 2018-09-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,103 - INFO - Naive portfolio rebalancing at 2018-10-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,103 - INFO - Naive portfolio rebalancing at 2018-11-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,103 - INFO - Naive portfolio rebalancing at 2018-12-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,103 - INFO - Naive portfolio rebalancing at 2019-01-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,104 - INFO - Naive portfolio rebalancing at 2019-02-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,104 - INFO - Naive portfolio rebalancing at 2019-03-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,104 - INFO - Naive portfolio rebalancing at 2019-04-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,104 - INFO - Naive portfolio rebalancing at 2019-05-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,105 - INFO - Naive portfolio rebalancing at 2019-06-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,105 - INFO - Naive portfolio rebalancing at 2019-07-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,105 - INFO - Naive portfolio rebalancing at 2019-08-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,105 - INFO - Naive portfolio rebalancing at 2019-09-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,106 - INFO - Naive portfolio rebalancing at 2019-10-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,106 - INFO - Naive portfolio rebalancing at 2019-11-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,106 - INFO - Naive portfolio rebalancing at 2019-12-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,106 - INFO - Naive portfolio rebalancing at 2020-01-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,107 - INFO - Naive portfolio rebalancing at 2020-02-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,107 - INFO - Naive portfolio rebalancing at 2020-03-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,107 - INFO - Naive portfolio rebalancing at 2020-04-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,107 - INFO - Naive portfolio rebalancing at 2020-05-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,108 - INFO - Naive portfolio rebalancing at 2020-06-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,108 - INFO - Naive portfolio rebalancing at 2020-07-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,108 - INFO - Naive portfolio rebalancing at 2020-08-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,108 - INFO - Naive portfolio rebalancing at 2020-09-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,109 - INFO - Naive portfolio rebalancing at 2020-10-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,109 - INFO - Naive portfolio rebalancing at 2020-11-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,109 - INFO - Naive portfolio rebalancing at 2020-12-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,109 - INFO - Naive portfolio rebalancing at 2021-01-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,110 - INFO - Naive portfolio rebalancing at 2021-02-26 00:00:00: 313 stocks
+2024-11-08 09:38:21,110 - INFO - Naive portfolio rebalancing at 2021-03-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,110 - INFO - Naive portfolio rebalancing at 2021-04-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,110 - INFO - Naive portfolio rebalancing at 2021-05-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,110 - INFO - Naive portfolio rebalancing at 2021-06-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,111 - INFO - Naive portfolio rebalancing at 2021-07-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,111 - INFO - Naive portfolio rebalancing at 2021-08-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,111 - INFO - Naive portfolio rebalancing at 2021-09-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,111 - INFO - Naive portfolio rebalancing at 2021-10-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,112 - INFO - Naive portfolio rebalancing at 2021-11-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,112 - INFO - Naive portfolio rebalancing at 2021-12-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,112 - INFO - Naive portfolio rebalancing at 2022-01-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,112 - INFO - Naive portfolio rebalancing at 2022-02-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,113 - INFO - Naive portfolio rebalancing at 2022-03-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,113 - INFO - Naive portfolio rebalancing at 2022-04-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,113 - INFO - Naive portfolio rebalancing at 2022-05-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,113 - INFO - Naive portfolio rebalancing at 2022-06-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,114 - INFO - Naive portfolio rebalancing at 2022-07-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,114 - INFO - Naive portfolio rebalancing at 2022-08-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,114 - INFO - Naive portfolio rebalancing at 2022-09-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,114 - INFO - Naive portfolio rebalancing at 2022-10-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,115 - INFO - Naive portfolio rebalancing at 2022-11-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,115 - INFO - Naive portfolio rebalancing at 2022-12-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,115 - INFO - Naive portfolio rebalancing at 2023-01-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,115 - INFO - Naive portfolio rebalancing at 2023-02-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,116 - INFO - Naive portfolio rebalancing at 2023-03-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,116 - INFO - Naive portfolio rebalancing at 2023-04-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,116 - INFO - Naive portfolio rebalancing at 2023-05-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,116 - INFO - Naive portfolio rebalancing at 2023-06-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,117 - INFO - Naive portfolio rebalancing at 2023-07-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,117 - INFO - Naive portfolio rebalancing at 2023-08-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,117 - INFO - Naive portfolio rebalancing at 2023-09-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,117 - INFO - Naive portfolio rebalancing at 2023-10-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,118 - INFO - Naive portfolio rebalancing at 2023-11-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,118 - INFO - Naive portfolio rebalancing at 2023-12-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,118 - INFO - Naive portfolio rebalancing at 2024-01-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,118 - INFO - Naive portfolio rebalancing at 2024-02-29 00:00:00: 313 stocks
+2024-11-08 09:38:21,119 - INFO - Naive portfolio rebalancing at 2024-03-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,119 - INFO - Naive portfolio rebalancing at 2024-04-30 00:00:00: 313 stocks
+2024-11-08 09:38:21,119 - INFO - Naive portfolio rebalancing at 2024-05-31 00:00:00: 313 stocks
+2024-11-08 09:38:21,119 - INFO - Naive portfolio rebalancing at 2024-06-28 00:00:00: 313 stocks
+2024-11-08 09:38:21,455 - INFO - Creating CNN benchmark portfolios...
+2024-11-08 09:38:21,550 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-08 09:38:21,640 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-08 09:38:21,731 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-08 09:38:21,820 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-08 09:38:21,912 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-08 09:38:21,912 - INFO - Processing model: GRU
+2024-11-08 09:38:22,670 - INFO - Processing model: TCN
+2024-11-08 09:38:24,189 - INFO - All portfolio weights saved to /home/indi/codespace/Portfolio-Optimization-Deep-Learning-WIth-Candlestick-Image/Backtest/results/all_portfolio_weights.csv
+2024-11-08 09:38:24,190 - INFO - Final column order:
+2024-11-08 09:38:24,190 - INFO - - Naive
+2024-11-08 09:38:24,190 - INFO - - CNN Top 100
+2024-11-08 09:38:24,190 - INFO - - CNN Bottom 100
+2024-11-08 09:38:24,190 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-08 09:38:24,190 - INFO - - CNN Top 50 + Min Variance
+2024-11-08 09:38:24,190 - INFO - - CNN Top 50 + Min CVaR
+2024-11-08 09:38:24,190 - INFO - - GRU Top 50
+2024-11-08 09:38:24,190 - INFO - - TCN Top 50
+2024-11-08 09:38:24,190 - INFO - - CNN + GRU Top 50
+2024-11-08 09:38:24,190 - INFO - - CNN + TCN Top 50
+2024-11-08 09:40:03,858 - INFO - Backtest completed successfully

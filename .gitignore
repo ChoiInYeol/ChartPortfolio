@@ -28,3 +28,5 @@
 *.parquet
 *.json
 *.yml
+*.zip
+*.h5
