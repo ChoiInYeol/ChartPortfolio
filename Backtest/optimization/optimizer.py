@@ -425,7 +425,7 @@ class OptimizationManager:
                 # 상위 n개 종목 선택
                 top_stocks = current_prob.nlargest(n_stocks).index
                 
-                # 최소 필요 데이터 기간 확인 (60��)
+                # 최소 필요 데이터 기간 확인 (60)
                 if len(available_returns) < 60:
                     self.logger.warning(f"Insufficient data for date {current_date}, using equal weights")
                     weights.loc[current_date, top_stocks] = 1.0 / n_stocks

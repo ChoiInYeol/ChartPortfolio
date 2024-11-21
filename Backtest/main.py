@@ -93,23 +93,18 @@ class PortfolioOptimizationPipeline:
             self.portfolio_weights = {}
             
             # 1. Naive 포트폴리오 (1/N)
-            # up_prob의 investment_date를 리밸런싱 날짜로 사용
-            rebalance_dates = up_prob.index
-
-            # 리밸런싱 날짜에 맞춰 1/N 가중치 설정
+            # 전체 기간에 대해 단순 동일가중 적용
             naive_weights = pd.DataFrame(0.0, index=returns.index, columns=returns.columns)
-            for date in rebalance_dates:
-                if date in returns.index:
-                    # 해당 시점에 존재하는 종목들에 대해서만 동일가중
-                    available_stocks = returns.columns[~returns.loc[date].isna()]
-                    if len(available_stocks) > 0:  # 거래 가능한 종목이 있는 경우에만 가중치 할당
-                        naive_weights.loc[date, available_stocks] = 1.0 / len(available_stocks)
-                        self.logger.info(f"Naive portfolio rebalancing at {date}: {len(available_stocks)} stocks")
-                    else:
-                        self.logger.warning(f"No available stocks for Naive portfolio at {date}")
-
+            
+            # 각 시점별로 거래 가능한 종목들에 대해 동일가중 적용
+            for date in returns.index:
+                available_stocks = returns.columns[~returns.loc[date].isna()]
+                if len(available_stocks) > 0:
+                    naive_weights.loc[date, available_stocks] = 1.0 / len(available_stocks)
+            
+            # 수익률 계산 (거래비용 없음)
             naive_returns, naive_net_returns = self.data_processor.calculate_portfolio_returns(
-                returns, naive_weights, transaction_cost=0.00015
+                returns, naive_weights, transaction_cost=0
             )
             self.portfolio_returns['Naive'] = naive_returns
             if 'include_net' in self.plot_types:
@@ -139,7 +134,7 @@ class PortfolioOptimizationPipeline:
                     returns_gross, returns_net = self.data_processor.calculate_portfolio_returns(
                         returns=returns,
                         weights=weights_df,
-                        transaction_cost=0.00015
+                        transaction_cost=0.0
                     )
                     
                     self.portfolio_returns[display_name] = returns_gross
@@ -163,7 +158,7 @@ class PortfolioOptimizationPipeline:
                         returns_gross, returns_net = self.data_processor.calculate_portfolio_returns(
                             returns=returns,
                             weights=weight_df,
-                            transaction_cost=0.00015
+                            transaction_cost=0.0
                         )
                         
                         model_name = f"CNN + {name}" if use_prob else name
@@ -178,7 +173,7 @@ class PortfolioOptimizationPipeline:
             column_order = [
                 'Naive',
                 'CNN Top 100',
-                'CNN Bottom 100',
+                #'CNN Bottom 100',
                 'CNN Top 50 + Max Sharpe',
                 'CNN Top 50 + Min Variance',
                 'CNN Top 50 + Min CVaR'
@@ -304,13 +299,6 @@ class PortfolioOptimizationPipeline:
             # 포트폴리오 비중 변화 시각화
             if 'weight_evolution' in self.plot_types:
                 for name, weight_df in self.portfolio_weights.items():
-                    # area plot 저장
-                    self.visualizer.plot_weight_evolution(
-                        weight_df,
-                        self.result_dir,
-                        name,
-                        plot_type='area'
-                    )
                     # bar plot 저장 
                     self.visualizer.plot_weight_evolution(
                         weight_df,

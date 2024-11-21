@@ -1,0 +1,318 @@
+2024-11-14 23:21:31,196 - INFO - 누락된 S&P 500 종목 수: 135
+2024-11-14 23:21:31,477 - ERROR - Error processing CTXS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CTXS?period1=315500400&period2=1731594091&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:31,487 - ERROR - Error processing NBL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/NBL?period1=315500400&period2=1731594091&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:31,489 - ERROR - Error processing HRS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/HRS?period1=315500400&period2=1731594091&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:31,502 - ERROR - Error processing ETFC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ETFC?period1=315500400&period2=1731594091&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:31,628 - INFO - Skipped FTV (insufficient data: 2106 days)
+2024-11-14 23:21:31,713 - INFO - Skipped IR (insufficient data: 1890 days)
+2024-11-14 23:21:31,751 - INFO - Skipped CBOE (insufficient data: 3630 days)
+2024-11-14 23:21:31,801 - INFO - Skipped CHK (insufficient data: 947 days)
+2024-11-14 23:21:31,906 - INFO - Skipped STI (insufficient data: 639 days)
+2024-11-14 23:21:31,919 - INFO - Skipped PYPL (insufficient data: 2358 days)
+2024-11-14 23:21:31,926 - INFO - Downloaded and processed ANDV
+2024-11-14 23:21:31,953 - ERROR - Error processing VIAB: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/VIAB?period1=315500400&period2=1731594091&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:31,994 - INFO - Skipped PSX (insufficient data: 3169 days)
+2024-11-14 23:21:32,015 - ERROR - Error processing UTX: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/UTX?period1=315500400&period2=1731594091&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,128 - INFO - Downloaded and processed TWX
+2024-11-14 23:21:32,171 - ERROR - Error processing ARNC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ARNC?period1=315500400&period2=1731594091&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,254 - ERROR - Error processing FLIR: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/FLIR?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,355 - INFO - Skipped CPRI (insufficient data: 3249 days)
+2024-11-14 23:21:32,366 - INFO - Skipped HBI (insufficient data: 4579 days)
+2024-11-14 23:21:32,413 - INFO - Skipped DG (insufficient data: 3775 days)
+2024-11-14 23:21:32,504 - INFO - Skipped EVHC (insufficient data: 2833 days)
+2024-11-14 23:21:32,527 - INFO - Skipped CHTR (insufficient data: 3741 days)
+2024-11-14 23:21:32,604 - ERROR - Error processing CERN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CERN?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,607 - INFO - Downloaded and processed AET
+2024-11-14 23:21:32,611 - ERROR - Error processing XEC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/XEC?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,615 - INFO - Downloaded and processed SRCL
+2024-11-14 23:21:32,676 - ERROR - Error processing TSS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/TSS?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,787 - ERROR - Error processing FBHS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/FBHS?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,798 - INFO - Downloaded and processed NFX
+2024-11-14 23:21:32,920 - ERROR - Error processing BHGE: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BHGE?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:32,997 - INFO - Skipped MA (insufficient data: 4650 days)
+2024-11-14 23:21:33,006 - INFO - Skipped COL (insufficient data: 3091 days)
+2024-11-14 23:21:33,016 - INFO - Skipped HPE (insufficient data: 2284 days)
+2024-11-14 23:21:33,072 - INFO - Skipped KHC (insufficient data: 2358 days)
+2024-11-14 23:21:33,117 - INFO - Skipped CFG (insufficient data: 2553 days)
+2024-11-14 23:21:33,160 - ERROR - Error processing ATVI: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ATVI?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,251 - INFO - Skipped AWK (insufficient data: 4170 days)
+2024-11-14 23:21:33,252 - ERROR - Error processing PKI: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/PKI?period1=315500400&period2=1731594092&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,257 - INFO - Skipped COTY (insufficient data: 2876 days)
+2024-11-14 23:21:33,271 - ERROR - Error processing BRK.B: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BRK.B?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,362 - INFO - Skipped INFO (insufficient data: 25 days)
+2024-11-14 23:21:33,402 - INFO - Skipped UA (insufficient data: 2177 days)
+2024-11-14 23:21:33,418 - ERROR - Error processing LLL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/LLL?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,495 - ERROR - Error processing BBT: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BBT?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,499 - ERROR - Error processing MYL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/MYL?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,605 - INFO - Skipped CF (insufficient data: 4848 days)
+2024-11-14 23:21:33,625 - INFO - Skipped FOX (insufficient data: 1430 days)
+2024-11-14 23:21:33,719 - INFO - Skipped HCP (insufficient data: 737 days)
+2024-11-14 23:21:33,736 - INFO - Skipped UAA (insufficient data: 4778 days)
+2024-11-14 23:21:33,750 - ERROR - Error processing WRK: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/WRK?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,790 - INFO - Skipped PX (insufficient data: 771 days)
+2024-11-14 23:21:33,811 - INFO - Skipped BHF (insufficient data: 1846 days)
+2024-11-14 23:21:33,858 - INFO - Skipped CA (insufficient data: 229 days)
+2024-11-14 23:21:33,970 - ERROR - Error processing WLTW: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/WLTW?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:33,990 - ERROR - Error processing ANTM: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ANTM?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,006 - ERROR - Error processing FB: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/FB?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,037 - ERROR - Error processing VAR: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/VAR?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,061 - ERROR - Error processing XL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/XL?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,098 - ERROR - Error processing RE: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/RE?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,211 - INFO - Skipped TRIP (insufficient data: 3255 days)
+2024-11-14 23:21:34,221 - INFO - Skipped MPC (insufficient data: 3370 days)
+2024-11-14 23:21:34,239 - ERROR - Error processing DISCK: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DISCK?period1=315500400&period2=1731594093&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,245 - ERROR - Error processing DISH: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DISH?period1=315500400&period2=1731594094&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,340 - ERROR - Error processing GPS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/GPS?period1=315500400&period2=1731594094&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,482 - INFO - Skipped ALLE (insufficient data: 2766 days)
+2024-11-14 23:21:34,496 - ERROR - Error processing RTN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/RTN?period1=315500400&period2=1731594094&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,519 - INFO - Skipped AAL (insufficient data: 4816 days)
+2024-11-14 23:21:34,559 - INFO - Skipped ZTS (insufficient data: 2967 days)
+2024-11-14 23:21:34,649 - INFO - Skipped SNI (insufficient data: 4135 days)
+2024-11-14 23:21:34,710 - INFO - Skipped PM (insufficient data: 4196 days)
+2024-11-14 23:21:34,882 - INFO - Skipped FOXA (insufficient data: 1431 days)
+2024-11-14 23:21:34,898 - INFO - Skipped KDP (insufficient data: 4160 days)
+2024-11-14 23:21:34,904 - ERROR - Error processing PXD: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/PXD?period1=315500400&period2=1731594094&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:34,953 - INFO - Skipped DFS (insufficient data: 4386 days)
+2024-11-14 23:21:34,983 - INFO - Skipped HLT (insufficient data: 2749 days)
+2024-11-14 23:21:35,004 - ERROR - Error processing ABC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ABC?period1=315500400&period2=1731594094&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,025 - INFO - Skipped V (insufficient data: 4194 days)
+2024-11-14 23:21:35,032 - INFO - Skipped HCA (insufficient data: 3444 days)
+2024-11-14 23:21:35,142 - ERROR - Error processing BLL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BLL?period1=315500400&period2=1731594094&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,225 - ERROR - Error processing CBS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CBS?period1=315500400&period2=1731594094&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,261 - ERROR - Error processing APC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/APC?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,280 - INFO - Skipped FISV (insufficient data: 369 days)
+2024-11-14 23:21:35,356 - INFO - Skipped NWS (insufficient data: 2872 days)
+2024-11-14 23:21:35,363 - INFO - Skipped ABBV (insufficient data: 2988 days)
+2024-11-14 23:21:35,382 - INFO - Skipped SYF (insufficient data: 2591 days)
+2024-11-14 23:21:35,395 - ERROR - Error processing DWDP: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DWDP?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,519 - ERROR - Error processing GGP: 'timestamp'
+2024-11-14 23:21:35,522 - ERROR - Error processing CXO: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CXO?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,560 - INFO - Skipped AVGO (insufficient data: 3845 days)
+2024-11-14 23:21:35,602 - ERROR - Error processing ADS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ADS?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,711 - INFO - Skipped XYL (insufficient data: 3293 days)
+2024-11-14 23:21:35,764 - ERROR - Error processing CTL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CTL?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,788 - INFO - Skipped APTV (insufficient data: 3268 days)
+2024-11-14 23:21:35,814 - INFO - Skipped SCG (insufficient data: 2350 days)
+2024-11-14 23:21:35,850 - INFO - Skipped ICE (insufficient data: 4780 days)
+2024-11-14 23:21:35,863 - ERROR - Error processing JEC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/JEC?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,954 - ERROR - Error processing DRE: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DRE?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:35,968 - INFO - Skipped QRVO (insufficient data: 2484 days)
+2024-11-14 23:21:36,026 - ERROR - Error processing RHT: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/RHT?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,036 - INFO - Skipped CMG (insufficient data: 4733 days)
+2024-11-14 23:21:36,104 - ERROR - Error processing TMK: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/TMK?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,226 - ERROR - Error processing SYMC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/SYMC?period1=315500400&period2=1731594095&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,277 - INFO - Skipped AMP (insufficient data: 4824 days)
+2024-11-14 23:21:36,339 - INFO - Skipped TDG (insufficient data: 4700 days)
+2024-11-14 23:21:36,341 - INFO - Skipped DAL (insufficient data: 4415 days)
+2024-11-14 23:21:36,457 - INFO - Skipped GM (insufficient data: 3520 days)
+2024-11-14 23:21:36,469 - INFO - Skipped VRSK (insufficient data: 3802 days)
+2024-11-14 23:21:36,534 - INFO - Skipped UAL (insufficient data: 4726 days)
+2024-11-14 23:21:36,543 - INFO - Downloaded and processed ESRX
+2024-11-14 23:21:36,587 - ERROR - Error processing KSU: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/KSU?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,600 - ERROR - Error processing ALXN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ALXN?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,713 - ERROR - Error processing AGN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/AGN?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,728 - ERROR - Error processing PBCT: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/PBCT?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,740 - INFO - Skipped TEL (insufficient data: 4386 days)
+2024-11-14 23:21:36,778 - ERROR - Error processing DISCA: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DISCA?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:36,850 - ERROR - Error processing BF.B: 'timestamp'
+2024-11-14 23:21:36,871 - INFO - Skipped LYB (insufficient data: 3663 days)
+2024-11-14 23:21:37,008 - INFO - Skipped WU (insufficient data: 4561 days)
+2024-11-14 23:21:37,009 - ERROR - Error processing XLNX: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/XLNX?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:37,030 - ERROR - Error processing MON: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/MON?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:37,109 - INFO - Skipped KMI (insufficient data: 3462 days)
+2024-11-14 23:21:37,128 - ERROR - Error processing CELG: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CELG?period1=315500400&period2=1731594096&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:37,208 - INFO - Skipped EXPE (insufficient data: 4863 days)
+2024-11-14 23:21:37,264 - ERROR - Error processing NLSN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/NLSN?period1=315500400&period2=1731594097&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:37,271 - ERROR - Error processing COG: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/COG?period1=315500400&period2=1731594097&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:37,287 - INFO - Skipped IQV (insufficient data: 2900 days)
+2024-11-14 23:21:37,298 - INFO - Skipped ULTA (insufficient data: 4293 days)
+2024-11-14 23:21:37,403 - INFO - Skipped NCLH (insufficient data: 2976 days)
+2024-11-14 23:21:37,452 - ERROR - Error processing WYND: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/WYND?period1=315500400&period2=1731594097&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:37,535 - ERROR - Error processing KORS: 'timestamp'
+2024-11-14 23:21:37,544 - INFO - Skipped NAVI (insufficient data: 2663 days)
+2024-11-14 23:21:37,546 - ERROR - Error processing TIF: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/TIF?period1=315500400&period2=1731594097&interval=1d&includeAdjustedClose=true
+2024-11-14 23:21:37,547 - INFO - Skipped LB (insufficient data: 97 days)
+2024-11-14 23:21:37,601 - INFO - Skipped NWSA (insufficient data: 2872 days)
+2024-11-14 23:21:37,603 - INFO - Skipped CSRA (insufficient data: 2264 days)
+2024-11-14 23:21:37,607 - INFO - Added 6 new symbols
+2024-11-14 23:21:40,781 - ERROR - Error processing stock_data/NFX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:21:42,326 - ERROR - Error processing stock_data/AET.csv: single positional indexer is out-of-bounds
+2024-11-14 23:21:43,369 - ERROR - Error processing stock_data/SRCL.csv: single positional indexer is out-of-bounds
+2024-11-14 23:21:46,858 - ERROR - Error processing stock_data/ANDV.csv: single positional indexer is out-of-bounds
+2024-11-14 23:21:50,253 - ERROR - Error processing stock_data/TWX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:21:52,290 - ERROR - Error processing stock_data/ESRX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:23:02,811 - INFO - Final dataset created with 2114 symbols
+2024-11-14 23:23:03,655 - INFO - SPY 데이터 다운로드 완료
+2024-11-14 23:24:00,921 - INFO - 다운로드 시도할 S&P 500 종목 수: 135
+2024-11-14 23:24:01,426 - INFO - Skipped V (insufficient data: 4194 days)
+2024-11-14 23:24:01,674 - ERROR - Error processing AGN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/AGN?period1=315500400&period2=1731594241&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:01,933 - ERROR - Error processing TMK: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/TMK?period1=315500400&period2=1731594241&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:02,181 - ERROR - Error processing TSS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/TSS?period1=315500400&period2=1731594241&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:02,454 - ERROR - Error processing CTXS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CTXS?period1=315500400&period2=1731594242&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:02,728 - ERROR - Error processing BF.B: 'timestamp'
+2024-11-14 23:24:03,212 - INFO - Skipped CF (insufficient data: 4848 days)
+2024-11-14 23:24:03,755 - INFO - Skipped CFG (insufficient data: 2553 days)
+2024-11-14 23:24:04,207 - INFO - Skipped MPC (insufficient data: 3370 days)
+2024-11-14 23:24:04,519 - INFO - Skipped FISV (insufficient data: 369 days)
+2024-11-14 23:24:04,761 - ERROR - Error processing WYND: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/WYND?period1=315500400&period2=1731594244&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:05,299 - INFO - Skipped SNI (insufficient data: 4135 days)
+2024-11-14 23:24:05,567 - ERROR - Error processing MYL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/MYL?period1=315500400&period2=1731594245&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:05,968 - INFO - Skipped CHTR (insufficient data: 3741 days)
+2024-11-14 23:24:06,416 - INFO - Skipped UA (insufficient data: 2177 days)
+2024-11-14 23:24:06,801 - INFO - Skipped IQV (insufficient data: 2900 days)
+2024-11-14 23:24:07,050 - ERROR - Error processing HRS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/HRS?period1=315500400&period2=1731594246&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:07,483 - INFO - Skipped PSX (insufficient data: 3169 days)
+2024-11-14 23:24:07,935 - INFO - Skipped FTV (insufficient data: 2106 days)
+2024-11-14 23:24:08,199 - INFO - Skipped LB (insufficient data: 97 days)
+2024-11-14 23:24:08,649 - INFO - Skipped NWS (insufficient data: 2872 days)
+2024-11-14 23:24:09,173 - INFO - Skipped EXPE (insufficient data: 4863 days)
+2024-11-14 23:24:09,416 - ERROR - Error processing VIAB: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/VIAB?period1=315500400&period2=1731594249&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:09,669 - ERROR - Error processing XEC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/XEC?period1=315500400&period2=1731594249&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:09,945 - ERROR - Error processing TIF: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/TIF?period1=315500400&period2=1731594249&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:10,201 - ERROR - Error processing WRK: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/WRK?period1=315500400&period2=1731594249&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:10,661 - INFO - Skipped ABBV (insufficient data: 2988 days)
+2024-11-14 23:24:11,888 - INFO - Skipped APTV (insufficient data: 3268 days)
+2024-11-14 23:24:12,219 - INFO - Skipped PX (insufficient data: 771 days)
+2024-11-14 23:24:12,727 - INFO - Skipped CMG (insufficient data: 4733 days)
+2024-11-14 23:24:13,170 - INFO - Skipped DAL (insufficient data: 4415 days)
+2024-11-14 23:24:13,610 - INFO - Skipped WU (insufficient data: 4561 days)
+2024-11-14 23:24:13,871 - ERROR - Error processing PBCT: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/PBCT?period1=315500400&period2=1731594253&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:14,240 - ERROR - Error processing CXO: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CXO?period1=315500400&period2=1731594253&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:14,479 - ERROR - Error processing DRE: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DRE?period1=315500400&period2=1731594254&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:14,758 - ERROR - Error processing LLL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/LLL?period1=315500400&period2=1731594254&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:15,015 - ERROR - Error processing JEC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/JEC?period1=315500400&period2=1731594254&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:15,269 - ERROR - Error processing BBT: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BBT?period1=315500400&period2=1731594255&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:15,716 - INFO - Skipped HLT (insufficient data: 2749 days)
+2024-11-14 23:24:16,201 - INFO - Skipped LYB (insufficient data: 3663 days)
+2024-11-14 23:24:16,446 - ERROR - Error processing COG: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/COG?period1=315500400&period2=1731594256&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:16,707 - ERROR - Error processing NBL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/NBL?period1=315500400&period2=1731594256&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:17,184 - INFO - Skipped ULTA (insufficient data: 4293 days)
+2024-11-14 23:24:17,729 - INFO - Skipped PYPL (insufficient data: 2358 days)
+2024-11-14 23:24:18,141 - INFO - Skipped HPE (insufficient data: 2284 days)
+2024-11-14 23:24:18,397 - ERROR - Error processing UTX: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/UTX?period1=315500400&period2=1731594258&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:18,760 - INFO - Skipped EVHC (insufficient data: 2833 days)
+2024-11-14 23:24:19,035 - ERROR - Error processing ETFC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ETFC?period1=315500400&period2=1731594258&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:19,303 - ERROR - Error processing XLNX: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/XLNX?period1=315500400&period2=1731594259&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:19,561 - ERROR - Error processing DWDP: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DWDP?period1=315500400&period2=1731594259&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:19,820 - ERROR - Error processing VAR: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/VAR?period1=315500400&period2=1731594259&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:20,174 - ERROR - Error processing CBS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CBS?period1=315500400&period2=1731594259&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:20,631 - INFO - Skipped UAA (insufficient data: 4778 days)
+2024-11-14 23:24:21,131 - INFO - Skipped PM (insufficient data: 4196 days)
+2024-11-14 23:24:21,378 - ERROR - Error processing FBHS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/FBHS?period1=315500400&period2=1731594261&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:21,760 - INFO - Skipped TRIP (insufficient data: 3255 days)
+2024-11-14 23:24:22,004 - ERROR - Error processing GPS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/GPS?period1=315500400&period2=1731594261&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:22,551 - INFO - Skipped TEL (insufficient data: 4386 days)
+2024-11-14 23:24:23,024 - INFO - Skipped GM (insufficient data: 3520 days)
+2024-11-14 23:24:23,411 - INFO - Skipped KHC (insufficient data: 2358 days)
+2024-11-14 23:24:23,669 - ERROR - Error processing FLIR: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/FLIR?period1=315500400&period2=1731594263&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:23,938 - INFO - Skipped CA (insufficient data: 229 days)
+2024-11-14 23:24:24,433 - INFO - Skipped AAL (insufficient data: 4816 days)
+2024-11-14 23:24:24,759 - INFO - Skipped CSRA (insufficient data: 2264 days)
+2024-11-14 23:24:25,015 - INFO - Skipped STI (insufficient data: 639 days)
+2024-11-14 23:24:25,273 - ERROR - Error processing WLTW: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/WLTW?period1=315500400&period2=1731594265&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:25,714 - INFO - Skipped KMI (insufficient data: 3462 days)
+2024-11-14 23:24:25,981 - ERROR - Error processing GGP: 'timestamp'
+2024-11-14 23:24:26,349 - INFO - Skipped CHK (insufficient data: 947 days)
+2024-11-14 23:24:26,796 - INFO - Skipped NWSA (insufficient data: 2872 days)
+2024-11-14 23:24:27,177 - INFO - Skipped IR (insufficient data: 1890 days)
+2024-11-14 23:24:27,442 - ERROR - Error processing ADS: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ADS?period1=315500400&period2=1731594267&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:27,845 - INFO - Skipped FOXA (insufficient data: 1431 days)
+2024-11-14 23:24:28,096 - ERROR - Error processing ABC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ABC?period1=315500400&period2=1731594267&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:28,348 - ERROR - Error processing BHGE: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BHGE?period1=315500400&period2=1731594268&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:28,605 - ERROR - Error processing CTL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CTL?period1=315500400&period2=1731594268&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:29,154 - INFO - Skipped AMP (insufficient data: 4824 days)
+2024-11-14 23:24:29,531 - INFO - Skipped QRVO (insufficient data: 2484 days)
+2024-11-14 23:24:30,014 - INFO - Skipped VRSK (insufficient data: 3802 days)
+2024-11-14 23:24:30,401 - INFO - Skipped ALLE (insufficient data: 2766 days)
+2024-11-14 23:24:30,855 - INFO - Skipped UAL (insufficient data: 4726 days)
+2024-11-14 23:24:31,104 - ERROR - Error processing KORS: 'timestamp'
+2024-11-14 23:24:31,361 - ERROR - Error processing DISCA: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DISCA?period1=315500400&period2=1731594271&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:31,872 - INFO - Skipped NCLH (insufficient data: 2976 days)
+2024-11-14 23:24:32,294 - INFO - Skipped NAVI (insufficient data: 2663 days)
+2024-11-14 23:24:32,546 - ERROR - Error processing KSU: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/KSU?period1=315500400&period2=1731594272&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:32,804 - ERROR - Error processing CELG: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CELG?period1=315500400&period2=1731594272&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:33,352 - INFO - Skipped ICE (insufficient data: 4780 days)
+2024-11-14 23:24:33,962 - INFO - Downloaded and processed ANDV
+2024-11-14 23:24:33,965 - INFO - Added 1 new symbols
+2024-11-14 23:24:34,216 - ERROR - Error processing ARNC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ARNC?period1=315500400&period2=1731594273&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:34,773 - INFO - Downloaded and processed TWX
+2024-11-14 23:24:34,775 - INFO - Added 1 new symbols
+2024-11-14 23:24:35,035 - ERROR - Error processing RTN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/RTN?period1=315500400&period2=1731594274&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:35,488 - INFO - Skipped HBI (insufficient data: 4579 days)
+2024-11-14 23:24:35,750 - ERROR - Error processing PXD: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/PXD?period1=315500400&period2=1731594275&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:36,009 - ERROR - Error processing ANTM: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ANTM?period1=315500400&period2=1731594275&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:36,269 - ERROR - Error processing PKI: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/PKI?period1=315500400&period2=1731594276&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:36,525 - ERROR - Error processing DISCK: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DISCK?period1=315500400&period2=1731594276&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:36,923 - INFO - Skipped CPRI (insufficient data: 3249 days)
+2024-11-14 23:24:37,190 - ERROR - Error processing NLSN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/NLSN?period1=315500400&period2=1731594276&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:37,959 - INFO - Skipped DFS (insufficient data: 4386 days)
+2024-11-14 23:24:38,442 - INFO - Skipped DG (insufficient data: 3775 days)
+2024-11-14 23:24:38,716 - INFO - Skipped INFO (insufficient data: 25 days)
+2024-11-14 23:24:39,214 - INFO - Skipped MA (insufficient data: 4650 days)
+2024-11-14 23:24:39,469 - ERROR - Error processing BRK.B: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BRK.B?period1=315500400&period2=1731594279&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:40,024 - INFO - Skipped KDP (insufficient data: 4160 days)
+2024-11-14 23:24:40,287 - ERROR - Error processing RE: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/RE?period1=315500400&period2=1731594280&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:40,537 - ERROR - Error processing CERN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/CERN?period1=315500400&period2=1731594280&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:41,070 - INFO - Downloaded and processed SRCL
+2024-11-14 23:24:41,073 - INFO - Added 1 new symbols
+2024-11-14 23:24:41,634 - INFO - Downloaded and processed AET
+2024-11-14 23:24:41,637 - INFO - Added 1 new symbols
+2024-11-14 23:24:41,979 - INFO - Skipped FOX (insufficient data: 1430 days)
+2024-11-14 23:24:42,344 - INFO - Skipped COL (insufficient data: 3091 days)
+2024-11-14 23:24:42,614 - ERROR - Error processing APC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/APC?period1=315500400&period2=1731594282&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:43,125 - INFO - Skipped AVGO (insufficient data: 3845 days)
+2024-11-14 23:24:43,640 - INFO - Skipped SCG (insufficient data: 2350 days)
+2024-11-14 23:24:44,050 - INFO - Skipped ZTS (insufficient data: 2967 days)
+2024-11-14 23:24:44,292 - ERROR - Error processing BLL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/BLL?period1=315500400&period2=1731594284&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:44,715 - INFO - Skipped XYL (insufficient data: 3293 days)
+2024-11-14 23:24:45,107 - INFO - Skipped BHF (insufficient data: 1846 days)
+2024-11-14 23:24:45,573 - INFO - Skipped SYF (insufficient data: 2591 days)
+2024-11-14 23:24:45,819 - ERROR - Error processing XL: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/XL?period1=315500400&period2=1731594285&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:46,321 - INFO - Skipped TDG (insufficient data: 4700 days)
+2024-11-14 23:24:46,562 - ERROR - Error processing DISH: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/DISH?period1=315500400&period2=1731594286&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:46,812 - ERROR - Error processing ALXN: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ALXN?period1=315500400&period2=1731594286&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:47,294 - INFO - Skipped CBOE (insufficient data: 3630 days)
+2024-11-14 23:24:47,607 - INFO - Skipped HCP (insufficient data: 737 days)
+2024-11-14 23:24:47,868 - ERROR - Error processing SYMC: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/SYMC?period1=315500400&period2=1731594287&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:48,324 - INFO - Skipped AWK (insufficient data: 4170 days)
+2024-11-14 23:24:48,931 - INFO - Skipped COTY (insufficient data: 2876 days)
+2024-11-14 23:24:49,204 - ERROR - Error processing RHT: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/RHT?period1=315500400&period2=1731594288&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:49,662 - INFO - Skipped HCA (insufficient data: 3444 days)
+2024-11-14 23:24:49,924 - ERROR - Error processing ATVI: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/ATVI?period1=315500400&period2=1731594289&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:50,183 - ERROR - Error processing FB: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/FB?period1=315500400&period2=1731594289&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:50,444 - ERROR - Error processing MON: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/MON?period1=315500400&period2=1731594290&interval=1d&includeAdjustedClose=true
+2024-11-14 23:24:51,063 - INFO - Downloaded and processed ESRX
+2024-11-14 23:24:51,066 - INFO - Added 1 new symbols
+2024-11-14 23:24:51,556 - INFO - Downloaded and processed NFX
+2024-11-14 23:24:51,558 - INFO - Added 1 new symbols
+2024-11-14 23:24:51,559 - INFO - 오류 발생 종목 수: 129
+2024-11-14 23:24:54,540 - ERROR - Error processing stock_data/NFX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:24:55,945 - ERROR - Error processing stock_data/AET.csv: single positional indexer is out-of-bounds
+2024-11-14 23:24:56,943 - ERROR - Error processing stock_data/SRCL.csv: single positional indexer is out-of-bounds
+2024-11-14 23:25:00,089 - ERROR - Error processing stock_data/ANDV.csv: single positional indexer is out-of-bounds
+2024-11-14 23:25:03,259 - ERROR - Error processing stock_data/TWX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:25:05,161 - ERROR - Error processing stock_data/ESRX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:26:13,026 - INFO - Final dataset created with 2114 symbols
+2024-11-14 23:26:13,804 - INFO - SPY 데이터 다운로드 완료
+2024-11-14 23:29:20,491 - INFO - 다운로드 시도할 S&P 500 종목 수: 6
+2024-11-14 23:29:21,170 - INFO - Downloaded and processed NFX
+2024-11-14 23:29:21,172 - INFO - Added 1 new symbols
+2024-11-14 23:29:21,792 - INFO - Downloaded and processed ANDV
+2024-11-14 23:29:21,795 - INFO - Added 1 new symbols
+2024-11-14 23:29:22,344 - INFO - Downloaded and processed ESRX
+2024-11-14 23:29:22,347 - INFO - Added 1 new symbols
+2024-11-14 23:29:22,964 - INFO - Downloaded and processed TWX
+2024-11-14 23:29:22,967 - INFO - Added 1 new symbols
+2024-11-14 23:29:23,629 - INFO - Downloaded and processed AET
+2024-11-14 23:29:23,631 - INFO - Added 1 new symbols
+2024-11-14 23:29:24,129 - INFO - Downloaded and processed SRCL
+2024-11-14 23:29:24,132 - INFO - Added 1 new symbols
+2024-11-14 23:29:26,724 - ERROR - Error processing stock_data/NFX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:29:28,139 - ERROR - Error processing stock_data/AET.csv: single positional indexer is out-of-bounds
+2024-11-14 23:29:29,069 - ERROR - Error processing stock_data/SRCL.csv: single positional indexer is out-of-bounds
+2024-11-14 23:29:32,208 - ERROR - Error processing stock_data/ANDV.csv: single positional indexer is out-of-bounds
+2024-11-14 23:29:35,302 - ERROR - Error processing stock_data/TWX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:29:37,231 - ERROR - Error processing stock_data/ESRX.csv: single positional indexer is out-of-bounds
+2024-11-14 23:30:42,439 - INFO - Final dataset created with 2114 symbols
+2024-11-14 23:30:43,244 - INFO - SPY 데이터 다운로드 완료
+2024-11-14 23:31:54,652 - INFO - SPY 데이터 다운로드 완료

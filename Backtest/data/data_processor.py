@@ -156,15 +156,22 @@ class DataProcessor:
         for date in last_period_returns.index:
             daily_returns[date] = (last_period_returns.loc[date] * last_weights).sum()
         
-        # 4. 거래비용 계산
-        turnover = pd.Series(0.0, index=daily_returns.index)
-        for i in range(1, len(weights)):
-            turnover.loc[weights.index[i]] = np.abs(weights.iloc[i] - weights.iloc[i-1]).sum()
+        # 4. 거래비용 계산 (리밸런싱 날짜에만 적용)
+        transaction_costs = pd.Series(transaction_cost, index=daily_returns.index)
         
-        transaction_costs = turnover * transaction_cost
+        # 첫 번째 리밸런싱의 거래비용
+        initial_cost = weights.iloc[0].sum() * transaction_cost  # 초기 포트폴리오 구성 비용
+        transaction_costs.iloc[0] = initial_cost
+        
+        # 이후 리밸런싱의 거래비용
+        for i in range(1, len(weights)):
+            rebalance_date = weights.index[i]
+            turnover = np.abs(weights.iloc[i] - weights.iloc[i-1]).sum()
+            transaction_costs[rebalance_date] = turnover * transaction_cost
         
         # 5. 순수익률 계산
-        net_daily_returns = daily_returns - transaction_costs
+        net_daily_returns = daily_returns.copy()
+        net_daily_returns[transaction_costs.index] -= transaction_costs
         
         # 6. 누적수익률 계산
         cum_returns = (1 + daily_returns).cumprod()
@@ -174,5 +181,7 @@ class DataProcessor:
         self.logger.debug(f"Daily returns range: {daily_returns.index[0]} to {daily_returns.index[-1]}")
         self.logger.debug(f"Number of valid returns: {daily_returns.count()}")
         self.logger.debug(f"Number of NaN returns: {daily_returns.isna().sum()}")
+        self.logger.debug(f"Total transaction costs: {transaction_costs.sum():.6f}")
+        self.logger.debug(f"Number of rebalancing days: {len(weights)}")
         
         return cum_returns, cum_net_returns

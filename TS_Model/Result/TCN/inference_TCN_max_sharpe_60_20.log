@@ -1,0 +1,53 @@
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TCN', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 50, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.1}}
+Model Path: Result/TCN
+Loading model: True_TCN_50_5_loss_-0.4090.pth
+Loading test data...
+First few dates after processing: [Timestamp('2018-04-26 00:00:00'), Timestamp('2018-04-27 00:00:00'), Timestamp('2018-04-30 00:00:00'), Timestamp('2018-05-01 00:00:00'), Timestamp('2018-05-02 00:00:00')]
+Total dates: 1577
+Validating test data...
+Test data shape - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+Test dates length: 1577
+Test data loading completed
+Test data loaded: 1577 samples
+Loaded 370 tickers from /home/indi/codespace/ImagePortOpt/Data/return_df.csv
+Converting dates from type <class 'list'> to DatetimeIndex
+Weights array shape: (1577, 370)
+Expected shape: (1577, 370)
+Weights saved to Result/TCN/weights_True_TCN_n50_t60_p20_loss-0.4003.csv
+Model parameters:
+- Use prob: True
+- Model: TCN
+- N_select: 50
+- Train length: 60
+- Pred length: 20
+- Model loss: -0.4003
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TCN', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 50, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.1}}
+Model Path: Result/TCN
+Loading model: True_TCN_50_5_loss_-0.4090.pth
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TCN', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 50, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.1}}
+Model Path: Result/TCN
+Loading model: True_TCN_50_5_loss_-0.4090.pth
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TCN', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 50, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.1}}
+Model Path: Result/TCN
+Selected best model: False_TCN_50_4_loss_-0.3900.pth
+Model loss: -0.3900
+Loading test data...
+First few dates after processing: [Timestamp('2018-04-26 00:00:00'), Timestamp('2018-04-27 00:00:00'), Timestamp('2018-04-30 00:00:00'), Timestamp('2018-05-01 00:00:00'), Timestamp('2018-05-02 00:00:00')]
+Total dates: 1577
+Validating test data...
+Test data shape - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+Test dates length: 1577
+Test data loading completed
+Test data loaded: 1577 samples
+Loaded 370 tickers from /home/indi/codespace/ImagePortOpt/Data/return_df.csv
+Converting dates from type <class 'list'> to DatetimeIndex
+Weights array shape: (1577, 370)
+Expected shape: (1577, 370)
+Weights saved to Result/TCN/weights_False_TCN_n50_t60_p20_loss-0.3900.csv
+Model parameters:
+- Use prob: False
+- Model: TCN
+- N_select: 50
+- Train length: 60
+- Pred length: 20
+- Model loss: -0.3900

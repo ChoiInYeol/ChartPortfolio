@@ -28,11 +28,11 @@ class DataLoader:
         self.logger = logging.getLogger(__name__)
         
         # 데이터 경로 설정
-        self.data_path = os.path.join(self.base_folder, 'data')
+        self.data_path = os.path.join(self.base_folder, '..', 'Data')
 
     def load_stock_returns(self) -> pd.DataFrame:
         """주식 수익률 데이터를 로드합니다."""
-        file_path = os.path.join(self.base_folder, '..', 'POD', 'data', 'return_df.csv')
+        file_path = os.path.join(self.base_folder, '..', 'Data', 'return_df.csv')
         if not os.path.exists(file_path):
             self.logger.error(f"Return data file not found: {file_path}")
             raise FileNotFoundError(f"Return data file not found: {file_path}")
@@ -49,13 +49,13 @@ class DataLoader:
         
         return returns
 
-    def load_up_prob(self, model: str = 'CNN', freq: str = 'month', 
+    def load_up_prob(self, model: str = '2D', freq: str = 'month', 
                      ws: int = 20, pw: int = 20) -> pd.DataFrame:
         """
         상승확률 데이터를 로드합니다.
         
         Args:
-            model (str): 모델 이름 (예: CNN, GRU)
+            model (str): 모델 이름 (예: 2D, 1D)
             freq (str): 주기 (예: month, week)
             ws (int): 윈도우 사이즈
             pw (int): 예측 윈도우
@@ -91,7 +91,7 @@ class DataLoader:
     def load_model_weights(self, model: str, use_prob: bool) -> Dict[str, pd.DataFrame]:
         """모델 가중치를 로드합니다."""
         weights_pattern = os.path.join(
-            self.base_folder, '..', 'POD', 'Result', 
+            self.base_folder, '..', 'TS_Model', 'Result', 
             model, f'weights_{str(use_prob)}_{model}_*.csv'
         )
         weights_files = glob.glob(weights_pattern)

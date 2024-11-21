@@ -1,0 +1,1665 @@
+2024-11-15 17:18:15,000 - INFO - 데이터셋 생성 시작
+2024-11-15 17:18:15,000 - INFO - 데이터 로드 시작
+2024-11-15 17:22:27,973 - INFO - 데이터셋 생성 시작
+2024-11-15 17:22:27,973 - INFO - 데이터 로드 시작
+2024-11-15 17:22:28,076 - INFO - 데이터 로드 완료
+2024-11-15 17:22:28,076 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-15 17:22:28,076 - INFO - 원본 상승확률(월별): (285, 370)
+2024-11-15 17:22:28,076 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-15 17:22:28,082 - INFO - 데이터 분할 완료
+2024-11-15 17:22:28,082 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-15 17:22:28,082 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-15 17:22:28,082 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-15 17:22:28,557 - INFO - 최종 데이터셋 크기:
+2024-11-15 17:22:28,557 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-15 17:22:28,557 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-15 17:22:28,557 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-15 17:22:30,247 - INFO - 데이터셋 생성 완료
+2024-11-15 17:26:40,558 - INFO - 데이터셋 생성 시작
+2024-11-15 17:26:40,559 - INFO - 데이터 로드 시작
+2024-11-15 17:26:40,654 - INFO - NaN 값 처리 시작
+2024-11-15 17:26:40,656 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 565
+2024-11-15 17:26:40,692 - INFO - NaN 값 처리 완료
+2024-11-15 17:26:40,694 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-15 17:26:40,694 - INFO - 데이터 로드 완료
+2024-11-15 17:26:40,694 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-15 17:26:40,694 - INFO - 원본 상승확률(월별): (285, 370)
+2024-11-15 17:26:40,694 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-15 17:26:40,699 - INFO - 데이터 분할 완료
+2024-11-15 17:26:40,699 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-15 17:26:40,699 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-15 17:26:40,699 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-15 17:26:41,139 - INFO - 최종 데이터셋 크기:
+2024-11-15 17:26:41,139 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-15 17:26:41,139 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-15 17:26:41,139 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-15 17:26:42,874 - INFO - 데이터셋 생성 완료
+2024-11-15 17:27:05,953 - INFO - 데이터셋 생성 시작
+2024-11-15 17:27:05,953 - INFO - 데이터 로드 시작
+2024-11-15 17:27:06,048 - INFO - NaN 값 처리 시작
+2024-11-15 17:27:06,049 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 565
+2024-11-15 17:27:06,084 - INFO - NaN 값 처리 완료
+2024-11-15 17:27:06,087 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-15 17:27:06,087 - INFO - 데이터 로드 완료
+2024-11-15 17:27:06,087 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-15 17:27:06,087 - INFO - 원본 상승확률(월별): (285, 370)
+2024-11-15 17:27:06,087 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-15 17:27:06,092 - INFO - 데이터 분할 완료
+2024-11-15 17:27:06,092 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-15 17:27:06,092 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-15 17:27:06,092 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-15 17:27:06,526 - INFO - 최종 데이터셋 크기:
+2024-11-15 17:27:06,526 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-15 17:27:06,526 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-15 17:27:06,526 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-15 17:27:08,247 - INFO - 데이터셋 생성 완료
+2024-11-22 06:44:05,664 - INFO - 데이터셋 생성 시작
+2024-11-22 06:44:05,664 - INFO - 데이터 로드 시작 (period: month, ws: 20, pw: 20)
+2024-11-22 06:44:05,765 - INFO - 상승확률 데이터 파일 'CNN_month_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 06:44:05,765 - INFO - NaN 값 처리 시작
+2024-11-22 06:44:05,766 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 565
+2024-11-22 06:44:05,799 - INFO - NaN 값 처리 완료
+2024-11-22 06:44:05,801 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 06:44:05,802 - INFO - 데이터 로드 완료
+2024-11-22 06:44:05,802 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 06:44:05,802 - INFO - 원본 상승확률(month별): (285, 370)
+2024-11-22 06:44:05,802 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 06:44:05,807 - INFO - 데이터 분할 완료
+2024-11-22 06:44:05,807 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 06:44:05,807 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 06:44:05,808 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 06:44:06,430 - INFO - 최종 데이터셋 크기:
+2024-11-22 06:44:06,431 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 06:44:06,431 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 06:44:06,431 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 06:44:08,615 - INFO - 데이터셋 생성 완료
+2024-11-22 06:45:10,694 - INFO - 데이터셋 생성 시작
+2024-11-22 06:45:10,694 - INFO - 데이터 로드 시작 (period: week, ws: 20, pw: 20)
+2024-11-22 06:45:10,807 - INFO - 상승확률 데이터 파일 'CNN_week_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 06:45:10,807 - INFO - NaN 값 처리 시작
+2024-11-22 06:45:10,809 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 2715
+2024-11-22 06:45:10,889 - INFO - NaN 값 처리 완료
+2024-11-22 06:45:10,891 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 06:45:10,891 - INFO - 데이터 로드 완료
+2024-11-22 06:45:10,891 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 06:45:10,891 - INFO - 원본 상승확률(week별): (1393, 370)
+2024-11-22 06:45:10,891 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 06:45:10,896 - INFO - 데이터 분할 완료
+2024-11-22 06:45:10,896 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 06:45:10,896 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 06:45:10,896 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 06:45:11,397 - INFO - 최종 데이터셋 크기:
+2024-11-22 06:45:11,397 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 06:45:11,397 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 06:45:11,397 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 06:45:13,592 - INFO - 데이터셋 생성 완료
+2024-11-22 06:50:40,346 - INFO - 데이터셋 생성 시작
+2024-11-22 06:50:40,346 - INFO - Processing 1D_day_5D_5P dataset
+2024-11-22 06:50:40,346 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 5)
+2024-11-22 06:50:40,457 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:40,457 - ERROR - Error processing 1D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:40,458 - INFO - Processing 1D_day_5D_20P dataset
+2024-11-22 06:50:40,458 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 20)
+2024-11-22 06:50:40,541 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:40,541 - ERROR - Error processing 1D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:40,541 - INFO - Processing 1D_day_5D_60P dataset
+2024-11-22 06:50:40,541 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 60)
+2024-11-22 06:50:40,622 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:40,622 - ERROR - Error processing 1D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:40,623 - INFO - Processing 1D_day_20D_5P dataset
+2024-11-22 06:50:40,623 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 5)
+2024-11-22 06:50:40,706 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:40,706 - ERROR - Error processing 1D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:40,707 - INFO - Processing 1D_day_20D_20P dataset
+2024-11-22 06:50:40,707 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 20)
+2024-11-22 06:50:40,790 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:40,790 - ERROR - Error processing 1D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:40,790 - INFO - Processing 1D_day_20D_60P dataset
+2024-11-22 06:50:40,790 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 60)
+2024-11-22 06:50:40,874 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:40,874 - ERROR - Error processing 1D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:40,874 - INFO - Processing 1D_day_60D_5P dataset
+2024-11-22 06:50:40,874 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 5)
+2024-11-22 06:50:40,956 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:40,956 - ERROR - Error processing 1D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:40,957 - INFO - Processing 1D_day_60D_20P dataset
+2024-11-22 06:50:40,957 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 20)
+2024-11-22 06:50:41,037 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,037 - ERROR - Error processing 1D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,038 - INFO - Processing 1D_day_60D_60P dataset
+2024-11-22 06:50:41,038 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 60)
+2024-11-22 06:50:41,119 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,119 - ERROR - Error processing 1D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,119 - INFO - Processing 1D_week_5D_5P dataset
+2024-11-22 06:50:41,119 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 5)
+2024-11-22 06:50:41,199 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,199 - ERROR - Error processing 1D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,200 - INFO - Processing 1D_week_5D_20P dataset
+2024-11-22 06:50:41,200 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 20)
+2024-11-22 06:50:41,280 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,280 - ERROR - Error processing 1D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,281 - INFO - Processing 1D_week_5D_60P dataset
+2024-11-22 06:50:41,281 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 60)
+2024-11-22 06:50:41,369 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,370 - ERROR - Error processing 1D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,370 - INFO - Processing 1D_week_20D_5P dataset
+2024-11-22 06:50:41,370 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 5)
+2024-11-22 06:50:41,451 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,451 - ERROR - Error processing 1D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,452 - INFO - Processing 1D_week_20D_20P dataset
+2024-11-22 06:50:41,452 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 20)
+2024-11-22 06:50:41,533 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,533 - ERROR - Error processing 1D_week_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,534 - INFO - Processing 1D_week_20D_60P dataset
+2024-11-22 06:50:41,534 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 60)
+2024-11-22 06:50:41,613 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,613 - ERROR - Error processing 1D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,613 - INFO - Processing 1D_week_60D_5P dataset
+2024-11-22 06:50:41,613 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 5)
+2024-11-22 06:50:41,700 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,700 - ERROR - Error processing 1D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,701 - INFO - Processing 1D_week_60D_20P dataset
+2024-11-22 06:50:41,701 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 20)
+2024-11-22 06:50:41,783 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,783 - ERROR - Error processing 1D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:41,783 - INFO - Processing 1D_week_60D_60P dataset
+2024-11-22 06:50:41,783 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 60)
+2024-11-22 06:50:41,865 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,866 - ERROR - Error processing 1D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:41,866 - INFO - Processing 1D_month_5D_5P dataset
+2024-11-22 06:50:41,866 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 5)
+2024-11-22 06:50:41,948 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,948 - ERROR - Error processing 1D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:41,948 - INFO - Processing 1D_month_5D_20P dataset
+2024-11-22 06:50:41,948 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 20)
+2024-11-22 06:50:42,030 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,030 - ERROR - Error processing 1D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,030 - INFO - Processing 1D_month_5D_60P dataset
+2024-11-22 06:50:42,031 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 60)
+2024-11-22 06:50:42,111 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,111 - ERROR - Error processing 1D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,111 - INFO - Processing 1D_month_20D_5P dataset
+2024-11-22 06:50:42,111 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 5)
+2024-11-22 06:50:42,192 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,192 - ERROR - Error processing 1D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,192 - INFO - Processing 1D_month_20D_20P dataset
+2024-11-22 06:50:42,192 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 20)
+2024-11-22 06:50:42,275 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,275 - ERROR - Error processing 1D_month_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,275 - INFO - Processing 1D_month_20D_60P dataset
+2024-11-22 06:50:42,275 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 60)
+2024-11-22 06:50:42,356 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,356 - ERROR - Error processing 1D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,356 - INFO - Processing 1D_month_60D_5P dataset
+2024-11-22 06:50:42,356 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 5)
+2024-11-22 06:50:42,446 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,446 - ERROR - Error processing 1D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,447 - INFO - Processing 1D_month_60D_20P dataset
+2024-11-22 06:50:42,447 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 20)
+2024-11-22 06:50:42,534 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,534 - ERROR - Error processing 1D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,535 - INFO - Processing 1D_month_60D_60P dataset
+2024-11-22 06:50:42,535 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 60)
+2024-11-22 06:50:42,617 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,617 - ERROR - Error processing 1D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,618 - INFO - Processing 1D_quarter_5D_5P dataset
+2024-11-22 06:50:42,618 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 5)
+2024-11-22 06:50:42,704 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,704 - ERROR - Error processing 1D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,705 - INFO - Processing 1D_quarter_5D_20P dataset
+2024-11-22 06:50:42,705 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 20)
+2024-11-22 06:50:42,791 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,791 - ERROR - Error processing 1D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:42,791 - INFO - Processing 1D_quarter_5D_60P dataset
+2024-11-22 06:50:42,791 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 60)
+2024-11-22 06:50:42,876 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,876 - ERROR - Error processing 1D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:42,877 - INFO - Processing 1D_quarter_20D_5P dataset
+2024-11-22 06:50:42,877 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 5)
+2024-11-22 06:50:42,962 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,962 - ERROR - Error processing 1D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:42,962 - INFO - Processing 1D_quarter_20D_20P dataset
+2024-11-22 06:50:42,962 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 20)
+2024-11-22 06:50:43,046 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,046 - ERROR - Error processing 1D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,047 - INFO - Processing 1D_quarter_20D_60P dataset
+2024-11-22 06:50:43,047 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 60)
+2024-11-22 06:50:43,131 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,132 - ERROR - Error processing 1D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,132 - INFO - Processing 1D_quarter_60D_5P dataset
+2024-11-22 06:50:43,132 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 5)
+2024-11-22 06:50:43,216 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,217 - ERROR - Error processing 1D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,217 - INFO - Processing 1D_quarter_60D_20P dataset
+2024-11-22 06:50:43,217 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 20)
+2024-11-22 06:50:43,302 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,303 - ERROR - Error processing 1D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,303 - INFO - Processing 1D_quarter_60D_60P dataset
+2024-11-22 06:50:43,303 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 60)
+2024-11-22 06:50:43,387 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,388 - ERROR - Error processing 1D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,388 - INFO - Processing 2D_day_5D_5P dataset
+2024-11-22 06:50:43,388 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 5)
+2024-11-22 06:50:43,473 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,473 - ERROR - Error processing 2D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,474 - INFO - Processing 2D_day_5D_20P dataset
+2024-11-22 06:50:43,474 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 20)
+2024-11-22 06:50:43,557 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,557 - ERROR - Error processing 2D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,557 - INFO - Processing 2D_day_5D_60P dataset
+2024-11-22 06:50:43,558 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 60)
+2024-11-22 06:50:43,644 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,644 - ERROR - Error processing 2D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,644 - INFO - Processing 2D_day_20D_5P dataset
+2024-11-22 06:50:43,644 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 5)
+2024-11-22 06:50:43,729 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,729 - ERROR - Error processing 2D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,730 - INFO - Processing 2D_day_20D_20P dataset
+2024-11-22 06:50:43,730 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 20)
+2024-11-22 06:50:43,816 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,816 - ERROR - Error processing 2D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:43,817 - INFO - Processing 2D_day_20D_60P dataset
+2024-11-22 06:50:43,817 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 60)
+2024-11-22 06:50:43,903 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,903 - ERROR - Error processing 2D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:43,904 - INFO - Processing 2D_day_60D_5P dataset
+2024-11-22 06:50:43,904 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 5)
+2024-11-22 06:50:43,988 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,988 - ERROR - Error processing 2D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:43,989 - INFO - Processing 2D_day_60D_20P dataset
+2024-11-22 06:50:43,989 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 20)
+2024-11-22 06:50:44,072 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,072 - ERROR - Error processing 2D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,073 - INFO - Processing 2D_day_60D_60P dataset
+2024-11-22 06:50:44,073 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 60)
+2024-11-22 06:50:44,155 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,155 - ERROR - Error processing 2D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,156 - INFO - Processing 2D_week_5D_5P dataset
+2024-11-22 06:50:44,156 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 5)
+2024-11-22 06:50:44,236 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,236 - ERROR - Error processing 2D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,237 - INFO - Processing 2D_week_5D_20P dataset
+2024-11-22 06:50:44,237 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 20)
+2024-11-22 06:50:44,318 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,319 - ERROR - Error processing 2D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,319 - INFO - Processing 2D_week_5D_60P dataset
+2024-11-22 06:50:44,319 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 60)
+2024-11-22 06:50:44,401 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,401 - ERROR - Error processing 2D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,402 - INFO - Processing 2D_week_20D_5P dataset
+2024-11-22 06:50:44,402 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 5)
+2024-11-22 06:50:44,484 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,484 - ERROR - Error processing 2D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,485 - INFO - Processing 2D_week_20D_20P dataset
+2024-11-22 06:50:44,485 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 20)
+2024-11-22 06:50:44,565 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,565 - ERROR - Error processing 2D_week_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,566 - INFO - Processing 2D_week_20D_60P dataset
+2024-11-22 06:50:44,566 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 60)
+2024-11-22 06:50:44,648 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,649 - ERROR - Error processing 2D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,649 - INFO - Processing 2D_week_60D_5P dataset
+2024-11-22 06:50:44,649 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 5)
+2024-11-22 06:50:44,734 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,734 - ERROR - Error processing 2D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,735 - INFO - Processing 2D_week_60D_20P dataset
+2024-11-22 06:50:44,735 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 20)
+2024-11-22 06:50:44,816 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,816 - ERROR - Error processing 2D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:44,816 - INFO - Processing 2D_week_60D_60P dataset
+2024-11-22 06:50:44,816 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 60)
+2024-11-22 06:50:44,909 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,910 - ERROR - Error processing 2D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:44,910 - INFO - Processing 2D_month_5D_5P dataset
+2024-11-22 06:50:44,910 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 5)
+2024-11-22 06:50:44,996 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,996 - ERROR - Error processing 2D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:44,996 - INFO - Processing 2D_month_5D_20P dataset
+2024-11-22 06:50:44,996 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 20)
+2024-11-22 06:50:45,084 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,085 - ERROR - Error processing 2D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,085 - INFO - Processing 2D_month_5D_60P dataset
+2024-11-22 06:50:45,085 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 60)
+2024-11-22 06:50:45,168 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,168 - ERROR - Error processing 2D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,169 - INFO - Processing 2D_month_20D_5P dataset
+2024-11-22 06:50:45,169 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 5)
+2024-11-22 06:50:45,249 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:45,249 - ERROR - Error processing 2D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:45,250 - INFO - Processing 2D_month_20D_20P dataset
+2024-11-22 06:50:45,250 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 20)
+2024-11-22 06:50:45,332 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,332 - ERROR - Error processing 2D_month_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,333 - INFO - Processing 2D_month_20D_60P dataset
+2024-11-22 06:50:45,333 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 60)
+2024-11-22 06:50:45,415 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,415 - ERROR - Error processing 2D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,416 - INFO - Processing 2D_month_60D_5P dataset
+2024-11-22 06:50:45,416 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 5)
+2024-11-22 06:50:45,498 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:45,498 - ERROR - Error processing 2D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:45,498 - INFO - Processing 2D_month_60D_20P dataset
+2024-11-22 06:50:45,498 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 20)
+2024-11-22 06:50:45,587 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,587 - ERROR - Error processing 2D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,588 - INFO - Processing 2D_month_60D_60P dataset
+2024-11-22 06:50:45,588 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 60)
+2024-11-22 06:50:45,671 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,671 - ERROR - Error processing 2D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,671 - INFO - Processing 2D_quarter_5D_5P dataset
+2024-11-22 06:50:45,671 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 5)
+2024-11-22 06:50:45,755 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:45,756 - ERROR - Error processing 2D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:50:45,756 - INFO - Processing 2D_quarter_5D_20P dataset
+2024-11-22 06:50:45,756 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 20)
+2024-11-22 06:50:45,840 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,840 - ERROR - Error processing 2D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:50:45,841 - INFO - Processing 2D_quarter_5D_60P dataset
+2024-11-22 06:50:45,841 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 60)
+2024-11-22 06:50:45,928 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,928 - ERROR - Error processing 2D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:50:45,928 - INFO - Processing 2D_quarter_20D_5P dataset
+2024-11-22 06:50:45,928 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 5)
+2024-11-22 06:50:46,015 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:46,015 - ERROR - Error processing 2D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:50:46,016 - INFO - Processing 2D_quarter_20D_20P dataset
+2024-11-22 06:50:46,016 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 20)
+2024-11-22 06:50:46,104 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:46,104 - ERROR - Error processing 2D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:50:46,105 - INFO - Processing 2D_quarter_20D_60P dataset
+2024-11-22 06:50:46,105 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 60)
+2024-11-22 06:50:46,187 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:46,187 - ERROR - Error processing 2D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:50:46,187 - INFO - Processing 2D_quarter_60D_5P dataset
+2024-11-22 06:50:46,187 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 5)
+2024-11-22 06:50:46,271 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:46,271 - ERROR - Error processing 2D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:50:46,272 - INFO - Processing 2D_quarter_60D_20P dataset
+2024-11-22 06:50:46,272 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 20)
+2024-11-22 06:50:46,358 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:46,358 - ERROR - Error processing 2D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:50:46,358 - INFO - Processing 2D_quarter_60D_60P dataset
+2024-11-22 06:50:46,358 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 60)
+2024-11-22 06:50:46,442 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:46,442 - ERROR - Error processing 2D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:50:46,443 - INFO - 데이터셋 생성 완료
+2024-11-22 06:56:08,983 - INFO - 데이터셋 생성 시작
+2024-11-22 06:56:08,983 - INFO - Processing 1D_day_5D_5P dataset
+2024-11-22 06:56:08,983 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 5)
+2024-11-22 06:56:09,083 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,083 - ERROR - Error processing 1D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,083 - INFO - Processing 1D_day_5D_20P dataset
+2024-11-22 06:56:09,083 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 20)
+2024-11-22 06:56:09,166 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,166 - ERROR - Error processing 1D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,167 - INFO - Processing 1D_day_5D_60P dataset
+2024-11-22 06:56:09,167 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 60)
+2024-11-22 06:56:09,248 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,248 - ERROR - Error processing 1D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,248 - INFO - Processing 1D_day_20D_5P dataset
+2024-11-22 06:56:09,248 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 5)
+2024-11-22 06:56:09,330 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,330 - ERROR - Error processing 1D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,330 - INFO - Processing 1D_day_20D_20P dataset
+2024-11-22 06:56:09,330 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 20)
+2024-11-22 06:56:09,415 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,415 - ERROR - Error processing 1D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,415 - INFO - Processing 1D_day_20D_60P dataset
+2024-11-22 06:56:09,415 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 60)
+2024-11-22 06:56:09,496 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,496 - ERROR - Error processing 1D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,496 - INFO - Processing 1D_day_60D_5P dataset
+2024-11-22 06:56:09,496 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 5)
+2024-11-22 06:56:09,579 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,579 - ERROR - Error processing 1D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,580 - INFO - Processing 1D_day_60D_20P dataset
+2024-11-22 06:56:09,580 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 20)
+2024-11-22 06:56:09,660 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,661 - ERROR - Error processing 1D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,661 - INFO - Processing 1D_day_60D_60P dataset
+2024-11-22 06:56:09,661 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 60)
+2024-11-22 06:56:09,740 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,740 - ERROR - Error processing 1D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,740 - INFO - Processing 1D_week_5D_5P dataset
+2024-11-22 06:56:09,740 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 5)
+2024-11-22 06:56:09,816 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,816 - ERROR - Error processing 1D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:09,816 - INFO - Processing 1D_week_5D_20P dataset
+2024-11-22 06:56:09,816 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 20)
+2024-11-22 06:56:09,892 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,892 - ERROR - Error processing 1D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:09,893 - INFO - Processing 1D_week_5D_60P dataset
+2024-11-22 06:56:09,893 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 60)
+2024-11-22 06:56:09,972 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,972 - ERROR - Error processing 1D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:09,972 - INFO - Processing 1D_week_20D_5P dataset
+2024-11-22 06:56:09,972 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 5)
+2024-11-22 06:56:10,052 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,052 - ERROR - Error processing 1D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,052 - INFO - Processing 1D_week_20D_20P dataset
+2024-11-22 06:56:10,052 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 20)
+2024-11-22 06:56:10,129 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,129 - ERROR - Error processing 1D_week_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,129 - INFO - Processing 1D_week_20D_60P dataset
+2024-11-22 06:56:10,129 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 60)
+2024-11-22 06:56:10,208 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,208 - ERROR - Error processing 1D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,208 - INFO - Processing 1D_week_60D_5P dataset
+2024-11-22 06:56:10,208 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 5)
+2024-11-22 06:56:10,289 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,289 - ERROR - Error processing 1D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,289 - INFO - Processing 1D_week_60D_20P dataset
+2024-11-22 06:56:10,289 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 20)
+2024-11-22 06:56:10,369 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,369 - ERROR - Error processing 1D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,369 - INFO - Processing 1D_week_60D_60P dataset
+2024-11-22 06:56:10,369 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 60)
+2024-11-22 06:56:10,448 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,448 - ERROR - Error processing 1D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,449 - INFO - Processing 1D_month_5D_5P dataset
+2024-11-22 06:56:10,449 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 5)
+2024-11-22 06:56:10,528 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,528 - ERROR - Error processing 1D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,529 - INFO - Processing 1D_month_5D_20P dataset
+2024-11-22 06:56:10,529 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 20)
+2024-11-22 06:56:10,610 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,611 - ERROR - Error processing 1D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,611 - INFO - Processing 1D_month_5D_60P dataset
+2024-11-22 06:56:10,611 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 60)
+2024-11-22 06:56:10,690 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,690 - ERROR - Error processing 1D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,690 - INFO - Processing 1D_month_20D_5P dataset
+2024-11-22 06:56:10,690 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 5)
+2024-11-22 06:56:10,766 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,766 - ERROR - Error processing 1D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:10,766 - INFO - Processing 1D_month_20D_20P dataset
+2024-11-22 06:56:10,766 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 20)
+2024-11-22 06:56:10,842 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,842 - ERROR - Error processing 1D_month_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:10,842 - INFO - Processing 1D_month_20D_60P dataset
+2024-11-22 06:56:10,842 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 60)
+2024-11-22 06:56:10,919 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,919 - ERROR - Error processing 1D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:10,919 - INFO - Processing 1D_month_60D_5P dataset
+2024-11-22 06:56:10,919 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 5)
+2024-11-22 06:56:11,001 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,001 - ERROR - Error processing 1D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,002 - INFO - Processing 1D_month_60D_20P dataset
+2024-11-22 06:56:11,002 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 20)
+2024-11-22 06:56:11,081 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,081 - ERROR - Error processing 1D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,081 - INFO - Processing 1D_month_60D_60P dataset
+2024-11-22 06:56:11,081 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 60)
+2024-11-22 06:56:11,172 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,172 - ERROR - Error processing 1D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,172 - INFO - Processing 1D_quarter_5D_5P dataset
+2024-11-22 06:56:11,172 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 5)
+2024-11-22 06:56:11,254 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,255 - ERROR - Error processing 1D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,255 - INFO - Processing 1D_quarter_5D_20P dataset
+2024-11-22 06:56:11,255 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 20)
+2024-11-22 06:56:11,335 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,335 - ERROR - Error processing 1D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,336 - INFO - Processing 1D_quarter_5D_60P dataset
+2024-11-22 06:56:11,336 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 60)
+2024-11-22 06:56:11,416 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,416 - ERROR - Error processing 1D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,417 - INFO - Processing 1D_quarter_20D_5P dataset
+2024-11-22 06:56:11,417 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 5)
+2024-11-22 06:56:11,497 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,497 - ERROR - Error processing 1D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,497 - INFO - Processing 1D_quarter_20D_20P dataset
+2024-11-22 06:56:11,497 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 20)
+2024-11-22 06:56:11,580 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,580 - ERROR - Error processing 1D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,581 - INFO - Processing 1D_quarter_20D_60P dataset
+2024-11-22 06:56:11,581 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 60)
+2024-11-22 06:56:11,661 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,662 - ERROR - Error processing 1D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,662 - INFO - Processing 1D_quarter_60D_5P dataset
+2024-11-22 06:56:11,662 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 5)
+2024-11-22 06:56:11,744 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,744 - ERROR - Error processing 1D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,744 - INFO - Processing 1D_quarter_60D_20P dataset
+2024-11-22 06:56:11,744 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 20)
+2024-11-22 06:56:11,826 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,826 - ERROR - Error processing 1D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:11,826 - INFO - Processing 1D_quarter_60D_60P dataset
+2024-11-22 06:56:11,826 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 60)
+2024-11-22 06:56:11,903 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,903 - ERROR - Error processing 1D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:11,904 - INFO - Processing 2D_day_5D_5P dataset
+2024-11-22 06:56:11,904 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 5)
+2024-11-22 06:56:11,982 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,983 - ERROR - Error processing 2D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:11,983 - INFO - Processing 2D_day_5D_20P dataset
+2024-11-22 06:56:11,983 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 20)
+2024-11-22 06:56:12,063 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,063 - ERROR - Error processing 2D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,063 - INFO - Processing 2D_day_5D_60P dataset
+2024-11-22 06:56:12,063 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 60)
+2024-11-22 06:56:12,146 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,146 - ERROR - Error processing 2D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,147 - INFO - Processing 2D_day_20D_5P dataset
+2024-11-22 06:56:12,147 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 5)
+2024-11-22 06:56:12,225 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,225 - ERROR - Error processing 2D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,226 - INFO - Processing 2D_day_20D_20P dataset
+2024-11-22 06:56:12,226 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 20)
+2024-11-22 06:56:12,307 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,307 - ERROR - Error processing 2D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,308 - INFO - Processing 2D_day_20D_60P dataset
+2024-11-22 06:56:12,308 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 60)
+2024-11-22 06:56:12,392 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,392 - ERROR - Error processing 2D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,392 - INFO - Processing 2D_day_60D_5P dataset
+2024-11-22 06:56:12,392 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 5)
+2024-11-22 06:56:12,472 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,472 - ERROR - Error processing 2D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,472 - INFO - Processing 2D_day_60D_20P dataset
+2024-11-22 06:56:12,472 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 20)
+2024-11-22 06:56:12,549 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,550 - ERROR - Error processing 2D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,550 - INFO - Processing 2D_day_60D_60P dataset
+2024-11-22 06:56:12,550 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 60)
+2024-11-22 06:56:12,631 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,631 - ERROR - Error processing 2D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,632 - INFO - Processing 2D_week_5D_5P dataset
+2024-11-22 06:56:12,632 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 5)
+2024-11-22 06:56:12,715 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,715 - ERROR - Error processing 2D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,715 - INFO - Processing 2D_week_5D_20P dataset
+2024-11-22 06:56:12,715 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 20)
+2024-11-22 06:56:12,796 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,796 - ERROR - Error processing 2D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:12,797 - INFO - Processing 2D_week_5D_60P dataset
+2024-11-22 06:56:12,797 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 60)
+2024-11-22 06:56:12,875 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,875 - ERROR - Error processing 2D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:12,876 - INFO - Processing 2D_week_20D_5P dataset
+2024-11-22 06:56:12,876 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 5)
+2024-11-22 06:56:12,954 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,954 - ERROR - Error processing 2D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:12,954 - INFO - Processing 2D_week_20D_20P dataset
+2024-11-22 06:56:12,954 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 20)
+2024-11-22 06:56:13,057 - INFO - 상승확률 데이터 파일 '2D_week_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 06:56:13,057 - INFO - NaN 값 처리 시작
+2024-11-22 06:56:13,060 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 2715
+2024-11-22 06:56:13,143 - INFO - NaN 값 처리 완료
+2024-11-22 06:56:13,145 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 06:56:13,145 - INFO - 데이터 로드 완료
+2024-11-22 06:56:13,145 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 06:56:13,145 - INFO - 원본 상승확률(week별): (1393, 370)
+2024-11-22 06:56:13,145 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 06:56:13,150 - INFO - 데이터 분할 완료
+2024-11-22 06:56:13,150 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 06:56:13,150 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 06:56:13,150 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 06:56:13,630 - INFO - 최종 데이터셋 크기:
+2024-11-22 06:56:13,630 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 06:56:13,630 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 06:56:13,630 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 06:56:15,396 - INFO - Saved dataset_2D_week_20D_20P.pkl and dates_2D_week_20D_20P.pkl
+2024-11-22 06:56:15,396 - INFO - Processing 2D_week_20D_60P dataset
+2024-11-22 06:56:15,396 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 60)
+2024-11-22 06:56:15,495 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:15,495 - ERROR - Error processing 2D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:15,495 - INFO - Processing 2D_week_60D_5P dataset
+2024-11-22 06:56:15,495 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 5)
+2024-11-22 06:56:15,592 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:15,592 - ERROR - Error processing 2D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:15,592 - INFO - Processing 2D_week_60D_20P dataset
+2024-11-22 06:56:15,592 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 20)
+2024-11-22 06:56:15,687 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:15,688 - ERROR - Error processing 2D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:15,688 - INFO - Processing 2D_week_60D_60P dataset
+2024-11-22 06:56:15,688 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 60)
+2024-11-22 06:56:15,786 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:15,787 - ERROR - Error processing 2D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:15,787 - INFO - Processing 2D_month_5D_5P dataset
+2024-11-22 06:56:15,787 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 5)
+2024-11-22 06:56:15,879 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:15,879 - ERROR - Error processing 2D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:15,879 - INFO - Processing 2D_month_5D_20P dataset
+2024-11-22 06:56:15,879 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 20)
+2024-11-22 06:56:15,967 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:15,967 - ERROR - Error processing 2D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:15,967 - INFO - Processing 2D_month_5D_60P dataset
+2024-11-22 06:56:15,967 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 60)
+2024-11-22 06:56:16,060 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:16,060 - ERROR - Error processing 2D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:16,060 - INFO - Processing 2D_month_20D_5P dataset
+2024-11-22 06:56:16,060 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 5)
+2024-11-22 06:56:16,153 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:16,153 - ERROR - Error processing 2D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:16,153 - INFO - Processing 2D_month_20D_20P dataset
+2024-11-22 06:56:16,153 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 20)
+2024-11-22 06:56:16,252 - INFO - 상승확률 데이터 파일 '2D_month_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 06:56:16,252 - INFO - NaN 값 처리 시작
+2024-11-22 06:56:16,254 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 565
+2024-11-22 06:56:16,298 - INFO - NaN 값 처리 완료
+2024-11-22 06:56:16,300 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 06:56:16,301 - INFO - 데이터 로드 완료
+2024-11-22 06:56:16,301 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 06:56:16,301 - INFO - 원본 상승확률(month별): (285, 370)
+2024-11-22 06:56:16,301 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 06:56:16,305 - INFO - 데이터 분할 완료
+2024-11-22 06:56:16,305 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 06:56:16,305 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 06:56:16,305 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 06:56:16,847 - INFO - 최종 데이터셋 크기:
+2024-11-22 06:56:16,847 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 06:56:16,847 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 06:56:16,847 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 06:56:18,591 - INFO - Saved dataset_2D_month_20D_20P.pkl and dates_2D_month_20D_20P.pkl
+2024-11-22 06:56:18,591 - INFO - Processing 2D_month_20D_60P dataset
+2024-11-22 06:56:18,591 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 60)
+2024-11-22 06:56:18,672 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:18,672 - ERROR - Error processing 2D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:18,673 - INFO - Processing 2D_month_60D_5P dataset
+2024-11-22 06:56:18,673 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 5)
+2024-11-22 06:56:18,750 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:18,750 - ERROR - Error processing 2D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:18,750 - INFO - Processing 2D_month_60D_20P dataset
+2024-11-22 06:56:18,750 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 20)
+2024-11-22 06:56:18,825 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:18,825 - ERROR - Error processing 2D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:18,825 - INFO - Processing 2D_month_60D_60P dataset
+2024-11-22 06:56:18,825 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 60)
+2024-11-22 06:56:18,901 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:18,901 - ERROR - Error processing 2D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:18,901 - INFO - Processing 2D_quarter_5D_5P dataset
+2024-11-22 06:56:18,901 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 5)
+2024-11-22 06:56:18,976 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:18,977 - ERROR - Error processing 2D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:56:18,977 - INFO - Processing 2D_quarter_5D_20P dataset
+2024-11-22 06:56:18,977 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 20)
+2024-11-22 06:56:19,054 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:19,054 - ERROR - Error processing 2D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:56:19,054 - INFO - Processing 2D_quarter_5D_60P dataset
+2024-11-22 06:56:19,054 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 60)
+2024-11-22 06:56:19,128 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:19,128 - ERROR - Error processing 2D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:56:19,128 - INFO - Processing 2D_quarter_20D_5P dataset
+2024-11-22 06:56:19,128 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 5)
+2024-11-22 06:56:19,201 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:19,202 - ERROR - Error processing 2D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:56:19,202 - INFO - Processing 2D_quarter_20D_20P dataset
+2024-11-22 06:56:19,202 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 20)
+2024-11-22 06:56:19,276 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:19,276 - ERROR - Error processing 2D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:56:19,276 - INFO - Processing 2D_quarter_20D_60P dataset
+2024-11-22 06:56:19,276 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 60)
+2024-11-22 06:56:19,350 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:19,350 - ERROR - Error processing 2D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:56:19,350 - INFO - Processing 2D_quarter_60D_5P dataset
+2024-11-22 06:56:19,350 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 5)
+2024-11-22 06:56:19,423 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:19,423 - ERROR - Error processing 2D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:56:19,423 - INFO - Processing 2D_quarter_60D_20P dataset
+2024-11-22 06:56:19,423 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 20)
+2024-11-22 06:56:19,497 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:19,497 - ERROR - Error processing 2D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:56:19,498 - INFO - Processing 2D_quarter_60D_60P dataset
+2024-11-22 06:56:19,498 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 60)
+2024-11-22 06:56:19,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:19,573 - ERROR - Error processing 2D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:56:19,573 - INFO - 데이터셋 생성 완료
+2024-11-22 06:58:10,804 - INFO - 데이터셋 생성 시작
+2024-11-22 06:58:10,804 - INFO - Processing 1D_day_5D_5P dataset
+2024-11-22 06:58:10,804 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 5)
+2024-11-22 06:58:10,900 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:10,900 - ERROR - Error processing 1D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:10,900 - INFO - Processing 1D_day_5D_20P dataset
+2024-11-22 06:58:10,900 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 20)
+2024-11-22 06:58:10,980 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:10,980 - ERROR - Error processing 1D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:10,981 - INFO - Processing 1D_day_5D_60P dataset
+2024-11-22 06:58:10,981 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 60)
+2024-11-22 06:58:11,062 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,062 - ERROR - Error processing 1D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,062 - INFO - Processing 1D_day_20D_5P dataset
+2024-11-22 06:58:11,062 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 5)
+2024-11-22 06:58:11,140 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,140 - ERROR - Error processing 1D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,140 - INFO - Processing 1D_day_20D_20P dataset
+2024-11-22 06:58:11,140 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 20)
+2024-11-22 06:58:11,220 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,220 - ERROR - Error processing 1D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,221 - INFO - Processing 1D_day_20D_60P dataset
+2024-11-22 06:58:11,221 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 60)
+2024-11-22 06:58:11,296 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,296 - ERROR - Error processing 1D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,297 - INFO - Processing 1D_day_60D_5P dataset
+2024-11-22 06:58:11,297 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 5)
+2024-11-22 06:58:11,371 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,371 - ERROR - Error processing 1D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,371 - INFO - Processing 1D_day_60D_20P dataset
+2024-11-22 06:58:11,371 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 20)
+2024-11-22 06:58:11,446 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,446 - ERROR - Error processing 1D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,446 - INFO - Processing 1D_day_60D_60P dataset
+2024-11-22 06:58:11,446 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 60)
+2024-11-22 06:58:11,520 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,520 - ERROR - Error processing 1D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,520 - INFO - Processing 1D_week_5D_5P dataset
+2024-11-22 06:58:11,520 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 5)
+2024-11-22 06:58:11,596 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,596 - ERROR - Error processing 1D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,597 - INFO - Processing 1D_week_5D_20P dataset
+2024-11-22 06:58:11,597 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 20)
+2024-11-22 06:58:11,671 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,671 - ERROR - Error processing 1D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,671 - INFO - Processing 1D_week_5D_60P dataset
+2024-11-22 06:58:11,671 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 60)
+2024-11-22 06:58:11,747 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,747 - ERROR - Error processing 1D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,747 - INFO - Processing 1D_week_20D_5P dataset
+2024-11-22 06:58:11,747 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 5)
+2024-11-22 06:58:11,822 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,822 - ERROR - Error processing 1D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:11,823 - INFO - Processing 1D_week_20D_20P dataset
+2024-11-22 06:58:11,823 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 20)
+2024-11-22 06:58:11,897 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,898 - ERROR - Error processing 1D_week_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:11,898 - INFO - Processing 1D_week_20D_60P dataset
+2024-11-22 06:58:11,898 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 60)
+2024-11-22 06:58:11,972 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,972 - ERROR - Error processing 1D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:11,973 - INFO - Processing 1D_week_60D_5P dataset
+2024-11-22 06:58:11,973 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 5)
+2024-11-22 06:58:12,051 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,051 - ERROR - Error processing 1D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,052 - INFO - Processing 1D_week_60D_20P dataset
+2024-11-22 06:58:12,052 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 20)
+2024-11-22 06:58:12,135 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,135 - ERROR - Error processing 1D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,136 - INFO - Processing 1D_week_60D_60P dataset
+2024-11-22 06:58:12,136 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 60)
+2024-11-22 06:58:12,215 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,215 - ERROR - Error processing 1D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,215 - INFO - Processing 1D_month_5D_5P dataset
+2024-11-22 06:58:12,215 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 5)
+2024-11-22 06:58:12,291 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,291 - ERROR - Error processing 1D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,291 - INFO - Processing 1D_month_5D_20P dataset
+2024-11-22 06:58:12,291 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 20)
+2024-11-22 06:58:12,368 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,368 - ERROR - Error processing 1D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,368 - INFO - Processing 1D_month_5D_60P dataset
+2024-11-22 06:58:12,368 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 60)
+2024-11-22 06:58:12,446 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,446 - ERROR - Error processing 1D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,446 - INFO - Processing 1D_month_20D_5P dataset
+2024-11-22 06:58:12,446 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 5)
+2024-11-22 06:58:12,524 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,524 - ERROR - Error processing 1D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,524 - INFO - Processing 1D_month_20D_20P dataset
+2024-11-22 06:58:12,524 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 20)
+2024-11-22 06:58:12,601 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,601 - ERROR - Error processing 1D_month_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,602 - INFO - Processing 1D_month_20D_60P dataset
+2024-11-22 06:58:12,602 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 60)
+2024-11-22 06:58:12,679 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,679 - ERROR - Error processing 1D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,679 - INFO - Processing 1D_month_60D_5P dataset
+2024-11-22 06:58:12,679 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 5)
+2024-11-22 06:58:12,757 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,757 - ERROR - Error processing 1D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,757 - INFO - Processing 1D_month_60D_20P dataset
+2024-11-22 06:58:12,757 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 20)
+2024-11-22 06:58:12,839 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,839 - ERROR - Error processing 1D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:12,839 - INFO - Processing 1D_month_60D_60P dataset
+2024-11-22 06:58:12,839 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 60)
+2024-11-22 06:58:12,917 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,917 - ERROR - Error processing 1D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:12,918 - INFO - Processing 1D_quarter_5D_5P dataset
+2024-11-22 06:58:12,918 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 5)
+2024-11-22 06:58:12,995 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,995 - ERROR - Error processing 1D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:12,995 - INFO - Processing 1D_quarter_5D_20P dataset
+2024-11-22 06:58:12,995 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 20)
+2024-11-22 06:58:13,072 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,072 - ERROR - Error processing 1D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,072 - INFO - Processing 1D_quarter_5D_60P dataset
+2024-11-22 06:58:13,072 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 60)
+2024-11-22 06:58:13,149 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,149 - ERROR - Error processing 1D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,150 - INFO - Processing 1D_quarter_20D_5P dataset
+2024-11-22 06:58:13,150 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 5)
+2024-11-22 06:58:13,228 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,228 - ERROR - Error processing 1D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,228 - INFO - Processing 1D_quarter_20D_20P dataset
+2024-11-22 06:58:13,228 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 20)
+2024-11-22 06:58:13,307 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,307 - ERROR - Error processing 1D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,307 - INFO - Processing 1D_quarter_20D_60P dataset
+2024-11-22 06:58:13,307 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 60)
+2024-11-22 06:58:13,384 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,384 - ERROR - Error processing 1D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,384 - INFO - Processing 1D_quarter_60D_5P dataset
+2024-11-22 06:58:13,384 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 5)
+2024-11-22 06:58:13,463 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,463 - ERROR - Error processing 1D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,464 - INFO - Processing 1D_quarter_60D_20P dataset
+2024-11-22 06:58:13,464 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 20)
+2024-11-22 06:58:13,542 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,542 - ERROR - Error processing 1D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,542 - INFO - Processing 1D_quarter_60D_60P dataset
+2024-11-22 06:58:13,542 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 60)
+2024-11-22 06:58:13,624 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,624 - ERROR - Error processing 1D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,624 - INFO - Processing 2D_day_5D_5P dataset
+2024-11-22 06:58:13,624 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 5)
+2024-11-22 06:58:13,703 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,703 - ERROR - Error processing 2D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,703 - INFO - Processing 2D_day_5D_20P dataset
+2024-11-22 06:58:13,703 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 20)
+2024-11-22 06:58:13,780 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,780 - ERROR - Error processing 2D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:13,780 - INFO - Processing 2D_day_5D_60P dataset
+2024-11-22 06:58:13,780 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 60)
+2024-11-22 06:58:13,855 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,855 - ERROR - Error processing 2D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:13,855 - INFO - Processing 2D_day_20D_5P dataset
+2024-11-22 06:58:13,855 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 5)
+2024-11-22 06:58:13,932 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,932 - ERROR - Error processing 2D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:13,932 - INFO - Processing 2D_day_20D_20P dataset
+2024-11-22 06:58:13,932 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 20)
+2024-11-22 06:58:14,015 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:14,015 - ERROR - Error processing 2D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:14,015 - INFO - Processing 2D_day_20D_60P dataset
+2024-11-22 06:58:14,015 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 60)
+2024-11-22 06:58:14,098 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:14,098 - ERROR - Error processing 2D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:14,098 - INFO - Processing 2D_day_60D_5P dataset
+2024-11-22 06:58:14,098 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 5)
+2024-11-22 06:58:14,178 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:14,178 - ERROR - Error processing 2D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:14,178 - INFO - Processing 2D_day_60D_20P dataset
+2024-11-22 06:58:14,178 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 20)
+2024-11-22 06:58:14,254 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:14,255 - ERROR - Error processing 2D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:14,255 - INFO - Processing 2D_day_60D_60P dataset
+2024-11-22 06:58:14,255 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 60)
+2024-11-22 06:58:14,331 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:14,332 - ERROR - Error processing 2D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:14,332 - INFO - Processing 2D_week_5D_5P dataset
+2024-11-22 06:58:14,332 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 5)
+2024-11-22 06:58:14,407 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:14,408 - ERROR - Error processing 2D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:14,408 - INFO - Processing 2D_week_5D_20P dataset
+2024-11-22 06:58:14,408 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 20)
+2024-11-22 06:58:14,483 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:14,483 - ERROR - Error processing 2D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:14,484 - INFO - Processing 2D_week_5D_60P dataset
+2024-11-22 06:58:14,484 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 60)
+2024-11-22 06:58:14,559 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:14,559 - ERROR - Error processing 2D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:14,559 - INFO - Processing 2D_week_20D_5P dataset
+2024-11-22 06:58:14,559 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 5)
+2024-11-22 06:58:14,636 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:14,636 - ERROR - Error processing 2D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:14,637 - INFO - Processing 2D_week_20D_20P dataset
+2024-11-22 06:58:14,637 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 20)
+2024-11-22 06:58:14,753 - INFO - 상승확률 데이터 파일 '2D_week_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 06:58:14,753 - INFO - NaN 값 처리 시작
+2024-11-22 06:58:14,755 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 2715
+2024-11-22 06:58:14,822 - INFO - NaN 값 처리 완료
+2024-11-22 06:58:14,824 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 06:58:14,824 - INFO - 데이터 로드 완료
+2024-11-22 06:58:14,824 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 06:58:14,824 - INFO - 원본 상승확률(week별): (1393, 370)
+2024-11-22 06:58:14,824 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 06:58:14,830 - INFO - 데이터 분할 완료
+2024-11-22 06:58:14,830 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 06:58:14,830 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 06:58:14,830 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 06:58:15,310 - INFO - 최종 데이터셋 크기:
+2024-11-22 06:58:15,311 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 06:58:15,311 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 06:58:15,311 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 06:58:17,614 - INFO - Saved dataset_2D_week_20D_20P.pkl and dates_2D_week_20D_20P.pkl
+2024-11-22 06:58:17,614 - INFO - Processing 2D_week_20D_60P dataset
+2024-11-22 06:58:17,614 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 60)
+2024-11-22 06:58:17,708 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:17,708 - ERROR - Error processing 2D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:17,708 - INFO - Processing 2D_week_60D_5P dataset
+2024-11-22 06:58:17,708 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 5)
+2024-11-22 06:58:17,801 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:17,801 - ERROR - Error processing 2D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:17,801 - INFO - Processing 2D_week_60D_20P dataset
+2024-11-22 06:58:17,801 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 20)
+2024-11-22 06:58:17,892 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:17,892 - ERROR - Error processing 2D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:17,893 - INFO - Processing 2D_week_60D_60P dataset
+2024-11-22 06:58:17,893 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 60)
+2024-11-22 06:58:17,982 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:17,982 - ERROR - Error processing 2D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:17,983 - INFO - Processing 2D_month_5D_5P dataset
+2024-11-22 06:58:17,983 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 5)
+2024-11-22 06:58:18,070 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:18,070 - ERROR - Error processing 2D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:18,070 - INFO - Processing 2D_month_5D_20P dataset
+2024-11-22 06:58:18,070 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 20)
+2024-11-22 06:58:18,154 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:18,154 - ERROR - Error processing 2D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:18,155 - INFO - Processing 2D_month_5D_60P dataset
+2024-11-22 06:58:18,155 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 60)
+2024-11-22 06:58:18,240 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:18,240 - ERROR - Error processing 2D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:18,240 - INFO - Processing 2D_month_20D_5P dataset
+2024-11-22 06:58:18,240 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 5)
+2024-11-22 06:58:18,359 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:18,359 - ERROR - Error processing 2D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:18,359 - INFO - Processing 2D_month_20D_20P dataset
+2024-11-22 06:58:18,359 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 20)
+2024-11-22 06:58:18,476 - INFO - 상승확률 데이터 파일 '2D_month_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 06:58:18,476 - INFO - NaN 값 처리 시작
+2024-11-22 06:58:18,478 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 565
+2024-11-22 06:58:18,502 - INFO - NaN 값 처리 완료
+2024-11-22 06:58:18,504 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 06:58:18,504 - INFO - 데이터 로드 완료
+2024-11-22 06:58:18,505 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 06:58:18,505 - INFO - 원본 상승확률(month별): (285, 370)
+2024-11-22 06:58:18,505 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 06:58:18,510 - INFO - 데이터 분할 완료
+2024-11-22 06:58:18,510 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 06:58:18,510 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 06:58:18,510 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 06:58:19,050 - INFO - 최종 데이터셋 크기:
+2024-11-22 06:58:19,050 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 06:58:19,050 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 06:58:19,050 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 06:58:21,123 - INFO - Saved dataset_2D_month_20D_20P.pkl and dates_2D_month_20D_20P.pkl
+2024-11-22 06:58:21,123 - INFO - Processing 2D_month_20D_60P dataset
+2024-11-22 06:58:21,123 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 60)
+2024-11-22 06:58:21,202 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,202 - ERROR - Error processing 2D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,202 - INFO - Processing 2D_month_60D_5P dataset
+2024-11-22 06:58:21,202 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 5)
+2024-11-22 06:58:21,281 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,281 - ERROR - Error processing 2D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,281 - INFO - Processing 2D_month_60D_20P dataset
+2024-11-22 06:58:21,281 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 20)
+2024-11-22 06:58:21,357 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:21,357 - ERROR - Error processing 2D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:21,357 - INFO - Processing 2D_month_60D_60P dataset
+2024-11-22 06:58:21,357 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 60)
+2024-11-22 06:58:21,434 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,434 - ERROR - Error processing 2D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,434 - INFO - Processing 2D_quarter_5D_5P dataset
+2024-11-22 06:58:21,434 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 5)
+2024-11-22 06:58:21,510 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,510 - ERROR - Error processing 2D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,510 - INFO - Processing 2D_quarter_5D_20P dataset
+2024-11-22 06:58:21,510 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 20)
+2024-11-22 06:58:21,585 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:21,585 - ERROR - Error processing 2D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 06:58:21,585 - INFO - Processing 2D_quarter_5D_60P dataset
+2024-11-22 06:58:21,585 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 60)
+2024-11-22 06:58:21,660 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,660 - ERROR - Error processing 2D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,661 - INFO - Processing 2D_quarter_20D_5P dataset
+2024-11-22 06:58:21,661 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 5)
+2024-11-22 06:58:21,734 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,734 - ERROR - Error processing 2D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,734 - INFO - Processing 2D_quarter_20D_20P dataset
+2024-11-22 06:58:21,734 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 20)
+2024-11-22 06:58:21,807 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:21,807 - ERROR - Error processing 2D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 06:58:21,807 - INFO - Processing 2D_quarter_20D_60P dataset
+2024-11-22 06:58:21,807 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 60)
+2024-11-22 06:58:21,881 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,881 - ERROR - Error processing 2D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 06:58:21,881 - INFO - Processing 2D_quarter_60D_5P dataset
+2024-11-22 06:58:21,881 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 5)
+2024-11-22 06:58:21,968 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,968 - ERROR - Error processing 2D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 06:58:21,968 - INFO - Processing 2D_quarter_60D_20P dataset
+2024-11-22 06:58:21,968 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 20)
+2024-11-22 06:58:22,049 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:22,049 - ERROR - Error processing 2D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 06:58:22,049 - INFO - Processing 2D_quarter_60D_60P dataset
+2024-11-22 06:58:22,049 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 60)
+2024-11-22 06:58:22,126 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:22,126 - ERROR - Error processing 2D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 06:58:22,126 - INFO - 데이터셋 생성 완료
+2024-11-22 07:01:03,276 - INFO - 데이터셋 생성 시작
+2024-11-22 07:01:03,276 - INFO - Processing 1D_day_5D_5P dataset
+2024-11-22 07:01:03,276 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 5)
+2024-11-22 07:01:03,377 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:03,377 - ERROR - Error processing 1D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:03,377 - INFO - Processing 1D_day_5D_20P dataset
+2024-11-22 07:01:03,377 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 20)
+2024-11-22 07:01:03,460 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:03,460 - ERROR - Error processing 1D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:03,461 - INFO - Processing 1D_day_5D_60P dataset
+2024-11-22 07:01:03,461 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 60)
+2024-11-22 07:01:03,541 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:03,541 - ERROR - Error processing 1D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:03,541 - INFO - Processing 1D_day_20D_5P dataset
+2024-11-22 07:01:03,541 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 5)
+2024-11-22 07:01:03,622 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:03,622 - ERROR - Error processing 1D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:03,623 - INFO - Processing 1D_day_20D_20P dataset
+2024-11-22 07:01:03,623 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 20)
+2024-11-22 07:01:03,703 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:03,703 - ERROR - Error processing 1D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:03,704 - INFO - Processing 1D_day_20D_60P dataset
+2024-11-22 07:01:03,704 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 60)
+2024-11-22 07:01:03,782 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:03,782 - ERROR - Error processing 1D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:03,783 - INFO - Processing 1D_day_60D_5P dataset
+2024-11-22 07:01:03,783 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 5)
+2024-11-22 07:01:03,864 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:03,864 - ERROR - Error processing 1D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:03,864 - INFO - Processing 1D_day_60D_20P dataset
+2024-11-22 07:01:03,864 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 20)
+2024-11-22 07:01:03,948 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:03,949 - ERROR - Error processing 1D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:03,949 - INFO - Processing 1D_day_60D_60P dataset
+2024-11-22 07:01:03,949 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 60)
+2024-11-22 07:01:04,036 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,036 - ERROR - Error processing 1D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_day_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,037 - INFO - Processing 1D_week_5D_5P dataset
+2024-11-22 07:01:04,037 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 5)
+2024-11-22 07:01:04,120 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,120 - ERROR - Error processing 1D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,121 - INFO - Processing 1D_week_5D_20P dataset
+2024-11-22 07:01:04,121 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 20)
+2024-11-22 07:01:04,207 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,207 - ERROR - Error processing 1D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,207 - INFO - Processing 1D_week_5D_60P dataset
+2024-11-22 07:01:04,208 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 60)
+2024-11-22 07:01:04,302 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,302 - ERROR - Error processing 1D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,302 - INFO - Processing 1D_week_20D_5P dataset
+2024-11-22 07:01:04,302 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 5)
+2024-11-22 07:01:04,383 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,383 - ERROR - Error processing 1D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,384 - INFO - Processing 1D_week_20D_20P dataset
+2024-11-22 07:01:04,384 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 20)
+2024-11-22 07:01:04,467 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,467 - ERROR - Error processing 1D_week_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,467 - INFO - Processing 1D_week_20D_60P dataset
+2024-11-22 07:01:04,467 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 60)
+2024-11-22 07:01:04,549 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,549 - ERROR - Error processing 1D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,550 - INFO - Processing 1D_week_60D_5P dataset
+2024-11-22 07:01:04,550 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 5)
+2024-11-22 07:01:04,632 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,632 - ERROR - Error processing 1D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,633 - INFO - Processing 1D_week_60D_20P dataset
+2024-11-22 07:01:04,633 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 20)
+2024-11-22 07:01:04,713 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,714 - ERROR - Error processing 1D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,714 - INFO - Processing 1D_week_60D_60P dataset
+2024-11-22 07:01:04,714 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 60)
+2024-11-22 07:01:04,795 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,795 - ERROR - Error processing 1D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_week_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:04,795 - INFO - Processing 1D_month_5D_5P dataset
+2024-11-22 07:01:04,795 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 5)
+2024-11-22 07:01:04,877 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,877 - ERROR - Error processing 1D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:04,877 - INFO - Processing 1D_month_5D_20P dataset
+2024-11-22 07:01:04,877 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 20)
+2024-11-22 07:01:04,961 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,961 - ERROR - Error processing 1D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:04,961 - INFO - Processing 1D_month_5D_60P dataset
+2024-11-22 07:01:04,961 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 60)
+2024-11-22 07:01:05,045 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,045 - ERROR - Error processing 1D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,046 - INFO - Processing 1D_month_20D_5P dataset
+2024-11-22 07:01:05,046 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 5)
+2024-11-22 07:01:05,134 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,134 - ERROR - Error processing 1D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,134 - INFO - Processing 1D_month_20D_20P dataset
+2024-11-22 07:01:05,134 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 20)
+2024-11-22 07:01:05,216 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,216 - ERROR - Error processing 1D_month_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,216 - INFO - Processing 1D_month_20D_60P dataset
+2024-11-22 07:01:05,216 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 60)
+2024-11-22 07:01:05,300 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,300 - ERROR - Error processing 1D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,301 - INFO - Processing 1D_month_60D_5P dataset
+2024-11-22 07:01:05,301 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 5)
+2024-11-22 07:01:05,383 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,384 - ERROR - Error processing 1D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,384 - INFO - Processing 1D_month_60D_20P dataset
+2024-11-22 07:01:05,384 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 20)
+2024-11-22 07:01:05,464 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,464 - ERROR - Error processing 1D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,464 - INFO - Processing 1D_month_60D_60P dataset
+2024-11-22 07:01:05,464 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 60)
+2024-11-22 07:01:05,544 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,544 - ERROR - Error processing 1D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_month_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,545 - INFO - Processing 1D_quarter_5D_5P dataset
+2024-11-22 07:01:05,545 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 5)
+2024-11-22 07:01:05,625 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,626 - ERROR - Error processing 1D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,626 - INFO - Processing 1D_quarter_5D_20P dataset
+2024-11-22 07:01:05,626 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 20)
+2024-11-22 07:01:05,707 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,707 - ERROR - Error processing 1D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,708 - INFO - Processing 1D_quarter_5D_60P dataset
+2024-11-22 07:01:05,708 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 60)
+2024-11-22 07:01:05,790 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,790 - ERROR - Error processing 1D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:05,791 - INFO - Processing 1D_quarter_20D_5P dataset
+2024-11-22 07:01:05,791 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 5)
+2024-11-22 07:01:05,875 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,875 - ERROR - Error processing 1D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:05,875 - INFO - Processing 1D_quarter_20D_20P dataset
+2024-11-22 07:01:05,876 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 20)
+2024-11-22 07:01:05,958 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,958 - ERROR - Error processing 1D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:05,959 - INFO - Processing 1D_quarter_20D_60P dataset
+2024-11-22 07:01:05,959 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 60)
+2024-11-22 07:01:06,040 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,040 - ERROR - Error processing 1D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,041 - INFO - Processing 1D_quarter_60D_5P dataset
+2024-11-22 07:01:06,041 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 5)
+2024-11-22 07:01:06,123 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,124 - ERROR - Error processing 1D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,124 - INFO - Processing 1D_quarter_60D_20P dataset
+2024-11-22 07:01:06,124 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 20)
+2024-11-22 07:01:06,208 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,208 - ERROR - Error processing 1D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,209 - INFO - Processing 1D_quarter_60D_60P dataset
+2024-11-22 07:01:06,209 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 60)
+2024-11-22 07:01:06,295 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,295 - ERROR - Error processing 1D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/1D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,296 - INFO - Processing 2D_day_5D_5P dataset
+2024-11-22 07:01:06,296 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 5)
+2024-11-22 07:01:06,380 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,380 - ERROR - Error processing 2D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,381 - INFO - Processing 2D_day_5D_20P dataset
+2024-11-22 07:01:06,381 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 20)
+2024-11-22 07:01:06,463 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,463 - ERROR - Error processing 2D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,464 - INFO - Processing 2D_day_5D_60P dataset
+2024-11-22 07:01:06,464 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 60)
+2024-11-22 07:01:06,545 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,545 - ERROR - Error processing 2D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,546 - INFO - Processing 2D_day_20D_5P dataset
+2024-11-22 07:01:06,546 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 5)
+2024-11-22 07:01:06,626 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,626 - ERROR - Error processing 2D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,627 - INFO - Processing 2D_day_20D_20P dataset
+2024-11-22 07:01:06,627 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 20)
+2024-11-22 07:01:06,708 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,708 - ERROR - Error processing 2D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,709 - INFO - Processing 2D_day_20D_60P dataset
+2024-11-22 07:01:06,709 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 60)
+2024-11-22 07:01:06,798 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,798 - ERROR - Error processing 2D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:06,799 - INFO - Processing 2D_day_60D_5P dataset
+2024-11-22 07:01:06,799 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 5)
+2024-11-22 07:01:06,888 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,888 - ERROR - Error processing 2D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:06,888 - INFO - Processing 2D_day_60D_20P dataset
+2024-11-22 07:01:06,888 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 20)
+2024-11-22 07:01:06,972 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,972 - ERROR - Error processing 2D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:06,973 - INFO - Processing 2D_day_60D_60P dataset
+2024-11-22 07:01:06,973 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 60)
+2024-11-22 07:01:07,056 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:07,057 - ERROR - Error processing 2D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_day_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:07,057 - INFO - Processing 2D_week_5D_5P dataset
+2024-11-22 07:01:07,057 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 5)
+2024-11-22 07:01:07,140 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:07,140 - ERROR - Error processing 2D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:07,141 - INFO - Processing 2D_week_5D_20P dataset
+2024-11-22 07:01:07,141 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 20)
+2024-11-22 07:01:07,221 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:07,222 - ERROR - Error processing 2D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:07,222 - INFO - Processing 2D_week_5D_60P dataset
+2024-11-22 07:01:07,222 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 60)
+2024-11-22 07:01:07,303 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:07,303 - ERROR - Error processing 2D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:07,303 - INFO - Processing 2D_week_20D_5P dataset
+2024-11-22 07:01:07,303 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 5)
+2024-11-22 07:01:07,386 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:07,386 - ERROR - Error processing 2D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:07,387 - INFO - Processing 2D_week_20D_20P dataset
+2024-11-22 07:01:07,387 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 20)
+2024-11-22 07:01:07,492 - INFO - 상승확률 데이터 파일 '2D_week_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 07:01:07,492 - INFO - NaN 값 처리 시작
+2024-11-22 07:01:07,494 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 2715
+2024-11-22 07:01:07,686 - INFO - NaN 값 처리 완료
+2024-11-22 07:01:07,692 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 07:01:07,692 - INFO - 데이터 로드 완료
+2024-11-22 07:01:07,692 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 07:01:07,692 - INFO - 원본 상승확률(week별): (1393, 370)
+2024-11-22 07:01:07,692 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 07:01:07,702 - INFO - 데이터 분할 완료
+2024-11-22 07:01:07,702 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 07:01:07,702 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 07:01:07,702 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 07:01:12,166 - INFO - 최종 데이터셋 크기:
+2024-11-22 07:01:12,166 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 07:01:12,166 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 07:01:12,166 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 07:01:13,829 - INFO - Saved dataset_2D_week_20D_20P.pkl and dates_2D_week_20D_20P.pkl
+2024-11-22 07:01:13,829 - INFO - Processing 2D_week_20D_60P dataset
+2024-11-22 07:01:13,829 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 60)
+2024-11-22 07:01:13,909 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:13,909 - ERROR - Error processing 2D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:13,909 - INFO - Processing 2D_week_60D_5P dataset
+2024-11-22 07:01:13,909 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 5)
+2024-11-22 07:01:13,991 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:13,991 - ERROR - Error processing 2D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:13,991 - INFO - Processing 2D_week_60D_20P dataset
+2024-11-22 07:01:13,991 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 20)
+2024-11-22 07:01:14,067 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:14,067 - ERROR - Error processing 2D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:14,067 - INFO - Processing 2D_week_60D_60P dataset
+2024-11-22 07:01:14,067 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 60)
+2024-11-22 07:01:14,141 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:14,141 - ERROR - Error processing 2D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_week_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:14,141 - INFO - Processing 2D_month_5D_5P dataset
+2024-11-22 07:01:14,141 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 5)
+2024-11-22 07:01:14,218 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:14,218 - ERROR - Error processing 2D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:14,218 - INFO - Processing 2D_month_5D_20P dataset
+2024-11-22 07:01:14,218 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 20)
+2024-11-22 07:01:14,303 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:14,303 - ERROR - Error processing 2D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:14,303 - INFO - Processing 2D_month_5D_60P dataset
+2024-11-22 07:01:14,303 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 60)
+2024-11-22 07:01:14,382 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:14,382 - ERROR - Error processing 2D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:14,382 - INFO - Processing 2D_month_20D_5P dataset
+2024-11-22 07:01:14,382 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 5)
+2024-11-22 07:01:14,459 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:14,459 - ERROR - Error processing 2D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:14,459 - INFO - Processing 2D_month_20D_20P dataset
+2024-11-22 07:01:14,459 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 20)
+2024-11-22 07:01:14,544 - INFO - 상승확률 데이터 파일 '2D_month_20D_20P_up_prob_df.csv' 로드 완료
+2024-11-22 07:01:14,544 - INFO - NaN 값 처리 시작
+2024-11-22 07:01:14,545 - INFO - 처리 전 NaN 개수 - 수익률: 11558, 상승확률: 565
+2024-11-22 07:01:14,681 - INFO - NaN 값 처리 완료
+2024-11-22 07:01:14,687 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 07:01:14,687 - INFO - 데이터 로드 완료
+2024-11-22 07:01:14,687 - INFO - 수익률 데이터(일별): (5974, 370)
+2024-11-22 07:01:14,687 - INFO - 원본 상승확률(month별): (285, 370)
+2024-11-22 07:01:14,687 - INFO - 확장된 상승확률(일별): (5974, 370)
+2024-11-22 07:01:14,697 - INFO - 데이터 분할 완료
+2024-11-22 07:01:14,697 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 07:01:14,697 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 07:01:14,697 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 07:01:19,319 - INFO - 최종 데이터셋 크기:
+2024-11-22 07:01:19,319 - INFO - Train - X: (2914, 60, 370), Y: (2914, 20, 370), Prob: (2914, 20, 370)
+2024-11-22 07:01:19,319 - INFO - Val - X: (1204, 60, 370), Y: (1204, 20, 370), Prob: (1204, 20, 370)
+2024-11-22 07:01:19,319 - INFO - Test - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+2024-11-22 07:01:21,192 - INFO - Saved dataset_2D_month_20D_20P.pkl and dates_2D_month_20D_20P.pkl
+2024-11-22 07:01:21,192 - INFO - Processing 2D_month_20D_60P dataset
+2024-11-22 07:01:21,192 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 60)
+2024-11-22 07:01:21,274 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,274 - ERROR - Error processing 2D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,274 - INFO - Processing 2D_month_60D_5P dataset
+2024-11-22 07:01:21,274 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 5)
+2024-11-22 07:01:21,356 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:21,356 - ERROR - Error processing 2D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:21,356 - INFO - Processing 2D_month_60D_20P dataset
+2024-11-22 07:01:21,356 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 20)
+2024-11-22 07:01:21,434 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:21,434 - ERROR - Error processing 2D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:21,434 - INFO - Processing 2D_month_60D_60P dataset
+2024-11-22 07:01:21,434 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 60)
+2024-11-22 07:01:21,511 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,511 - ERROR - Error processing 2D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_month_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,511 - INFO - Processing 2D_quarter_5D_5P dataset
+2024-11-22 07:01:21,511 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 5)
+2024-11-22 07:01:21,588 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:21,588 - ERROR - Error processing 2D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_5P_up_prob_df.csv'
+2024-11-22 07:01:21,588 - INFO - Processing 2D_quarter_5D_20P dataset
+2024-11-22 07:01:21,588 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 20)
+2024-11-22 07:01:21,666 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:21,666 - ERROR - Error processing 2D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_20P_up_prob_df.csv'
+2024-11-22 07:01:21,666 - INFO - Processing 2D_quarter_5D_60P dataset
+2024-11-22 07:01:21,666 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 60)
+2024-11-22 07:01:21,744 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,744 - ERROR - Error processing 2D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_5D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,744 - INFO - Processing 2D_quarter_20D_5P dataset
+2024-11-22 07:01:21,744 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 5)
+2024-11-22 07:01:21,822 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:21,822 - ERROR - Error processing 2D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_5P_up_prob_df.csv'
+2024-11-22 07:01:21,822 - INFO - Processing 2D_quarter_20D_20P dataset
+2024-11-22 07:01:21,823 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 20)
+2024-11-22 07:01:21,901 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:21,901 - ERROR - Error processing 2D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_20P_up_prob_df.csv'
+2024-11-22 07:01:21,901 - INFO - Processing 2D_quarter_20D_60P dataset
+2024-11-22 07:01:21,901 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 60)
+2024-11-22 07:01:21,981 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,981 - ERROR - Error processing 2D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_20D_60P_up_prob_df.csv'
+2024-11-22 07:01:21,982 - INFO - Processing 2D_quarter_60D_5P dataset
+2024-11-22 07:01:21,982 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 5)
+2024-11-22 07:01:22,059 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:22,060 - ERROR - Error processing 2D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_5P_up_prob_df.csv'
+2024-11-22 07:01:22,060 - INFO - Processing 2D_quarter_60D_20P dataset
+2024-11-22 07:01:22,060 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 20)
+2024-11-22 07:01:22,135 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:22,136 - ERROR - Error processing 2D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_20P_up_prob_df.csv'
+2024-11-22 07:01:22,136 - INFO - Processing 2D_quarter_60D_60P dataset
+2024-11-22 07:01:22,136 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 60)
+2024-11-22 07:01:22,211 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:22,211 - ERROR - Error processing 2D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/2D_quarter_60D_60P_up_prob_df.csv'
+2024-11-22 07:01:22,211 - INFO - 데이터셋 생성 완료
+2024-11-22 08:01:14,566 - INFO - 데이터셋 생성 시작
+2024-11-22 08:01:14,566 - INFO - Processing 1D_day_5D_5P dataset
+2024-11-22 08:01:14,566 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 5)
+2024-11-22 08:01:14,566 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,566 - ERROR - Error processing 1D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,566 - INFO - Processing 1D_day_5D_20P dataset
+2024-11-22 08:01:14,566 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 20)
+2024-11-22 08:01:14,566 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,566 - ERROR - Error processing 1D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,566 - INFO - Processing 1D_day_5D_60P dataset
+2024-11-22 08:01:14,566 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 5, pw: 60)
+2024-11-22 08:01:14,566 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,566 - ERROR - Error processing 1D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_day_20D_5P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 5)
+2024-11-22 08:01:14,567 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - ERROR - Error processing 1D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_day_20D_20P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 20)
+2024-11-22 08:01:14,567 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - ERROR - Error processing 1D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_day_20D_60P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 20, pw: 60)
+2024-11-22 08:01:14,567 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - ERROR - Error processing 1D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_day_60D_5P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 5)
+2024-11-22 08:01:14,567 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - ERROR - Error processing 1D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_day_60D_20P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 20)
+2024-11-22 08:01:14,567 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - ERROR - Error processing 1D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_day_60D_60P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: day, ws: 60, pw: 60)
+2024-11-22 08:01:14,567 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - ERROR - Error processing 1D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_week_5D_5P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 5)
+2024-11-22 08:01:14,567 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - ERROR - Error processing 1D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,567 - INFO - Processing 1D_week_5D_20P dataset
+2024-11-22 08:01:14,567 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 20)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_week_5D_60P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 5, pw: 60)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_week_20D_5P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 5)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_week_20D_20P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 20)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_week_20D_60P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 60)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_week_60D_5P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 5)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_week_60D_20P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 20)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_week_60D_60P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 60, pw: 60)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_month_5D_5P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 5)
+2024-11-22 08:01:14,568 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - ERROR - Error processing 1D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,568 - INFO - Processing 1D_month_5D_20P dataset
+2024-11-22 08:01:14,568 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 20)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_month_5D_60P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 5, pw: 60)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_month_20D_5P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 5)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_month_20D_20P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 20)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_month_20D_60P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 20, pw: 60)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_month_60D_5P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 5)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_month_60D_20P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 20)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_month_60D_60P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: month, ws: 60, pw: 60)
+2024-11-22 08:01:14,569 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - ERROR - Error processing 1D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,569 - INFO - Processing 1D_quarter_5D_5P dataset
+2024-11-22 08:01:14,569 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 5)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_5D_20P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 20)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_5D_60P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 5, pw: 60)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_20D_5P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 5)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_20D_20P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 20)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_20D_60P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 20, pw: 60)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_60D_5P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 5)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_60D_20P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 20)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 1D_quarter_60D_60P dataset
+2024-11-22 08:01:14,570 - INFO - 데이터 로드 시작 (model: 1D, period: quarter, ws: 60, pw: 60)
+2024-11-22 08:01:14,570 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - ERROR - Error processing 1D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,570 - INFO - Processing 2D_day_5D_5P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 5)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_5D_20P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 20)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_5D_60P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 5, pw: 60)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_20D_5P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 5)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_20D_20P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 20)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_20D_60P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 20, pw: 60)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_60D_5P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 5)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_60D_20P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 20)
+2024-11-22 08:01:14,571 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - ERROR - Error processing 2D_day_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,571 - INFO - Processing 2D_day_60D_60P dataset
+2024-11-22 08:01:14,571 - INFO - 데이터 로드 시작 (model: 2D, period: day, ws: 60, pw: 60)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_day_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_5D_5P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 5)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_5D_20P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 20)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_5D_60P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 5, pw: 60)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_20D_5P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 5)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_20D_20P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 20)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_20D_60P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 20, pw: 60)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_60D_5P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 5)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_60D_20P dataset
+2024-11-22 08:01:14,572 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 20)
+2024-11-22 08:01:14,572 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - ERROR - Error processing 2D_week_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,572 - INFO - Processing 2D_week_60D_60P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: week, ws: 60, pw: 60)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_week_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_5D_5P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 5)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_month_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_5D_20P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 20)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_month_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_5D_60P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 5, pw: 60)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_month_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_20D_5P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 5)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_month_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_20D_20P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 20)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_month_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_20D_60P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 20, pw: 60)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_month_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_60D_5P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 5)
+2024-11-22 08:01:14,573 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - ERROR - Error processing 2D_month_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,573 - INFO - Processing 2D_month_60D_20P dataset
+2024-11-22 08:01:14,573 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 20)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_month_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_month_60D_60P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: month, ws: 60, pw: 60)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_month_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_5D_5P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 5)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_quarter_5D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_5D_20P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 20)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_quarter_5D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_5D_60P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 5, pw: 60)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_quarter_5D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_20D_5P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 5)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_quarter_20D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_20D_20P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 20)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_quarter_20D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_20D_60P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 20, pw: 60)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_quarter_20D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_60D_5P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 5)
+2024-11-22 08:01:14,574 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - ERROR - Error processing 2D_quarter_60D_5P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,574 - INFO - Processing 2D_quarter_60D_20P dataset
+2024-11-22 08:01:14,574 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 20)
+2024-11-22 08:01:14,575 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,575 - ERROR - Error processing 2D_quarter_60D_20P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,575 - INFO - Processing 2D_quarter_60D_60P dataset
+2024-11-22 08:01:14,575 - INFO - 데이터 로드 시작 (model: 2D, period: quarter, ws: 60, pw: 60)
+2024-11-22 08:01:14,575 - ERROR - 파일을 찾을 수 없습니다: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,575 - ERROR - Error processing 2D_quarter_60D_60P: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/random_return_df.csv'
+2024-11-22 08:01:14,575 - INFO - 데이터셋 생성 완료
+2024-11-22 08:04:49,822 - INFO - 데이터셋 생성 시작
+2024-11-22 08:04:49,822 - INFO - Processing default dataset
+2024-11-22 08:04:49,822 - INFO - 데이터 로드 시작 (model: 1D, period: week, ws: 20, pw: 20)
+2024-11-22 08:04:49,856 - INFO - 데이터 파일 로드 완료
+2024-11-22 08:04:49,856 - INFO - - 수익률 데이터: random_return_df.csv
+2024-11-22 08:04:49,856 - INFO - - 상승확률 데이터: random_up_prob_df.csv
+2024-11-22 08:04:49,856 - INFO - NaN 값 처리 시작
+2024-11-22 08:04:49,856 - INFO - 처리 전 NaN 개수 - 수익률: 3750, 상승확률: 184
+2024-11-22 08:04:49,899 - INFO - NaN 값 처리 완료
+2024-11-22 08:04:49,900 - INFO - 처리 후 NaN 개수 - 수익률: 0, 상승확률: 0
+2024-11-22 08:04:49,900 - INFO - 데이터 로드 완료
+2024-11-22 08:04:49,901 - INFO - 수익률 데이터(일별): (5974, 100)
+2024-11-22 08:04:49,901 - INFO - 원본 상승확률(week별): (285, 100)
+2024-11-22 08:04:49,901 - INFO - 확장된 상승확률(일별): (5974, 100)
+2024-11-22 08:04:49,904 - INFO - 데이터 분할 완료
+2024-11-22 08:04:49,904 - INFO - 학습 데이터: 2001-01-02 00:00:00 ~ 2012-11-26 00:00:00 (2993개)
+2024-11-22 08:04:49,904 - INFO - 검증 데이터: 2012-11-27 00:00:00 ~ 2017-12-29 00:00:00 (1283개)
+2024-11-22 08:04:49,904 - INFO - 테스트 데이터: 2018-01-02 00:00:00 ~ 2024-08-01 00:00:00 (1656개)
+2024-11-22 08:04:51,062 - INFO - 최종 데이터셋 크기:
+2024-11-22 08:04:51,062 - INFO - Train - X: (2914, 60, 100), Y: (2914, 20, 100), Prob: (2914, 20, 100)
+2024-11-22 08:04:51,062 - INFO - Val - X: (1204, 60, 100), Y: (1204, 20, 100), Prob: (1204, 20, 100)
+2024-11-22 08:04:51,062 - INFO - Test - X: (1577, 60, 100), Y: (1577, 20, 100), Prob: (1577, 20, 100)
+2024-11-22 08:04:51,497 - INFO - Saved dataset.pkl and dates.pkl
+2024-11-22 08:04:51,497 - INFO - 데이터셋 생성 완료

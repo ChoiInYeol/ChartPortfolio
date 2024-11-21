@@ -739,3 +739,615 @@ AttributeError: 'PortfolioOptimizationPipeline' object has no attribute 'portfol
 2024-11-08 09:38:24,190 - INFO - - CNN + GRU Top 50
 2024-11-08 09:38:24,190 - INFO - - CNN + TCN Top 50
 2024-11-08 09:40:03,858 - INFO - Backtest completed successfully
+2024-11-15 17:57:15,893 - ERROR - Error during backtest: Return data file not found: /home/indi/codespace/ImagePortOpt/Backtest/../POD/data/return_df.csv
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 88, in run
+    returns = self.data_loader.load_stock_returns()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/ImagePortOpt/Backtest/data/data_loader.py", line 38, in load_stock_returns
+    raise FileNotFoundError(f"Return data file not found: {file_path}")
+FileNotFoundError: Return data file not found: /home/indi/codespace/ImagePortOpt/Backtest/../POD/data/return_df.csv
+2024-11-15 17:57:59,364 - ERROR - Error during backtest: Up probability data file not found: /home/indi/codespace/ImagePortOpt/Backtest/data/CNN_month_20D_20P_up_prob_df.csv
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 89, in run
+    up_prob = self.data_loader.load_up_prob()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/ImagePortOpt/Backtest/data/data_loader.py", line 68, in load_up_prob
+    raise FileNotFoundError(f"Up probability data file not found: {file_path}")
+FileNotFoundError: Up probability data file not found: /home/indi/codespace/ImagePortOpt/Backtest/data/CNN_month_20D_20P_up_prob_df.csv
+2024-11-15 17:58:52,043 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-15 17:58:52,044 - INFO - Naive portfolio rebalancing at 2018-01-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,044 - INFO - Naive portfolio rebalancing at 2018-02-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,044 - INFO - Naive portfolio rebalancing at 2018-03-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,044 - INFO - Naive portfolio rebalancing at 2018-04-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,045 - INFO - Naive portfolio rebalancing at 2018-05-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,045 - INFO - Naive portfolio rebalancing at 2018-06-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,045 - INFO - Naive portfolio rebalancing at 2018-07-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,046 - INFO - Naive portfolio rebalancing at 2018-08-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,046 - INFO - Naive portfolio rebalancing at 2018-09-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,046 - INFO - Naive portfolio rebalancing at 2018-10-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,046 - INFO - Naive portfolio rebalancing at 2018-11-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,047 - INFO - Naive portfolio rebalancing at 2018-12-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,047 - INFO - Naive portfolio rebalancing at 2019-01-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,047 - INFO - Naive portfolio rebalancing at 2019-02-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,047 - INFO - Naive portfolio rebalancing at 2019-03-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,048 - INFO - Naive portfolio rebalancing at 2019-04-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,048 - INFO - Naive portfolio rebalancing at 2019-05-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,048 - INFO - Naive portfolio rebalancing at 2019-06-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,049 - INFO - Naive portfolio rebalancing at 2019-07-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,049 - INFO - Naive portfolio rebalancing at 2019-08-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,049 - INFO - Naive portfolio rebalancing at 2019-09-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,049 - INFO - Naive portfolio rebalancing at 2019-10-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,050 - INFO - Naive portfolio rebalancing at 2019-11-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,050 - INFO - Naive portfolio rebalancing at 2019-12-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,050 - INFO - Naive portfolio rebalancing at 2020-01-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,050 - INFO - Naive portfolio rebalancing at 2020-02-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,051 - INFO - Naive portfolio rebalancing at 2020-03-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,051 - INFO - Naive portfolio rebalancing at 2020-04-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,051 - INFO - Naive portfolio rebalancing at 2020-05-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,051 - INFO - Naive portfolio rebalancing at 2020-06-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,052 - INFO - Naive portfolio rebalancing at 2020-07-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,052 - INFO - Naive portfolio rebalancing at 2020-08-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,052 - INFO - Naive portfolio rebalancing at 2020-09-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,052 - INFO - Naive portfolio rebalancing at 2020-10-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,053 - INFO - Naive portfolio rebalancing at 2020-11-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,053 - INFO - Naive portfolio rebalancing at 2020-12-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,053 - INFO - Naive portfolio rebalancing at 2021-01-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,053 - INFO - Naive portfolio rebalancing at 2021-02-26 00:00:00: 370 stocks
+2024-11-15 17:58:52,054 - INFO - Naive portfolio rebalancing at 2021-03-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,054 - INFO - Naive portfolio rebalancing at 2021-04-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,054 - INFO - Naive portfolio rebalancing at 2021-05-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,054 - INFO - Naive portfolio rebalancing at 2021-06-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,055 - INFO - Naive portfolio rebalancing at 2021-07-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,055 - INFO - Naive portfolio rebalancing at 2021-08-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,055 - INFO - Naive portfolio rebalancing at 2021-09-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,055 - INFO - Naive portfolio rebalancing at 2021-10-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,056 - INFO - Naive portfolio rebalancing at 2021-11-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,056 - INFO - Naive portfolio rebalancing at 2021-12-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,056 - INFO - Naive portfolio rebalancing at 2022-01-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,056 - INFO - Naive portfolio rebalancing at 2022-02-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,057 - INFO - Naive portfolio rebalancing at 2022-03-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,057 - INFO - Naive portfolio rebalancing at 2022-04-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,057 - INFO - Naive portfolio rebalancing at 2022-05-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,057 - INFO - Naive portfolio rebalancing at 2022-06-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,058 - INFO - Naive portfolio rebalancing at 2022-07-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,058 - INFO - Naive portfolio rebalancing at 2022-08-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,058 - INFO - Naive portfolio rebalancing at 2022-09-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,058 - INFO - Naive portfolio rebalancing at 2022-10-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,059 - INFO - Naive portfolio rebalancing at 2022-11-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,059 - INFO - Naive portfolio rebalancing at 2022-12-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,059 - INFO - Naive portfolio rebalancing at 2023-01-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,059 - INFO - Naive portfolio rebalancing at 2023-02-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,060 - INFO - Naive portfolio rebalancing at 2023-03-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,060 - INFO - Naive portfolio rebalancing at 2023-04-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,060 - INFO - Naive portfolio rebalancing at 2023-05-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,060 - INFO - Naive portfolio rebalancing at 2023-06-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,061 - INFO - Naive portfolio rebalancing at 2023-07-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,061 - INFO - Naive portfolio rebalancing at 2023-08-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,061 - INFO - Naive portfolio rebalancing at 2023-09-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,061 - INFO - Naive portfolio rebalancing at 2023-10-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,062 - INFO - Naive portfolio rebalancing at 2023-11-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,062 - INFO - Naive portfolio rebalancing at 2023-12-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,062 - INFO - Naive portfolio rebalancing at 2024-01-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,062 - INFO - Naive portfolio rebalancing at 2024-02-29 00:00:00: 370 stocks
+2024-11-15 17:58:52,063 - INFO - Naive portfolio rebalancing at 2024-03-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,063 - INFO - Naive portfolio rebalancing at 2024-04-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,063 - INFO - Naive portfolio rebalancing at 2024-05-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,063 - INFO - Naive portfolio rebalancing at 2024-06-28 00:00:00: 370 stocks
+2024-11-15 17:58:52,064 - INFO - Naive portfolio rebalancing at 2024-07-31 00:00:00: 370 stocks
+2024-11-15 17:58:52,064 - INFO - Naive portfolio rebalancing at 2024-08-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,064 - INFO - Naive portfolio rebalancing at 2024-09-30 00:00:00: 370 stocks
+2024-11-15 17:58:52,411 - INFO - Creating CNN benchmark portfolios...
+2024-11-15 18:02:19,967 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-15 18:02:20,066 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-15 18:02:20,164 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-15 18:02:20,261 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-15 18:02:20,358 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-15 18:02:20,359 - INFO - Processing model: GRU
+2024-11-15 18:02:20,891 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-15 18:02:20,891 - INFO - Final column order:
+2024-11-15 18:02:20,891 - INFO - - Naive
+2024-11-15 18:02:20,891 - INFO - - CNN Top 100
+2024-11-15 18:02:20,891 - INFO - - CNN Bottom 100
+2024-11-15 18:02:20,891 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-15 18:02:20,891 - INFO - - CNN Top 50 + Min Variance
+2024-11-15 18:02:20,892 - INFO - - CNN Top 50 + Min CVaR
+2024-11-15 18:04:01,233 - INFO - Backtest completed successfully
+2024-11-15 18:04:31,131 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-15 18:04:31,132 - INFO - Naive portfolio rebalancing at 2018-01-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,133 - INFO - Naive portfolio rebalancing at 2018-02-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,133 - INFO - Naive portfolio rebalancing at 2018-03-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,133 - INFO - Naive portfolio rebalancing at 2018-04-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,134 - INFO - Naive portfolio rebalancing at 2018-05-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,134 - INFO - Naive portfolio rebalancing at 2018-06-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,134 - INFO - Naive portfolio rebalancing at 2018-07-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,134 - INFO - Naive portfolio rebalancing at 2018-08-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,135 - INFO - Naive portfolio rebalancing at 2018-09-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,135 - INFO - Naive portfolio rebalancing at 2018-10-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,135 - INFO - Naive portfolio rebalancing at 2018-11-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,136 - INFO - Naive portfolio rebalancing at 2018-12-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,136 - INFO - Naive portfolio rebalancing at 2019-01-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,136 - INFO - Naive portfolio rebalancing at 2019-02-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,136 - INFO - Naive portfolio rebalancing at 2019-03-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,137 - INFO - Naive portfolio rebalancing at 2019-04-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,137 - INFO - Naive portfolio rebalancing at 2019-05-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,137 - INFO - Naive portfolio rebalancing at 2019-06-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,137 - INFO - Naive portfolio rebalancing at 2019-07-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,138 - INFO - Naive portfolio rebalancing at 2019-08-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,138 - INFO - Naive portfolio rebalancing at 2019-09-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,138 - INFO - Naive portfolio rebalancing at 2019-10-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,138 - INFO - Naive portfolio rebalancing at 2019-11-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,139 - INFO - Naive portfolio rebalancing at 2019-12-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,139 - INFO - Naive portfolio rebalancing at 2020-01-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,139 - INFO - Naive portfolio rebalancing at 2020-02-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,139 - INFO - Naive portfolio rebalancing at 2020-03-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,140 - INFO - Naive portfolio rebalancing at 2020-04-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,140 - INFO - Naive portfolio rebalancing at 2020-05-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,140 - INFO - Naive portfolio rebalancing at 2020-06-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,140 - INFO - Naive portfolio rebalancing at 2020-07-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,141 - INFO - Naive portfolio rebalancing at 2020-08-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,141 - INFO - Naive portfolio rebalancing at 2020-09-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,141 - INFO - Naive portfolio rebalancing at 2020-10-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,141 - INFO - Naive portfolio rebalancing at 2020-11-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,142 - INFO - Naive portfolio rebalancing at 2020-12-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,142 - INFO - Naive portfolio rebalancing at 2021-01-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,142 - INFO - Naive portfolio rebalancing at 2021-02-26 00:00:00: 370 stocks
+2024-11-15 18:04:31,142 - INFO - Naive portfolio rebalancing at 2021-03-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,143 - INFO - Naive portfolio rebalancing at 2021-04-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,143 - INFO - Naive portfolio rebalancing at 2021-05-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,143 - INFO - Naive portfolio rebalancing at 2021-06-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,143 - INFO - Naive portfolio rebalancing at 2021-07-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,144 - INFO - Naive portfolio rebalancing at 2021-08-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,144 - INFO - Naive portfolio rebalancing at 2021-09-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,144 - INFO - Naive portfolio rebalancing at 2021-10-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,144 - INFO - Naive portfolio rebalancing at 2021-11-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,145 - INFO - Naive portfolio rebalancing at 2021-12-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,145 - INFO - Naive portfolio rebalancing at 2022-01-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,145 - INFO - Naive portfolio rebalancing at 2022-02-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,146 - INFO - Naive portfolio rebalancing at 2022-03-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,146 - INFO - Naive portfolio rebalancing at 2022-04-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,146 - INFO - Naive portfolio rebalancing at 2022-05-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,146 - INFO - Naive portfolio rebalancing at 2022-06-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,147 - INFO - Naive portfolio rebalancing at 2022-07-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,147 - INFO - Naive portfolio rebalancing at 2022-08-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,147 - INFO - Naive portfolio rebalancing at 2022-09-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,147 - INFO - Naive portfolio rebalancing at 2022-10-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,148 - INFO - Naive portfolio rebalancing at 2022-11-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,148 - INFO - Naive portfolio rebalancing at 2022-12-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,148 - INFO - Naive portfolio rebalancing at 2023-01-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,148 - INFO - Naive portfolio rebalancing at 2023-02-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,149 - INFO - Naive portfolio rebalancing at 2023-03-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,149 - INFO - Naive portfolio rebalancing at 2023-04-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,149 - INFO - Naive portfolio rebalancing at 2023-05-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,149 - INFO - Naive portfolio rebalancing at 2023-06-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,150 - INFO - Naive portfolio rebalancing at 2023-07-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,150 - INFO - Naive portfolio rebalancing at 2023-08-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,150 - INFO - Naive portfolio rebalancing at 2023-09-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,150 - INFO - Naive portfolio rebalancing at 2023-10-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,151 - INFO - Naive portfolio rebalancing at 2023-11-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,151 - INFO - Naive portfolio rebalancing at 2023-12-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,151 - INFO - Naive portfolio rebalancing at 2024-01-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,151 - INFO - Naive portfolio rebalancing at 2024-02-29 00:00:00: 370 stocks
+2024-11-15 18:04:31,152 - INFO - Naive portfolio rebalancing at 2024-03-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,152 - INFO - Naive portfolio rebalancing at 2024-04-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,152 - INFO - Naive portfolio rebalancing at 2024-05-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,152 - INFO - Naive portfolio rebalancing at 2024-06-28 00:00:00: 370 stocks
+2024-11-15 18:04:31,153 - INFO - Naive portfolio rebalancing at 2024-07-31 00:00:00: 370 stocks
+2024-11-15 18:04:31,153 - INFO - Naive portfolio rebalancing at 2024-08-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,153 - INFO - Naive portfolio rebalancing at 2024-09-30 00:00:00: 370 stocks
+2024-11-15 18:04:31,504 - INFO - Creating CNN benchmark portfolios...
+2024-11-15 18:04:31,603 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-15 18:04:31,706 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-15 18:04:31,808 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-15 18:04:31,905 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-15 18:04:32,005 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-15 18:04:32,005 - INFO - Processing model: GRU
+2024-11-15 18:04:33,022 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-15 18:04:33,022 - INFO - Final column order:
+2024-11-15 18:04:33,022 - INFO - - Naive
+2024-11-15 18:04:33,022 - INFO - - CNN Top 100
+2024-11-15 18:04:33,022 - INFO - - CNN Bottom 100
+2024-11-15 18:04:33,022 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-15 18:04:33,022 - INFO - - CNN Top 50 + Min Variance
+2024-11-15 18:04:33,022 - INFO - - CNN Top 50 + Min CVaR
+2024-11-15 18:04:33,022 - INFO - - CNN + GRU Top 50
+2024-11-15 18:06:29,370 - INFO - Backtest completed successfully
+2024-11-21 16:17:16,829 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-21 16:17:16,830 - INFO - Naive portfolio rebalancing at 2018-01-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,830 - INFO - Naive portfolio rebalancing at 2018-02-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,831 - INFO - Naive portfolio rebalancing at 2018-03-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,831 - INFO - Naive portfolio rebalancing at 2018-04-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,831 - INFO - Naive portfolio rebalancing at 2018-05-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,832 - INFO - Naive portfolio rebalancing at 2018-06-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,832 - INFO - Naive portfolio rebalancing at 2018-07-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,832 - INFO - Naive portfolio rebalancing at 2018-08-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,832 - INFO - Naive portfolio rebalancing at 2018-09-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,833 - INFO - Naive portfolio rebalancing at 2018-10-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,833 - INFO - Naive portfolio rebalancing at 2018-11-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,833 - INFO - Naive portfolio rebalancing at 2018-12-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,833 - INFO - Naive portfolio rebalancing at 2019-01-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,834 - INFO - Naive portfolio rebalancing at 2019-02-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,834 - INFO - Naive portfolio rebalancing at 2019-03-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,834 - INFO - Naive portfolio rebalancing at 2019-04-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,834 - INFO - Naive portfolio rebalancing at 2019-05-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,835 - INFO - Naive portfolio rebalancing at 2019-06-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,835 - INFO - Naive portfolio rebalancing at 2019-07-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,835 - INFO - Naive portfolio rebalancing at 2019-08-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,836 - INFO - Naive portfolio rebalancing at 2019-09-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,836 - INFO - Naive portfolio rebalancing at 2019-10-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,836 - INFO - Naive portfolio rebalancing at 2019-11-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,836 - INFO - Naive portfolio rebalancing at 2019-12-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,837 - INFO - Naive portfolio rebalancing at 2020-01-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,837 - INFO - Naive portfolio rebalancing at 2020-02-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,837 - INFO - Naive portfolio rebalancing at 2020-03-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,837 - INFO - Naive portfolio rebalancing at 2020-04-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,838 - INFO - Naive portfolio rebalancing at 2020-05-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,838 - INFO - Naive portfolio rebalancing at 2020-06-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,838 - INFO - Naive portfolio rebalancing at 2020-07-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,838 - INFO - Naive portfolio rebalancing at 2020-08-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,839 - INFO - Naive portfolio rebalancing at 2020-09-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,839 - INFO - Naive portfolio rebalancing at 2020-10-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,839 - INFO - Naive portfolio rebalancing at 2020-11-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,839 - INFO - Naive portfolio rebalancing at 2020-12-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,840 - INFO - Naive portfolio rebalancing at 2021-01-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,840 - INFO - Naive portfolio rebalancing at 2021-02-26 00:00:00: 370 stocks
+2024-11-21 16:17:16,840 - INFO - Naive portfolio rebalancing at 2021-03-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,840 - INFO - Naive portfolio rebalancing at 2021-04-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,841 - INFO - Naive portfolio rebalancing at 2021-05-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,841 - INFO - Naive portfolio rebalancing at 2021-06-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,841 - INFO - Naive portfolio rebalancing at 2021-07-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,841 - INFO - Naive portfolio rebalancing at 2021-08-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,842 - INFO - Naive portfolio rebalancing at 2021-09-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,842 - INFO - Naive portfolio rebalancing at 2021-10-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,842 - INFO - Naive portfolio rebalancing at 2021-11-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,842 - INFO - Naive portfolio rebalancing at 2021-12-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,843 - INFO - Naive portfolio rebalancing at 2022-01-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,843 - INFO - Naive portfolio rebalancing at 2022-02-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,843 - INFO - Naive portfolio rebalancing at 2022-03-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,843 - INFO - Naive portfolio rebalancing at 2022-04-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,844 - INFO - Naive portfolio rebalancing at 2022-05-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,844 - INFO - Naive portfolio rebalancing at 2022-06-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,844 - INFO - Naive portfolio rebalancing at 2022-07-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,844 - INFO - Naive portfolio rebalancing at 2022-08-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,845 - INFO - Naive portfolio rebalancing at 2022-09-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,845 - INFO - Naive portfolio rebalancing at 2022-10-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,845 - INFO - Naive portfolio rebalancing at 2022-11-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,845 - INFO - Naive portfolio rebalancing at 2022-12-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,846 - INFO - Naive portfolio rebalancing at 2023-01-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,846 - INFO - Naive portfolio rebalancing at 2023-02-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,846 - INFO - Naive portfolio rebalancing at 2023-03-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,846 - INFO - Naive portfolio rebalancing at 2023-04-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,847 - INFO - Naive portfolio rebalancing at 2023-05-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,847 - INFO - Naive portfolio rebalancing at 2023-06-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,847 - INFO - Naive portfolio rebalancing at 2023-07-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,847 - INFO - Naive portfolio rebalancing at 2023-08-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,848 - INFO - Naive portfolio rebalancing at 2023-09-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,848 - INFO - Naive portfolio rebalancing at 2023-10-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,848 - INFO - Naive portfolio rebalancing at 2023-11-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,848 - INFO - Naive portfolio rebalancing at 2023-12-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,849 - INFO - Naive portfolio rebalancing at 2024-01-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,849 - INFO - Naive portfolio rebalancing at 2024-02-29 00:00:00: 370 stocks
+2024-11-21 16:17:16,849 - INFO - Naive portfolio rebalancing at 2024-03-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,849 - INFO - Naive portfolio rebalancing at 2024-04-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,850 - INFO - Naive portfolio rebalancing at 2024-05-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,850 - INFO - Naive portfolio rebalancing at 2024-06-28 00:00:00: 370 stocks
+2024-11-21 16:17:16,850 - INFO - Naive portfolio rebalancing at 2024-07-31 00:00:00: 370 stocks
+2024-11-21 16:17:16,850 - INFO - Naive portfolio rebalancing at 2024-08-30 00:00:00: 370 stocks
+2024-11-21 16:17:16,851 - INFO - Naive portfolio rebalancing at 2024-09-30 00:00:00: 370 stocks
+2024-11-21 16:17:17,196 - INFO - Creating CNN benchmark portfolios...
+2024-11-21 16:17:17,296 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-21 16:17:17,392 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-21 16:17:17,487 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-21 16:17:17,583 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-21 16:17:17,680 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-21 16:17:17,680 - INFO - Processing model: GRU
+2024-11-21 16:17:18,473 - INFO - Processing model: TCN
+2024-11-21 16:17:19,220 - INFO - Processing model: TRANSFORMER
+2024-11-21 16:17:20,698 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-21 16:17:20,698 - INFO - Final column order:
+2024-11-21 16:17:20,698 - INFO - - Naive
+2024-11-21 16:17:20,698 - INFO - - CNN Top 100
+2024-11-21 16:17:20,698 - INFO - - CNN Bottom 100
+2024-11-21 16:17:20,698 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-21 16:17:20,698 - INFO - - CNN Top 50 + Min Variance
+2024-11-21 16:17:20,698 - INFO - - CNN Top 50 + Min CVaR
+2024-11-21 16:17:20,698 - INFO - - GRU Top 50
+2024-11-21 16:17:20,698 - INFO - - TCN Top 50
+2024-11-21 16:17:20,698 - INFO - - CNN + GRU Top 50
+2024-11-21 16:17:20,698 - INFO - - CNN + TCN Top 50
+2024-11-21 16:17:20,698 - INFO - - CNN + TRANSFORMER Top 50
+2024-11-21 16:19:50,743 - INFO - Backtest completed successfully
+2024-11-21 16:22:08,445 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-21 16:22:08,445 - INFO - Naive portfolio rebalancing at 2018-01-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,446 - INFO - Naive portfolio rebalancing at 2018-02-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,446 - INFO - Naive portfolio rebalancing at 2018-03-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,446 - INFO - Naive portfolio rebalancing at 2018-04-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,447 - INFO - Naive portfolio rebalancing at 2018-05-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,447 - INFO - Naive portfolio rebalancing at 2018-06-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,447 - INFO - Naive portfolio rebalancing at 2018-07-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,447 - INFO - Naive portfolio rebalancing at 2018-08-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,448 - INFO - Naive portfolio rebalancing at 2018-09-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,448 - INFO - Naive portfolio rebalancing at 2018-10-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,448 - INFO - Naive portfolio rebalancing at 2018-11-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,449 - INFO - Naive portfolio rebalancing at 2018-12-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,449 - INFO - Naive portfolio rebalancing at 2019-01-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,449 - INFO - Naive portfolio rebalancing at 2019-02-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,449 - INFO - Naive portfolio rebalancing at 2019-03-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,450 - INFO - Naive portfolio rebalancing at 2019-04-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,450 - INFO - Naive portfolio rebalancing at 2019-05-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,450 - INFO - Naive portfolio rebalancing at 2019-06-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,450 - INFO - Naive portfolio rebalancing at 2019-07-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,451 - INFO - Naive portfolio rebalancing at 2019-08-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,451 - INFO - Naive portfolio rebalancing at 2019-09-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,451 - INFO - Naive portfolio rebalancing at 2019-10-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,451 - INFO - Naive portfolio rebalancing at 2019-11-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,452 - INFO - Naive portfolio rebalancing at 2019-12-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,452 - INFO - Naive portfolio rebalancing at 2020-01-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,452 - INFO - Naive portfolio rebalancing at 2020-02-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,452 - INFO - Naive portfolio rebalancing at 2020-03-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,453 - INFO - Naive portfolio rebalancing at 2020-04-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,453 - INFO - Naive portfolio rebalancing at 2020-05-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,453 - INFO - Naive portfolio rebalancing at 2020-06-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,453 - INFO - Naive portfolio rebalancing at 2020-07-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,454 - INFO - Naive portfolio rebalancing at 2020-08-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,454 - INFO - Naive portfolio rebalancing at 2020-09-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,454 - INFO - Naive portfolio rebalancing at 2020-10-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,454 - INFO - Naive portfolio rebalancing at 2020-11-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,455 - INFO - Naive portfolio rebalancing at 2020-12-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,455 - INFO - Naive portfolio rebalancing at 2021-01-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,455 - INFO - Naive portfolio rebalancing at 2021-02-26 00:00:00: 370 stocks
+2024-11-21 16:22:08,455 - INFO - Naive portfolio rebalancing at 2021-03-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,456 - INFO - Naive portfolio rebalancing at 2021-04-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,456 - INFO - Naive portfolio rebalancing at 2021-05-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,456 - INFO - Naive portfolio rebalancing at 2021-06-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,457 - INFO - Naive portfolio rebalancing at 2021-07-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,457 - INFO - Naive portfolio rebalancing at 2021-08-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,457 - INFO - Naive portfolio rebalancing at 2021-09-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,457 - INFO - Naive portfolio rebalancing at 2021-10-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,458 - INFO - Naive portfolio rebalancing at 2021-11-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,458 - INFO - Naive portfolio rebalancing at 2021-12-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,458 - INFO - Naive portfolio rebalancing at 2022-01-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,458 - INFO - Naive portfolio rebalancing at 2022-02-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,459 - INFO - Naive portfolio rebalancing at 2022-03-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,459 - INFO - Naive portfolio rebalancing at 2022-04-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,459 - INFO - Naive portfolio rebalancing at 2022-05-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,460 - INFO - Naive portfolio rebalancing at 2022-06-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,460 - INFO - Naive portfolio rebalancing at 2022-07-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,460 - INFO - Naive portfolio rebalancing at 2022-08-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,460 - INFO - Naive portfolio rebalancing at 2022-09-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,461 - INFO - Naive portfolio rebalancing at 2022-10-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,461 - INFO - Naive portfolio rebalancing at 2022-11-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,461 - INFO - Naive portfolio rebalancing at 2022-12-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,461 - INFO - Naive portfolio rebalancing at 2023-01-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,462 - INFO - Naive portfolio rebalancing at 2023-02-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,462 - INFO - Naive portfolio rebalancing at 2023-03-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,462 - INFO - Naive portfolio rebalancing at 2023-04-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,462 - INFO - Naive portfolio rebalancing at 2023-05-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,463 - INFO - Naive portfolio rebalancing at 2023-06-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,463 - INFO - Naive portfolio rebalancing at 2023-07-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,463 - INFO - Naive portfolio rebalancing at 2023-08-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,463 - INFO - Naive portfolio rebalancing at 2023-09-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,464 - INFO - Naive portfolio rebalancing at 2023-10-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,464 - INFO - Naive portfolio rebalancing at 2023-11-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,464 - INFO - Naive portfolio rebalancing at 2023-12-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,464 - INFO - Naive portfolio rebalancing at 2024-01-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,465 - INFO - Naive portfolio rebalancing at 2024-02-29 00:00:00: 370 stocks
+2024-11-21 16:22:08,465 - INFO - Naive portfolio rebalancing at 2024-03-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,465 - INFO - Naive portfolio rebalancing at 2024-04-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,465 - INFO - Naive portfolio rebalancing at 2024-05-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,466 - INFO - Naive portfolio rebalancing at 2024-06-28 00:00:00: 370 stocks
+2024-11-21 16:22:08,466 - INFO - Naive portfolio rebalancing at 2024-07-31 00:00:00: 370 stocks
+2024-11-21 16:22:08,466 - INFO - Naive portfolio rebalancing at 2024-08-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,466 - INFO - Naive portfolio rebalancing at 2024-09-30 00:00:00: 370 stocks
+2024-11-21 16:22:08,813 - INFO - Creating CNN benchmark portfolios...
+2024-11-21 16:22:08,912 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-21 16:22:09,011 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-21 16:22:09,111 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-21 16:22:09,209 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-21 16:22:09,310 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-21 16:22:09,310 - INFO - Processing model: GRU
+2024-11-21 16:22:10,104 - INFO - Processing model: TCN
+2024-11-21 16:22:10,836 - INFO - Processing model: TRANSFORMER
+2024-11-21 16:22:12,320 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-21 16:22:12,320 - INFO - Final column order:
+2024-11-21 16:22:12,320 - INFO - - Naive
+2024-11-21 16:22:12,320 - INFO - - CNN Top 100
+2024-11-21 16:22:12,320 - INFO - - CNN Bottom 100
+2024-11-21 16:22:12,320 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-21 16:22:12,320 - INFO - - CNN Top 50 + Min Variance
+2024-11-21 16:22:12,320 - INFO - - CNN Top 50 + Min CVaR
+2024-11-21 16:22:12,320 - INFO - - GRU Top 50
+2024-11-21 16:22:12,320 - INFO - - TCN Top 50
+2024-11-21 16:22:12,320 - INFO - - CNN + GRU Top 50
+2024-11-21 16:22:12,320 - INFO - - CNN + TCN Top 50
+2024-11-21 16:22:12,320 - INFO - - CNN + TRANSFORMER Top 50
+2024-11-21 16:24:27,541 - INFO - Backtest completed successfully
+2024-11-21 16:28:36,479 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-21 16:28:36,480 - INFO - Naive portfolio rebalancing at 2018-01-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,480 - INFO - Naive portfolio rebalancing at 2018-02-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,480 - INFO - Naive portfolio rebalancing at 2018-03-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,481 - INFO - Naive portfolio rebalancing at 2018-04-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,481 - INFO - Naive portfolio rebalancing at 2018-05-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,481 - INFO - Naive portfolio rebalancing at 2018-06-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,482 - INFO - Naive portfolio rebalancing at 2018-07-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,482 - INFO - Naive portfolio rebalancing at 2018-08-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,482 - INFO - Naive portfolio rebalancing at 2018-09-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,482 - INFO - Naive portfolio rebalancing at 2018-10-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,483 - INFO - Naive portfolio rebalancing at 2018-11-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,483 - INFO - Naive portfolio rebalancing at 2018-12-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,483 - INFO - Naive portfolio rebalancing at 2019-01-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,484 - INFO - Naive portfolio rebalancing at 2019-02-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,484 - INFO - Naive portfolio rebalancing at 2019-03-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,484 - INFO - Naive portfolio rebalancing at 2019-04-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,484 - INFO - Naive portfolio rebalancing at 2019-05-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,485 - INFO - Naive portfolio rebalancing at 2019-06-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,485 - INFO - Naive portfolio rebalancing at 2019-07-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,485 - INFO - Naive portfolio rebalancing at 2019-08-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,485 - INFO - Naive portfolio rebalancing at 2019-09-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,486 - INFO - Naive portfolio rebalancing at 2019-10-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,486 - INFO - Naive portfolio rebalancing at 2019-11-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,486 - INFO - Naive portfolio rebalancing at 2019-12-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,486 - INFO - Naive portfolio rebalancing at 2020-01-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,487 - INFO - Naive portfolio rebalancing at 2020-02-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,487 - INFO - Naive portfolio rebalancing at 2020-03-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,487 - INFO - Naive portfolio rebalancing at 2020-04-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,488 - INFO - Naive portfolio rebalancing at 2020-05-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,488 - INFO - Naive portfolio rebalancing at 2020-06-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,488 - INFO - Naive portfolio rebalancing at 2020-07-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,488 - INFO - Naive portfolio rebalancing at 2020-08-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,489 - INFO - Naive portfolio rebalancing at 2020-09-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,489 - INFO - Naive portfolio rebalancing at 2020-10-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,489 - INFO - Naive portfolio rebalancing at 2020-11-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,489 - INFO - Naive portfolio rebalancing at 2020-12-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,490 - INFO - Naive portfolio rebalancing at 2021-01-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,490 - INFO - Naive portfolio rebalancing at 2021-02-26 00:00:00: 370 stocks
+2024-11-21 16:28:36,490 - INFO - Naive portfolio rebalancing at 2021-03-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,490 - INFO - Naive portfolio rebalancing at 2021-04-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,491 - INFO - Naive portfolio rebalancing at 2021-05-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,491 - INFO - Naive portfolio rebalancing at 2021-06-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,491 - INFO - Naive portfolio rebalancing at 2021-07-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,491 - INFO - Naive portfolio rebalancing at 2021-08-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,492 - INFO - Naive portfolio rebalancing at 2021-09-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,492 - INFO - Naive portfolio rebalancing at 2021-10-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,492 - INFO - Naive portfolio rebalancing at 2021-11-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,492 - INFO - Naive portfolio rebalancing at 2021-12-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,493 - INFO - Naive portfolio rebalancing at 2022-01-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,493 - INFO - Naive portfolio rebalancing at 2022-02-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,493 - INFO - Naive portfolio rebalancing at 2022-03-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,493 - INFO - Naive portfolio rebalancing at 2022-04-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,494 - INFO - Naive portfolio rebalancing at 2022-05-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,494 - INFO - Naive portfolio rebalancing at 2022-06-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,494 - INFO - Naive portfolio rebalancing at 2022-07-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,494 - INFO - Naive portfolio rebalancing at 2022-08-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,495 - INFO - Naive portfolio rebalancing at 2022-09-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,495 - INFO - Naive portfolio rebalancing at 2022-10-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,495 - INFO - Naive portfolio rebalancing at 2022-11-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,495 - INFO - Naive portfolio rebalancing at 2022-12-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,496 - INFO - Naive portfolio rebalancing at 2023-01-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,496 - INFO - Naive portfolio rebalancing at 2023-02-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,496 - INFO - Naive portfolio rebalancing at 2023-03-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,496 - INFO - Naive portfolio rebalancing at 2023-04-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,497 - INFO - Naive portfolio rebalancing at 2023-05-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,497 - INFO - Naive portfolio rebalancing at 2023-06-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,497 - INFO - Naive portfolio rebalancing at 2023-07-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,497 - INFO - Naive portfolio rebalancing at 2023-08-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,498 - INFO - Naive portfolio rebalancing at 2023-09-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,498 - INFO - Naive portfolio rebalancing at 2023-10-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,498 - INFO - Naive portfolio rebalancing at 2023-11-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,498 - INFO - Naive portfolio rebalancing at 2023-12-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,499 - INFO - Naive portfolio rebalancing at 2024-01-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,499 - INFO - Naive portfolio rebalancing at 2024-02-29 00:00:00: 370 stocks
+2024-11-21 16:28:36,499 - INFO - Naive portfolio rebalancing at 2024-03-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,499 - INFO - Naive portfolio rebalancing at 2024-04-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,500 - INFO - Naive portfolio rebalancing at 2024-05-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,500 - INFO - Naive portfolio rebalancing at 2024-06-28 00:00:00: 370 stocks
+2024-11-21 16:28:36,500 - INFO - Naive portfolio rebalancing at 2024-07-31 00:00:00: 370 stocks
+2024-11-21 16:28:36,500 - INFO - Naive portfolio rebalancing at 2024-08-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,501 - INFO - Naive portfolio rebalancing at 2024-09-30 00:00:00: 370 stocks
+2024-11-21 16:28:36,824 - INFO - Creating CNN benchmark portfolios...
+2024-11-21 16:28:36,920 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-21 16:28:37,016 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-21 16:28:37,110 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-21 16:28:37,206 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-21 16:28:37,305 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-21 16:28:37,306 - INFO - Processing model: GRU
+2024-11-21 16:28:38,763 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-21 16:28:38,764 - INFO - Final column order:
+2024-11-21 16:28:38,764 - INFO - - Naive
+2024-11-21 16:28:38,764 - INFO - - CNN Top 100
+2024-11-21 16:28:38,764 - INFO - - CNN Bottom 100
+2024-11-21 16:28:38,764 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-21 16:28:38,764 - INFO - - CNN Top 50 + Min Variance
+2024-11-21 16:28:38,764 - INFO - - CNN Top 50 + Min CVaR
+2024-11-21 16:28:38,764 - INFO - - GRU Top 50
+2024-11-21 16:28:38,764 - INFO - - CNN + GRU Top 50
+2024-11-21 16:30:36,357 - INFO - Backtest completed successfully
+2024-11-21 16:34:22,784 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-21 16:34:23,373 - INFO - Creating CNN benchmark portfolios...
+2024-11-21 16:34:23,475 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-21 16:34:23,578 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-21 16:34:23,676 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-21 16:34:23,773 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-21 16:34:23,876 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-21 16:34:23,877 - INFO - Processing model: GRU
+2024-11-21 16:34:24,634 - INFO - Processing model: TCN
+2024-11-21 16:34:25,340 - INFO - Processing model: TRANSFORMER
+2024-11-21 16:34:26,965 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-21 16:34:26,965 - INFO - Final column order:
+2024-11-21 16:34:26,965 - INFO - - Naive
+2024-11-21 16:34:26,965 - INFO - - CNN Top 100
+2024-11-21 16:34:26,965 - INFO - - CNN Bottom 100
+2024-11-21 16:34:26,965 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-21 16:34:26,965 - INFO - - CNN Top 50 + Min Variance
+2024-11-21 16:34:26,965 - INFO - - CNN Top 50 + Min CVaR
+2024-11-21 16:34:26,965 - INFO - - GRU Top 50
+2024-11-21 16:34:26,965 - INFO - - TCN Top 50
+2024-11-21 16:34:26,965 - INFO - - CNN + GRU Top 50
+2024-11-21 16:34:26,965 - INFO - - CNN + TCN Top 50
+2024-11-21 16:34:26,965 - INFO - - CNN + TRANSFORMER Top 50
+2024-11-21 16:36:43,299 - INFO - Backtest completed successfully
+2024-11-21 16:56:43,729 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-21 16:56:44,307 - INFO - Creating CNN benchmark portfolios...
+2024-11-21 16:56:44,413 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-21 16:56:44,512 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-21 16:56:44,609 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-21 16:56:44,710 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-21 16:56:44,808 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-21 16:56:44,808 - INFO - Processing model: GRU
+2024-11-21 16:56:45,574 - INFO - Processing model: TCN
+2024-11-21 16:56:47,473 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-21 16:56:47,473 - INFO - Final column order:
+2024-11-21 16:56:47,473 - INFO - - Naive
+2024-11-21 16:56:47,473 - INFO - - CNN Top 100
+2024-11-21 16:56:47,473 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-21 16:56:47,473 - INFO - - CNN Top 50 + Min Variance
+2024-11-21 16:56:47,473 - INFO - - CNN Top 50 + Min CVaR
+2024-11-21 16:56:47,473 - INFO - - GRU Top 50
+2024-11-21 16:56:47,473 - INFO - - TCN Top 50
+2024-11-21 16:56:47,473 - INFO - - CNN + GRU Top 50
+2024-11-21 16:56:47,473 - INFO - - CNN + TCN Top 50
+2024-11-21 16:58:55,805 - INFO - Backtest completed successfully
+2024-11-22 07:33:43,079 - ERROR - Error during backtest: Up probability data file not found: /home/indi/codespace/ImagePortOpt/Backtest/../Data/CNN_month_20D_20P_up_prob_df.csv
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 89, in run
+    up_prob = self.data_loader.load_up_prob()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/ImagePortOpt/Backtest/data/data_loader.py", line 68, in load_up_prob
+    raise FileNotFoundError(f"Up probability data file not found: {file_path}")
+FileNotFoundError: Up probability data file not found: /home/indi/codespace/ImagePortOpt/Backtest/../Data/CNN_month_20D_20P_up_prob_df.csv
+2024-11-22 07:34:24,851 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-22 07:34:25,454 - INFO - Creating CNN benchmark portfolios...
+2024-11-22 07:34:25,557 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-22 07:34:25,657 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-22 07:34:25,755 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-22 07:34:25,855 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-22 07:34:25,955 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-22 07:34:25,955 - INFO - Processing model: GRU
+2024-11-22 07:34:27,681 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-22 07:34:27,681 - INFO - Final column order:
+2024-11-22 07:34:27,681 - INFO - - Naive
+2024-11-22 07:34:27,681 - INFO - - CNN Top 100
+2024-11-22 07:34:27,681 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-22 07:34:27,681 - INFO - - CNN Top 50 + Min Variance
+2024-11-22 07:34:27,681 - INFO - - CNN Top 50 + Min CVaR
+2024-11-22 07:34:27,681 - INFO - - GRU Top 50
+2024-11-22 07:34:27,681 - INFO - - CNN + GRU Top 50
+2024-11-22 07:36:27,061 - INFO - Backtest completed successfully
+2024-11-22 07:39:32,151 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-22 07:39:32,746 - INFO - Creating CNN benchmark portfolios...
+2024-11-22 07:39:32,847 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-22 07:39:32,944 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-22 07:39:33,040 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-22 07:39:33,135 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-22 07:39:33,230 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-22 07:39:33,230 - INFO - Processing model: GRU
+2024-11-22 07:39:34,947 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-22 07:39:34,948 - INFO - Final column order:
+2024-11-22 07:39:34,948 - INFO - - Naive
+2024-11-22 07:39:34,948 - INFO - - CNN Top 100
+2024-11-22 07:39:34,948 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-22 07:39:34,948 - INFO - - CNN Top 50 + Min Variance
+2024-11-22 07:39:34,948 - INFO - - CNN Top 50 + Min CVaR
+2024-11-22 07:39:34,948 - INFO - - GRU Top 50
+2024-11-22 07:39:34,948 - INFO - - CNN + GRU Top 50
+2024-11-22 07:41:32,192 - INFO - Backtest completed successfully

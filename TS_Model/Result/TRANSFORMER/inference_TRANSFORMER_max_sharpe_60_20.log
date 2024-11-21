@@ -1,0 +1,131 @@
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading test data...
+First few dates after processing: [Timestamp('2018-04-26 00:00:00'), Timestamp('2018-04-27 00:00:00'), Timestamp('2018-04-30 00:00:00'), Timestamp('2018-05-01 00:00:00'), Timestamp('2018-05-02 00:00:00')]
+Total dates: 1577
+Validating test data...
+Test data shape - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+Test dates length: 1577
+Test data loading completed
+Test data loaded: 1577 samples
+Error during inference: 'NoneType' object is not callable
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 302, in infer
+    outputs = self.model(x)
+              ^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+Input shapes - x: torch.Size([1, 60, 370]), prob: N/A
+Empty weights array received
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading Transformer model (use_prob: False)
+Loading test data...
+First few dates after processing: [Timestamp('2018-04-26 00:00:00'), Timestamp('2018-04-27 00:00:00'), Timestamp('2018-04-30 00:00:00'), Timestamp('2018-05-01 00:00:00'), Timestamp('2018-05-02 00:00:00')]
+Total dates: 1577
+Validating test data...
+Test data shape - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+Test dates length: 1577
+Test data loading completed
+Test data loaded: 1577 samples
+Error during inference: 'NoneType' object is not callable
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 300, in infer
+    outputs = self.model(x)
+              ^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+Input shapes - x: torch.Size([1, 60, 370]), prob: N/A
+Empty weights array received
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading Transformer model (use_prob: False)
+Loading test data...
+First few dates after processing: [Timestamp('2018-04-26 00:00:00'), Timestamp('2018-04-27 00:00:00'), Timestamp('2018-04-30 00:00:00'), Timestamp('2018-05-01 00:00:00'), Timestamp('2018-05-02 00:00:00')]
+Total dates: 1577
+Validating test data...
+Test data shape - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+Test dates length: 1577
+Test data loading completed
+Test data loaded: 1577 samples
+Error during inference: 'NoneType' object is not callable
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 302, in infer
+    outputs = self.model(x, prob) if self.use_prob else self.model(x, None)
+                                                        ^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+Input shapes - x: torch.Size([1, 60, 370]), prob: torch.Size([1, 20, 370])
+Empty weights array received
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading Transformer model (use_prob: False)
+Loading test data...
+First few dates after processing: [Timestamp('2018-04-26 00:00:00'), Timestamp('2018-04-27 00:00:00'), Timestamp('2018-04-30 00:00:00'), Timestamp('2018-05-01 00:00:00'), Timestamp('2018-05-02 00:00:00')]
+Total dates: 1577
+Validating test data...
+Test data shape - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+Test dates length: 1577
+Test data loading completed
+Test data loaded: 1577 samples
+Error during inference: 'NoneType' object is not callable
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 302, in infer
+    outputs = self.model(x, prob) if self.use_prob else self.model(x, prob)
+                                                        ^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+Input shapes - x: torch.Size([1, 60, 370]), prob: torch.Size([1, 20, 370])
+Empty weights array received
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading Transformer model (use_prob: False)
+Loading test data...
+First few dates after processing: [Timestamp('2018-04-26 00:00:00'), Timestamp('2018-04-27 00:00:00'), Timestamp('2018-04-30 00:00:00'), Timestamp('2018-05-01 00:00:00'), Timestamp('2018-05-02 00:00:00')]
+Total dates: 1577
+Validating test data...
+Test data shape - X: (1577, 60, 370), Y: (1577, 20, 370), Prob: (1577, 20, 370)
+Test dates length: 1577
+Test data loading completed
+Test data loaded: 1577 samples
+Error during inference: 'NoneType' object is not callable
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 302, in infer
+    outputs = self.model(x, prob) if self.use_prob else self.model(x, prob)
+                                                        ^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not callable
+
+Input shapes - x: torch.Size([1, 60, 370]), prob: torch.Size([1, 20, 370])
+Loaded 370 tickers from /home/indi/codespace/ImagePortOpt/Data/return_df.csv
+Converting dates from type <class 'list'> to DatetimeIndex
+Weights array shape: (0,)
+Expected shape: (1577, 370)
+Dimension mismatch!
+Got shape (0,), expected (1577, 370)
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading Transformer model (use_prob: False)
+Error during inference: Model is not properly loaded
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 277, in infer
+    raise ValueError("Model is not properly loaded")
+ValueError: Model is not properly loaded
+
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading Transformer model (use_prob: False)
+Error during inference: Model is not properly loaded
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 278, in infer
+    raise ValueError("Model is not properly loaded")
+ValueError: Model is not properly loaded
+
+Configuration: {'START': '2001-01-01', 'END': '2024-08-01', 'LEN_DATA': 5000, 'N_STOCK': 370, 'N_SELECT': 50, 'TRAIN_LEN': 60, 'PRED_LEN': 20, 'TRAIN_START_DATE': '2001-01-01', 'TRAIN_END_DATE': '2017-12-31', 'TRAIN_RATIO': 0.7, 'VALIDATION_RATIO': 0.3, 'TEST_START_DATE': '2018-01-01', 'TEST_END_DATE': '2024-08-01', 'RESULT_DIR': 'Result', 'MODEL': 'TRANSFORMER', 'BATCH': 128, 'EPOCHS': 500, 'EARLY_STOP': 10, 'LR': 0.001, 'MOMENTUM': 0.9, 'USE_CUDA': True, 'SEED': 42, 'LB': 0, 'UB': 0.2, 'LOSS_FUNCTION': 'max_sharpe', 'N_LAYER': 1, 'HIDDEN_DIM': 128, 'N_HEAD': 10, 'N_FEAT': 370, 'DROPOUT': 0.3, 'BIDIRECTIONAL': False, 'TCN': {'n_timestep': 60, 'n_output': 370, 'kernel_size': 4, 'n_dropout': 0.1, 'hidden_size': 64, 'level': 3, 'channels': [64, 64, 64]}, 'TRANSFORMER': {'n_timestep': 60, 'n_output': 370, 'n_layer': 6, 'n_head': 5, 'n_dropout': 0.5}}
+Model Path: Result/TRANSFORMER
+Loading Transformer model (use_prob: False)
+Error during inference: Model is not properly loaded
+Traceback: Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/TS_Model/inference.py", line 278, in infer
+    raise ValueError("Model is not properly loaded")
+ValueError: Model is not properly loaded
+
