@@ -75,8 +75,7 @@ class Inference:
                     dropout_p=self.config["DROPOUT"],
                     bidirectional=self.config["BIDIRECTIONAL"],
                     lb=self.lb,
-                    ub=self.ub,
-                    n_select=self.config['N_SELECT']
+                    ub=self.ub
                 )
             else:
                 from model.gru import GRU
@@ -87,8 +86,7 @@ class Inference:
                     dropout_p=self.config["DROPOUT"],
                     bidirectional=self.config["BIDIRECTIONAL"],
                     lb=self.lb,
-                    ub=self.ub,
-                    n_select=self.config['N_SELECT']
+                    ub=self.ub
                 )
         elif self.model_name.lower() == "transformer":
             if self.use_prob:
@@ -101,8 +99,7 @@ class Inference:
                     n_dropout=self.config["TRANSFORMER"]["n_dropout"],
                     n_output=self.n_stock,
                     lb=self.lb,
-                    ub=self.ub,
-                    n_select=self.config['N_SELECT']
+                    ub=self.ub
                 )
             else:
                 from model.transformer import Transformer
@@ -114,8 +111,7 @@ class Inference:
                     n_dropout=self.config["TRANSFORMER"]["n_dropout"],
                     n_output=self.n_stock,
                     lb=self.lb,
-                    ub=self.ub,
-                    n_select=self.config['N_SELECT']
+                    ub=self.ub
                 )
         elif self.model_name.lower() == "tcn":
             if self.use_prob:
@@ -128,8 +124,7 @@ class Inference:
                     n_dropout=self.config["TCN"]["n_dropout"],
                     n_timestep=self.config["TCN"]["n_timestep"],
                     lb=self.lb,
-                    ub=self.ub,
-                    n_select=self.config['N_SELECT']
+                    ub=self.ub
                 )
             else:
                 from model.tcn import TCN
@@ -141,8 +136,7 @@ class Inference:
                     n_dropout=self.config["TCN"]["n_dropout"],
                     n_timestep=self.config["TCN"]["n_timestep"],
                     lb=self.lb,
-                    ub=self.ub,
-                    n_select=self.config['N_SELECT']
+                    ub=self.ub
                 )
         else:
             raise ValueError(f"Unsupported model type: {self.model_name}")
@@ -150,42 +144,36 @@ class Inference:
         model = model.to(self.device)
         if self.distributed:
             model = DDP(model, device_ids=[self.local_rank], output_device=self.local_rank)
-
-        # 파일 목록 가져오기 시 파일 잠금 사용
-        max_retries = 5
-        retry_delay = 1
         
-        for attempt in range(max_retries):
-            try:
-                with open(self.model_path + "/.lock", "w") as lockfile:
-                    fcntl.flock(lockfile.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    
-                    # 모델 파일 목록 가져오기
-                    pth_files = [f for f in os.listdir(self.model_path) if f.endswith('.pth')]
-                    if not pth_files:
-                        fcntl.flock(lockfile.fileno(), fcntl.LOCK_UN)
-                        raise FileNotFoundError("No .pth files found")
-                    
-                    # 가장 최근 모델 선택
-                    latest_model = sorted(pth_files, key=lambda x: int(x.split('_')[3]))[-1]
-                    model_path = os.path.join(self.model_path, latest_model)
-                    
-                    # 모델 로드
-                    logger.info(f"Loading model: {latest_model}")
-                    checkpoint = torch.load(model_path, map_location=self.device, weights_only=True)
-                    
-                    fcntl.flock(lockfile.fileno(), fcntl.LOCK_UN)
+        try:
+            # 모델 파일 목록 가져오기
+            pth_files = [f for f in os.listdir(self.model_path) if f.endswith('.pth')]
+            if not pth_files:
+                raise FileNotFoundError("No .pth files found")
+            
+            # False_GRU_13_loss_0.4678.pth 형식의 파일 찾기
+            target_model = None
+            for pth_file in pth_files:
+                if pth_file.startswith(f"{str(self.use_prob)}_{self.model_name.upper()}"):
+                    target_model = pth_file
                     break
-                    
-            except (IOError, OSError) as e:
-                if attempt == max_retries - 1:
-                    raise
-                time.sleep(retry_delay)
-        
-        model.load_state_dict(checkpoint['model_state_dict'])
-        model.eval()
-        
-        return model
+                
+            if target_model is None:
+                raise FileNotFoundError(f"No matching model found for {self.use_prob}_{self.model_name}")
+            
+            model_path = os.path.join(self.model_path, target_model)
+            logger.info(f"Loading model: {target_model}")
+            
+            # 모델 로드
+            checkpoint = torch.load(model_path, map_location=self.device)
+            model.load_state_dict(checkpoint['model_state_dict'])
+            model.eval()
+            
+            return model
+            
+        except Exception as e:
+            logger.error(f"Error loading model: {str(e)}")
+            raise
 
     def _load_test_data(self):
         """테스트 데이터 로드"""
@@ -242,41 +230,37 @@ class Inference:
     def _load_best_model(self):
         """
         설정과 일치하는 가장 좋은 성능의 모델 로드
-        
-        Returns:
-            str: 선택된 모델의 전체 경로
         """
-        # 모델 파일 리스트 가져오기
         pth_files = [f for f in os.listdir(self.model_path) if f.endswith('.pth')]
         if not pth_files:
             raise FileNotFoundError("No .pth files found in the specified model path.")
         
-        # 현재 설정과 일치하는 모델 필터링
         valid_models = []
         for pth_file in pth_files:
             try:
-                # 파일명 파싱
-                # format: {use_prob}_{model_type}_{n_select}_{epoch}_loss_{loss}.pth
+                # 파일명 파싱 규칙 수정
+                # 새로운 format: {use_prob}_{model_type}_{epoch}_loss_{loss}.pth
                 parts = pth_file.split('_')
+                if len(parts) < 5:  # 최소 필요한 부분 확인
+                    continue
+                    
                 use_prob = parts[0].lower() == 'true'
-                model_type = parts[1]
-                n_select = int(parts[2])
+                model_type = parts[1].lower()
                 loss = float(parts[-1].replace('.pth', ''))
                 
                 # 현재 설정과 일치하는지 확인
-                if (model_type == self.config["MODEL"] and 
-                    n_select == self.config["N_SELECT"] and 
+                if (model_type == self.config["MODEL"].lower() and 
                     use_prob == self.use_prob):
                     valid_models.append((loss, pth_file))
+                    
             except (IndexError, ValueError) as e:
                 logger.warning(f"Skipping invalid model file {pth_file}: {str(e)}")
                 continue
         
         if not valid_models:
             raise FileNotFoundError(
-                f"No matching model found for current configuration:\n"
+                f"No matching model found for configuration:\n"
                 f"Model: {self.config['MODEL']}\n"
-                f"N_SELECT: {self.config['N_SELECT']}\n"
                 f"use_prob: {self.use_prob}"
             )
         
@@ -374,8 +358,7 @@ class Inference:
             for file in model_files:
                 parts = file.split('_')
                 if (parts[0].lower() == str(self.use_prob).lower() and 
-                    parts[1] == self.model_name and 
-                    int(parts[2]) == self.config["N_SELECT"]):
+                    parts[1] == self.model_name):
                     used_model = file
                     break
             
@@ -388,7 +371,6 @@ class Inference:
             weights_filename = (
                 f"weights_"
                 f"{self.use_prob}_{self.model_name}_"
-                f"n{self.config['N_SELECT']}_"
                 f"t{self.len_train}_p{self.len_pred}_"
                 f"loss{model_loss:.4f}.csv"
             )
@@ -413,7 +395,6 @@ class Inference:
             logger.info(f"Model parameters:")
             logger.info(f"- Use prob: {self.use_prob}")
             logger.info(f"- Model: {self.model_name}")
-            logger.info(f"- N_select: {self.config['N_SELECT']}")
             logger.info(f"- Train length: {self.len_train}")
             logger.info(f"- Pred length: {self.len_pred}")
             logger.info(f"- Model loss: {model_loss:.4f}")

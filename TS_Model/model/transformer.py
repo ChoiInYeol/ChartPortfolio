@@ -211,9 +211,19 @@ class Encoder(nn.Module):
 
 
 class Transformer(nn.Module):
-    def __init__(self, n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub, n_select=5):
+    def __init__(self, n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub):
         """
-        트랜스포머 모델 초기화
+        트랜스포머 기반 포트폴리오 최적화 모델
+        
+        Args:
+            n_feature: 입력 특성 수
+            n_timestep: 시계열 길이
+            n_layer: 인코더 레이어 수
+            n_head: 어텐션 헤드 수
+            n_dropout: 드롭아웃 비율
+            n_output: 출력 차원 (종목 수)
+            lb: 종목별 최소 비중
+            ub: 종목별 최대 비중
         """
         super().__init__()
         self.encoder = Encoder(
@@ -227,40 +237,63 @@ class Transformer(nn.Module):
         self.tempmaxpool = nn.MaxPool1d(n_timestep)
         self.lb = lb
         self.ub = ub
-        self.n_select = n_select
+        self.swish = nn.SiLU()
 
-    def forward(self, src, x_probs=None, returnWeights=False):
+    def forward(self, x, returnWeights=False):
         """
-        트랜스포머 forward pass
+        순전파
         
         Args:
-            src: 입력 시퀀스
-            x_probs: 상승확률 (사용하지 않음)
+            x: 입력 시퀀스 (batch_size, seq_len, n_stocks)
             returnWeights: 어텐션 가중치 반환 여부
+            
+        Returns:
+            포트폴리오 비중 (batch_size, n_stocks)
+            어텐션 가중치 (returnWeights=True인 경우)
         """
-        mask = creatMask(src.shape[0], src.shape[1]).to(device)
+        mask = creatMask(x.shape[0], x.shape[1]).to(device)
         
         if returnWeights:
-            e_outputs, weights = self.encoder(src, mask, returnWeights=True)
+            e_outputs, weights = self.encoder(x, mask, returnWeights=True)
         else:
-            e_outputs = self.encoder(src, mask)
+            e_outputs = self.encoder(x, mask)
 
         e_outputs = self.tempmaxpool(e_outputs.transpose(1, 2)).squeeze(-1)
-        output = self.out(e_outputs)
-        output = F.softmax(output, dim=1)
-        output = torch.stack([self.rebalance(batch, self.lb, self.ub) for batch in output])
+        
+        # 비중 계산
+        logit = self.out(e_outputs)
+        logit = self.swish(logit)
+        logit = F.softmax(logit, dim=1)
+        
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(batch, self.lb, self.ub) 
+            for batch in logit
+        ])
         
         if returnWeights:
-            return output, weights
-        return output
+            return final_weights, weights
+        return final_weights
 
     def rebalance(self, weight, lb, ub):
-        """원본 rebalance 메서드 유지"""
+        """
+        포트폴리오 비중 재조정
+        
+        Args:
+            weight: 초기 비중
+            lb: 최소 비중
+            ub: 최대 비중
+            
+        Returns:
+            재조정된 비중
+        """
         old = weight
         weight_clamped = torch.clamp(old, lb, ub)
         while True:
             leftover = (old - weight_clamped).sum().item()
             nominees = weight_clamped[torch.where(weight_clamped != ub)[0]]
+            if len(nominees) == 0:
+                break
             gift = leftover * (nominees / nominees.sum())
             weight_clamped[torch.where(weight_clamped != ub)[0]] += gift
             old = weight_clamped
@@ -271,74 +304,62 @@ class Transformer(nn.Module):
         return weight_clamped
 
 
-class TransformerWithProb(nn.Module):
-    def __init__(self, n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub, n_select=5):
+class TransformerWithProb(Transformer):
+    def __init__(self, n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub):
         """
-        확률 기반 트랜스포머 모델 초기화
+        상승확률을 활용하는 트랜스포머 기반 포트폴리오 최적화 모델
         """
-        super().__init__()
-        self.encoder = Encoder(
-            input_size=n_feature,
-            seq_len=n_timestep,
-            N=n_layer,
-            heads=n_head,
-            dropout=n_dropout
-        )
+        super().__init__(n_feature, n_timestep, n_layer, n_head, n_dropout, n_output, lb, ub)
+        
+        # 상승확률 인코딩을 위한 레이어
         self.prob_encoder = nn.Sequential(
             nn.Linear(n_output, n_feature),
-            nn.ReLU(),
+            nn.SiLU(),
             nn.Dropout(n_dropout)
         )
+        
+        # 결합된 특성을 처리하기 위한 레이어
         self.out = nn.Linear(n_feature * 2, n_output)
-        self.tempmaxpool = nn.MaxPool1d(n_timestep)
-        self.lb = lb
-        self.ub = ub
-        self.n_select = n_select
 
-    def forward(self, src, x_probs, returnWeights=False):
+    def forward(self, x_returns, x_probs, returnWeights=False):
         """
-        확률 기반 트랜스포머 forward pass
+        순전파
         
         Args:
-            src: 입력 시퀀스
-            x_probs: 상승확률
+            x_returns: 수익률 시퀀스 (batch_size, seq_len, n_stocks)
+            x_probs: 상승확률 (batch_size, pred_len, n_stocks)
             returnWeights: 어텐션 가중치 반환 여부
+            
+        Returns:
+            포트폴리오 비중 (batch_size, n_stocks)
+            어텐션 가중치 (returnWeights=True인 경우)
         """
-        mask = creatMask(src.shape[0], src.shape[1]).to(device)
+        mask = creatMask(x_returns.shape[0], x_returns.shape[1]).to(device)
         
         if returnWeights:
-            e_outputs, weights = self.encoder(src, mask, returnWeights=True)
+            e_outputs, weights = self.encoder(x_returns, mask, returnWeights=True)
         else:
-            e_outputs = self.encoder(src, mask)
+            e_outputs = self.encoder(x_returns, mask)
 
         e_outputs = self.tempmaxpool(e_outputs.transpose(1, 2)).squeeze(-1)
         
-        # 확률 데이터 처리 (첫 번째 예측 시점의 확률 사용)
+        # 상승확률 처리 (첫 번째 예측 시점의 확률 사용)
         prob_features = self.prob_encoder(x_probs[:, 0, :])
         
         # 특성 결합
         combined = torch.cat([e_outputs, prob_features], dim=1)
         
-        output = self.out(combined)
-        output = F.softmax(output, dim=1)
-        output = torch.stack([self.rebalance(batch, self.lb, self.ub) for batch in output])
+        # 비중 계산
+        logit = self.out(combined)
+        logit = self.swish(logit)
+        logit = F.softmax(logit, dim=1)
+        
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(batch, self.lb, self.ub) 
+            for batch in logit
+        ])
         
         if returnWeights:
-            return output, weights
-        return output
-
-    def rebalance(self, weight, lb, ub):
-        """Transformer의 rebalance 메서드와 동일"""
-        old = weight
-        weight_clamped = torch.clamp(old, lb, ub)
-        while True:
-            leftover = (old - weight_clamped).sum().item()
-            nominees = weight_clamped[torch.where(weight_clamped != ub)[0]]
-            gift = leftover * (nominees / nominees.sum())
-            weight_clamped[torch.where(weight_clamped != ub)[0]] += gift
-            old = weight_clamped
-            if len(torch.where(weight_clamped > ub)[0]) == 0:
-                break
-            else:
-                weight_clamped = torch.clamp(old, lb, ub)
-        return weight_clamped
+            return final_weights, weights
+        return final_weights

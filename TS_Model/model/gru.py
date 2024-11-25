@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 class GRU(nn.Module):
     def __init__(self, n_layers, hidden_dim, n_stocks, dropout_p=0.3, bidirectional=False,
-                 lb=0, ub=0.2, n_select=50):
+                 lb=0, ub=0.2):
         """
         GRU 기반 포트폴리오 최적화 모델
         
@@ -16,15 +16,12 @@ class GRU(nn.Module):
             bidirectional: 양방향 GRU 여부
             lb: 종목별 최소 비중
             ub: 종목별 최대 비중
-            n_select: 선택할 종목 수
         """
         super().__init__()
         self.n_layers = n_layers
         self.hidden_dim = hidden_dim
-        self.n_select = n_select
         self.lb = lb
         self.ub = ub
-        self.n_stocks = n_stocks
         
         # GRU 레이어
         self.gru = nn.GRU(
@@ -34,21 +31,15 @@ class GRU(nn.Module):
         
         self.dropout = nn.Dropout(dropout_p)
         self.scale = 2 if bidirectional else 1
-        
-        # 종목 선택을 위한 레이어
-        self.selection_layer = nn.Linear(hidden_dim * self.scale, n_stocks)
-        
-        # 선택된 종목의 비중 결정을 위한 레이어
-        self.weight_layer = nn.Linear(hidden_dim * self.scale, n_select)
+        self.fc = nn.Linear(hidden_dim * self.scale, n_stocks)
         self.swish = nn.SiLU()
 
-    def forward(self, x, x_probs=None):
+    def forward(self, x, probs=None):
         """
         순전파
         
         Args:
             x: 입력 시퀀스 (batch_size, seq_len, n_stocks)
-            x_probs: 상승확률 (사용하지 않음)
             
         Returns:
             포트폴리오 비중 (batch_size, n_stocks)
@@ -58,36 +49,24 @@ class GRU(nn.Module):
         
         # GRU 통과
         x, _ = self.gru(x, init_h)
-        h_t = x[:, -1, :]  # 마지막 타임스텝의 은닉 상태
+        h_t = x[:, -1, :]
         
-        # 종목 선택
-        selection_scores = self.selection_layer(self.dropout(h_t))
-        selection_scores = torch.sigmoid(selection_scores)
-        
-        # Top-k 종목 선택
-        _, top_indices = torch.topk(selection_scores, self.n_select, dim=1)
-        
-        # 선택된 종목에 대한 비중 계산
-        weights = self.weight_layer(self.dropout(h_t))
-        weights = self.swish(weights)
-        weights = F.softmax(weights, dim=-1)
-        
-        # 최종 포트폴리오 비중 생성
-        final_weights = torch.zeros(batch_size, self.n_stocks).to(x.device)
-        for i in range(batch_size):
-            final_weights[i].scatter_(0, top_indices[i], weights[i])
+        # 비중 계산
+        logit = self.fc(self.dropout(h_t))
+        logit = self.swish(logit)
+        logit = F.softmax(logit, dim=-1)
         
         # 최소/최대 비중 제약 적용
         final_weights = torch.stack([
             self.rebalance(batch, self.lb, self.ub) 
-            for batch in final_weights
+            for batch in logit
         ])
         
         return final_weights
 
     def rebalance(self, weight, lb, ub):
         """
-        선택된 종목에 대해서만 rebalancing 수행
+        포트폴리오 비중 재조정
         
         Args:
             weight: 초기 비중
@@ -97,17 +76,15 @@ class GRU(nn.Module):
         Returns:
             재조정된 비중
         """
-        selected_mask = (weight > 0).float()
-        old = weight * selected_mask
-        
+        old = weight
         weight_clamped = torch.clamp(old, lb, ub)
         while True:
             leftover = (old - weight_clamped).sum().item()
-            nominees = weight_clamped[torch.where((weight_clamped != ub) & (selected_mask == 1))[0]]
+            nominees = weight_clamped[torch.where(weight_clamped != ub)[0]]
             if len(nominees) == 0:
                 break
             gift = leftover * (nominees / nominees.sum())
-            weight_clamped[torch.where((weight_clamped != ub) & (selected_mask == 1))[0]] += gift
+            weight_clamped[torch.where(weight_clamped != ub)[0]] += gift
             old = weight_clamped
             if len(torch.where(weight_clamped > ub)[0]) == 0:
                 break
@@ -118,11 +95,11 @@ class GRU(nn.Module):
 
 class GRUWithProb(GRU):
     def __init__(self, n_layers, hidden_dim, n_stocks, dropout_p=0.3, bidirectional=False,
-                 lb=0, ub=0.2, n_select=50):
+                 lb=0, ub=0.2):
         """
         상승확률을 활용하는 GRU 기반 포트폴리오 최적화 모델
         """
-        super().__init__(n_layers, hidden_dim, n_stocks, dropout_p, bidirectional, lb, ub, n_select)
+        super().__init__(n_layers, hidden_dim, n_stocks, dropout_p, bidirectional, lb, ub)
         
         # 상승확률 인코딩을 위한 레이어
         self.prob_encoder = nn.Sequential(
@@ -131,9 +108,8 @@ class GRUWithProb(GRU):
             nn.Dropout(dropout_p)
         )
         
-        # 결합된 특성을 처리하기 위한 레이어 수정
-        self.selection_layer = nn.Linear(hidden_dim * (self.scale + 1), n_stocks)
-        self.weight_layer = nn.Linear(hidden_dim * (self.scale + 1), n_select)
+        # 결합된 특성을 처리하기 위한 레이어
+        self.fc = nn.Linear(hidden_dim * (self.scale + 1), n_stocks)
 
     def forward(self, x_returns, x_probs):
         """
@@ -159,27 +135,15 @@ class GRUWithProb(GRU):
         # 특성 결합
         combined = torch.cat([h_returns, h_probs], dim=1)
         
-        # 종목 선택
-        selection_scores = self.selection_layer(self.dropout(combined))
-        selection_scores = torch.sigmoid(selection_scores)
-        
-        # Top-k 종목 선택
-        _, top_indices = torch.topk(selection_scores, self.n_select, dim=1)
-        
-        # 선택된 종목에 대한 비중 계산
-        weights = self.weight_layer(self.dropout(combined))
-        weights = self.swish(weights)
-        weights = F.softmax(weights, dim=-1)
-        
-        # 최종 포트폴리오 비중 생성
-        final_weights = torch.zeros(batch_size, self.n_stocks).to(x_returns.device)
-        for i in range(batch_size):
-            final_weights[i].scatter_(0, top_indices[i], weights[i])
+        # 비중 계산
+        logit = self.fc(self.dropout(combined))
+        logit = self.swish(logit)
+        logit = F.softmax(logit, dim=-1)
         
         # 최소/최대 비중 제약 적용
         final_weights = torch.stack([
             self.rebalance(batch, self.lb, self.ub) 
-            for batch in final_weights
+            for batch in logit
         ])
         
         return final_weights

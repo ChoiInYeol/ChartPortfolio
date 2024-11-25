@@ -72,7 +72,6 @@ class Trainer:
             parts = file.split('_')
             use_prob = parts[0].lower() == 'true'
             model_type = parts[1]
-            n_select = int(parts[2])
             
             # 현재 설정과 일치하는지 확인
             if (model_type == self.config["MODEL"] and 
@@ -91,7 +90,6 @@ class Trainer:
                 n_timestep=self.config["TCN"]["n_timestep"],
                 lb=self.config["LB"],
                 ub=self.config["UB"],
-                n_select=self.config["N_SELECT"]
             )
         elif self.config["MODEL"] == "GRU":
             if self.use_prob:
@@ -443,12 +441,11 @@ class Trainer:
         # 임시 파일에 먼저 저장
         temp_save_path = os.path.join(
             self.model_dir, 
-            f'temp_{self.use_prob}_{self.config["MODEL"]}_{self.config["N_SELECT"]}_{epoch}_loss_{self.best_loss:.4f}.pth'
+            f'temp_{self.use_prob}_{self.config["MODEL"]}_{epoch}_loss_{self.best_loss:.4f}.pth'
         )
-        
         final_save_path = os.path.join(
             self.model_dir, 
-            f'{self.use_prob}_{self.config["MODEL"]}_{self.config["N_SELECT"]}_{epoch}_loss_{self.best_loss:.4f}.pth'
+            f'{self.use_prob}_{self.config["MODEL"]}_{epoch}_loss_{self.best_loss:.4f}.pth'
         )
         
         # 임시 파일에 저장

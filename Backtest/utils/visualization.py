@@ -420,16 +420,6 @@ class PortfolioVisualizer:
         plt.grid(True, alpha=0.3)
         plt.xticks(rotation=45)
         
-        # 각 리밸런싱 시점의 active positions 수 표시
-        for date in rebalance_dates:
-            if date in weights_resampled.index:
-                active_positions = (weights_resampled.loc[date] > 0).sum()
-                plt.text(date, -0.05, f'N={active_positions}',
-                        horizontalalignment='center',
-                        verticalalignment='top',
-                        fontsize=8,
-                        rotation=45)
-        
         plt.tight_layout()
         
         # 파일명에 net 포함 여부 반영

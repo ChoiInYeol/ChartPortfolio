@@ -867,3 +867,217 @@ Dataset: dataset.pkl
 Use probability: False
 Error occurred: 'N_SELECT'
 Program failed: 'N_SELECT'
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['train']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing train for GRU
+Dataset: dataset.pkl
+Use probability: False
+Error occurred: Error(s) in loading state_dict for GRU:
+	Missing key(s) in state_dict: "fc.weight", "fc.bias". 
+	Unexpected key(s) in state_dict: "selection_layer.weight", "selection_layer.bias", "weight_layer.weight", "weight_layer.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+Program failed: Error(s) in loading state_dict for GRU:
+	Missing key(s) in state_dict: "fc.weight", "fc.bias". 
+	Unexpected key(s) in state_dict: "selection_layer.weight", "selection_layer.bias", "weight_layer.weight", "weight_layer.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['train']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing train for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting training...
+Error occurred: GRU.forward() takes 2 positional arguments but 3 were given
+Program failed: GRU.forward() takes 2 positional arguments but 3 were given
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['train']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing train for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting training...
+Error occurred: GRU.forward() takes 2 positional arguments but 3 were given
+Program failed: GRU.forward() takes 2 positional arguments but 3 were given
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['train']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing train for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting training...
+Error occurred: 'N_SELECT'
+Program failed: 'N_SELECT'
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['train']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing train for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting training...
+Training completed
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['inference']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing inference for GRU
+Dataset: dataset.pkl
+Use probability: False
+Error occurred: invalid literal for int() with base 10: 'loss'
+Program failed: invalid literal for int() with base 10: 'loss'
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['inference']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing inference for GRU
+Dataset: dataset.pkl
+Use probability: False
+Error occurred: Error(s) in loading state_dict for GRU:
+	Unexpected key(s) in state_dict: "attention.weight", "attention.bias", "prob_encoder.0.weight", "prob_encoder.0.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([370, 256]) from checkpoint, the shape in current model is torch.Size([100, 128]).
+	size mismatch for fc.bias: copying a param with shape torch.Size([370]) from checkpoint, the shape in current model is torch.Size([100]).
+Program failed: Error(s) in loading state_dict for GRU:
+	Unexpected key(s) in state_dict: "attention.weight", "attention.bias", "prob_encoder.0.weight", "prob_encoder.0.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([370, 256]) from checkpoint, the shape in current model is torch.Size([100, 128]).
+	size mismatch for fc.bias: copying a param with shape torch.Size([370]) from checkpoint, the shape in current model is torch.Size([100]).
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['inference']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing inference for GRU
+Dataset: dataset.pkl
+Use probability: False
+Error occurred: Error(s) in loading state_dict for GRU:
+	Unexpected key(s) in state_dict: "attention.weight", "attention.bias", "prob_encoder.0.weight", "prob_encoder.0.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([370, 256]) from checkpoint, the shape in current model is torch.Size([100, 128]).
+	size mismatch for fc.bias: copying a param with shape torch.Size([370]) from checkpoint, the shape in current model is torch.Size([100]).
+Program failed: Error(s) in loading state_dict for GRU:
+	Unexpected key(s) in state_dict: "attention.weight", "attention.bias", "prob_encoder.0.weight", "prob_encoder.0.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([370, 256]) from checkpoint, the shape in current model is torch.Size([100, 128]).
+	size mismatch for fc.bias: copying a param with shape torch.Size([370]) from checkpoint, the shape in current model is torch.Size([100]).
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['inference']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing inference for GRU
+Dataset: dataset.pkl
+Use probability: False
+Error occurred: Error(s) in loading state_dict for GRU:
+	Unexpected key(s) in state_dict: "attention.weight", "attention.bias", "prob_encoder.0.weight", "prob_encoder.0.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([370, 256]) from checkpoint, the shape in current model is torch.Size([100, 128]).
+	size mismatch for fc.bias: copying a param with shape torch.Size([370]) from checkpoint, the shape in current model is torch.Size([100]).
+Program failed: Error(s) in loading state_dict for GRU:
+	Unexpected key(s) in state_dict: "attention.weight", "attention.bias", "prob_encoder.0.weight", "prob_encoder.0.bias". 
+	size mismatch for gru.weight_ih_l0: copying a param with shape torch.Size([384, 370]) from checkpoint, the shape in current model is torch.Size([384, 100]).
+	size mismatch for fc.weight: copying a param with shape torch.Size([370, 256]) from checkpoint, the shape in current model is torch.Size([100, 128]).
+	size mismatch for fc.bias: copying a param with shape torch.Size([370]) from checkpoint, the shape in current model is torch.Size([100]).
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['inference']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing inference for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting inference...
+Inference completed
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['train']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing train for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting training...
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['train']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing train for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting training...
+Training completed
+Configuration loaded successfully
+Using config file: config/config.yaml
+Random seed set to 42
+User selections:
+- Modes: ['inference']
+- Models: ['GRU']
+- Dataset: default
+- Use probability data: False
+
+Executing inference for GRU
+Dataset: dataset.pkl
+Use probability: False
+Starting inference...
+Inference completed

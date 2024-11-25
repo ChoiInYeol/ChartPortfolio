@@ -1351,3 +1351,37 @@ FileNotFoundError: Up probability data file not found: /home/indi/codespace/Imag
 2024-11-22 07:39:34,948 - INFO - - GRU Top 50
 2024-11-22 07:39:34,948 - INFO - - CNN + GRU Top 50
 2024-11-22 07:41:32,192 - INFO - Backtest completed successfully
+2024-11-22 08:27:36,294 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-22 08:27:36,886 - INFO - Creating CNN benchmark portfolios...
+2024-11-22 08:27:36,989 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-22 08:27:37,086 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-22 08:27:37,185 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-22 08:27:37,282 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-22 08:27:37,378 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-22 08:27:37,378 - INFO - Processing model: GRU
+2024-11-22 08:27:38,700 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-22 08:27:38,700 - INFO - Final column order:
+2024-11-22 08:27:38,700 - INFO - - Naive
+2024-11-22 08:27:38,700 - INFO - - CNN Top 100
+2024-11-22 08:27:38,700 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-22 08:27:38,700 - INFO - - CNN Top 50 + Min Variance
+2024-11-22 08:27:38,700 - INFO - - CNN Top 50 + Min CVaR
+2024-11-22 08:27:38,701 - INFO - - GRU Top 60
+2024-11-22 08:29:12,459 - INFO - Backtest completed successfully
+2024-11-22 09:04:24,472 - INFO - Data loaded - Returns: (1698, 370), Up prob: (81, 370)
+2024-11-22 09:04:25,069 - INFO - Creating CNN benchmark portfolios...
+2024-11-22 09:04:25,170 - INFO - Successfully processed benchmark portfolio: CNN Top 100
+2024-11-22 09:04:25,265 - INFO - Successfully processed benchmark portfolio: CNN Bottom 100
+2024-11-22 09:04:25,362 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Max Sharpe
+2024-11-22 09:04:25,458 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min Variance
+2024-11-22 09:04:25,551 - INFO - Successfully processed benchmark portfolio: CNN Top 50 + Min CVaR
+2024-11-22 09:04:25,551 - INFO - Processing model: GRU
+2024-11-22 09:04:26,875 - INFO - All portfolio weights saved to /home/indi/codespace/ImagePortOpt/Backtest/results/all_portfolio_weights.csv
+2024-11-22 09:04:26,876 - INFO - Final column order:
+2024-11-22 09:04:26,876 - INFO - - Naive
+2024-11-22 09:04:26,876 - INFO - - CNN Top 100
+2024-11-22 09:04:26,876 - INFO - - CNN Top 50 + Max Sharpe
+2024-11-22 09:04:26,876 - INFO - - CNN Top 50 + Min Variance
+2024-11-22 09:04:26,876 - INFO - - CNN Top 50 + Min CVaR
+2024-11-22 09:04:26,876 - INFO - - GRU Top 60
+2024-11-22 09:05:45,217 - INFO - Backtest completed successfully
