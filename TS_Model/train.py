@@ -149,8 +149,8 @@ class Trainer:
         if not hasattr(self, 'train_x'):
             self.set_data()
             
-        train_loader = self.dataloader(self.train_x, self.train_y, self.train_prob)
-        val_loader = self.dataloader(self.val_x, self.val_y, self.val_prob)
+        train_loader = self.dataloader(self.train_x, self.train_y, self.train_prob, is_train=True)
+        val_loader = self.dataloader(self.val_x, self.val_y, self.val_prob, is_train=False)
         
         epochs = tqdm(range(self.config["TRAINING"]["EPOCHS"]), desc="Training")
         
@@ -325,18 +325,16 @@ class Trainer:
             logging.error(f"Error loading data: {str(e)}")
             raise
 
-    def dataloader(self, x, y, probs):
-        """데이터로더 생성"""
-        # 데이터 검증
-        print("\n=== Dataloader Input Validation ===")
-        print(f"x shape: {x.shape}")
-        print(f"y shape: {y.shape}")
-        print(f"probs shape: {probs.shape}")
-        print(f"x contains NaN: {np.isnan(x).any()}")
-        print(f"y contains NaN: {np.isnan(y).any()}")
-        print(f"probs contains NaN: {np.isnan(probs).any()}")
-        print("=================================\n")
+    def dataloader(self, x, y, probs, is_train=True):
+        """
+        데이터로더 생성
         
+        Args:
+            x: 입력 데이터
+            y: 타겟 데이터
+            probs: 확률 데이터
+            is_train: 학습용 데이터로더인지 여부
+        """
         dataset = torch.utils.data.TensorDataset(
             torch.tensor(x, dtype=torch.float32),
             torch.tensor(y, dtype=torch.float32),
@@ -348,7 +346,7 @@ class Trainer:
                 dataset,
                 num_replicas=dist.get_world_size(),
                 rank=self.local_rank,
-                shuffle=True
+                shuffle=is_train  # 학습 시에만 shuffle
             )
         else:
             sampler = None
@@ -356,11 +354,11 @@ class Trainer:
         return torch.utils.data.DataLoader(
             dataset=dataset,
             batch_size=self.config["TRAINING"]["BATCH_SIZE"],
-            shuffle=(sampler is None),
+            shuffle=(sampler is None and is_train),  # 학습 시에만 shuffle
             sampler=sampler,
             num_workers=4,
             pin_memory=True,
-            drop_last=True,
+            drop_last=is_train,  # 학습 시에만 마지막 배치 drop
         )
 
     def infer_and_save_weights(self):
@@ -394,10 +392,10 @@ class Trainer:
         if not self.distributed or self.local_rank == 0:
             # 주식 이름 로드
             try:
-                tickers = pd.read_csv("data/return_df.csv", index_col=0).columns[:self.config["N_STOCK"]]
+                tickers = pd.read_csv("/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv", index_col=0).columns[:self.config['DATA']['N_STOCKS']]
             except Exception as e:
                 logger.error(f"Error loading tickers: {e}")
-                tickers = [f"Stock_{i}" for i in range(self.config["N_STOCK"])]
+                tickers = [f"Stock_{i}" for i in range(self.config['DATA']['N_STOCKS'])]
 
             # 날짜 인덱스 가져오기
             if data_type == "train":
@@ -450,3 +448,83 @@ class Trainer:
         """소멸자에서 process group 정리"""
         if self.distributed and dist.is_initialized():
             dist.destroy_process_group()
+
+    def predict(self, data_type: str = 'train') -> np.ndarray:
+        """지정된 데이터셋에 대한 포트폴리오 가중치를 예측합니다."""
+        self.model.eval()
+        
+        # 데이터셋 선택
+        if data_type == 'train':
+            x_data = self.train_x
+            prob_data = self.train_prob if self.use_prob else None
+        elif data_type == 'val':
+            x_data = self.val_x
+            prob_data = self.val_prob if self.use_prob else None
+        else:
+            raise ValueError(f"Unknown data type: {data_type}")
+        
+        # 예측을 위한 데이터로더 생성 (shuffle=False)
+        loader = self.dataloader(x_data, 
+                               np.zeros_like(x_data),  # dummy y values
+                               prob_data if self.use_prob else np.zeros_like(x_data),
+                               is_train=False)
+        
+        predictions = []
+        with torch.no_grad():
+            for batch in loader:
+                x_returns = batch[0].to(self.device)
+                if self.use_prob:
+                    x_probs = batch[2].to(self.device)
+                    pred = self.model(x_returns, x_probs)
+                else:
+                    pred = self.model(x_returns)
+                predictions.append(pred.cpu().numpy())
+        
+        return np.concatenate(predictions, axis=0)
+
+    def save_weights(self, weights_array: np.ndarray, data_type: str = 'train'):
+        """
+        가중치를 저장합니다.
+        
+        Args:
+            weights_array (np.ndarray): 저장할 가중치 배열
+            data_type (str): 데이터 타입 ('train' 또는 'val')
+        """
+        if weights_array.size == 0:
+            logger.error("Empty weights array received")
+            return
+        
+        try:
+            # 티커 가져오기
+            tickers = pd.read_csv(
+                "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv",
+                index_col=0
+            ).columns[:self.config['DATA']['N_STOCKS']]
+            
+            # 날짜 인덱스 사용
+            dates = self.train_dates if data_type == 'train' else self.val_dates
+            date_index = pd.DatetimeIndex([date[0] for date in dates])
+            
+            # 가중치 파일명 생성
+            weights_filename = (
+                f"portfolio_weights_"
+                f"{self.config['MODEL']['TYPE']}_"
+                f"{'prob' if self.use_prob else 'no_prob'}_"
+                f"{self.config['PORTFOLIO']['OBJECTIVE']}_{data_type}.csv"
+            )
+            
+            weights_path = self.model_dir / weights_filename
+            
+            # DataFrame 생성 및 저장
+            df_weights = pd.DataFrame(
+                weights_array,
+                columns=tickers,
+                index=date_index
+            )
+            df_weights.to_csv(weights_path)
+            
+            logger.info(f"{data_type.capitalize()} weights saved to {weights_path}")
+            
+        except Exception as e:
+            logger.error(f"Error saving {data_type} weights: {str(e)}")
+            raise

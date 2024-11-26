@@ -45,6 +45,15 @@ def main():
             logging.info("Starting training...")
             trainer = Trainer(config)
             trainer.train()
+            
+            # 학습 데이터에 대한 가중치 예측 및 저장
+            train_weights = trainer.predict(data_type='train')
+            trainer.save_weights(train_weights, data_type='train')
+            
+            # 검증 데이터에 대한 가중치 예측 및 저장
+            val_weights = trainer.predict(data_type='val')
+            trainer.save_weights(val_weights, data_type='val')
+            
             logging.info("Training completed")
             
         elif args.mode == 'inference':

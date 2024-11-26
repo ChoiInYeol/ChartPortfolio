@@ -72,6 +72,14 @@ def filter_sp500_stocks(returns_df: pd.DataFrame, probs_df: pd.DataFrame) -> Tup
         logging.info(f"필터링된 수익률 데이터 shape: {filtered_returns.shape}")
         logging.info(f"필터링된 상승확률 데이터 shape: {filtered_probs.shape}")
         
+        # csv로 저장
+        filtered_returns.to_csv(
+            "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv"
+        )
+        filtered_probs.to_csv(
+            "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_probs.csv"
+        )
+        
         return filtered_returns, filtered_probs
         
     except Exception as e:

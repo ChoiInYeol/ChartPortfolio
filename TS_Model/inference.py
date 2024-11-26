@@ -158,13 +158,9 @@ class ModelInference:
             return
         
         try:
-            # PROCESSED 경로 사용
-            data_processed = str(self.config['PATHS']['DATA']['PROCESSED'])
-            
-            logger.info(f"Loading tickers from {data_processed}")
-            
+            # filtered_returns.csv 파일에서 칼럼명(티커) 가져오기
             tickers = pd.read_csv(
-                Path(data_processed) / 'return_df.csv',
+                "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv",
                 index_col=0
             ).columns[:self.config['DATA']['N_STOCKS']]
             
