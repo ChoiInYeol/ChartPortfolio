@@ -1,6 +1,7 @@
 import argparse
 import yaml
 import logging
+import torch
 from pathlib import Path
 from dataload.make_dataset import prepare_dataset
 from train import Trainer
@@ -15,6 +16,10 @@ def parse_args():
                        help='실행 모드 (train 또는 inference)')
     parser.add_argument('--model_path', type=str,
                        help='추론 시 사용할 모델 가중치 경로 (inference 모드에서만 사용)')
+    parser.add_argument('--model_type', type=str, choices=['GRU', 'TCN', 'TRANSFORMER'],
+                       help='사용할 모델 타입')
+    parser.add_argument('--use_prob', type=str, choices=['true', 'false'],
+                       help='확률 기반 모델 사용 여부')
     return parser.parse_args()
 
 def setup_logging():
@@ -31,9 +36,22 @@ def main():
     
     with open(args.config, 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
+        
+    # 커맨드라인 인자로 config 값 업데이트
+    if args.model_type:
+        config['MODEL']['TYPE'] = args.model_type
+    if args.use_prob:
+        config['MODEL']['USE_PROB'] = args.use_prob.lower() == 'true'
     
     setup_logging()
-    logging.info(f"Running in {args.mode} mode")
+    logging.info(f"Running in {args.mode} mode with model {config['MODEL']['TYPE']} (use_prob={config['MODEL']['USE_PROB']})")
+    
+    # GPU 병렬 처리 설정
+    if torch.cuda.is_available() and torch.cuda.device_count() > 1:
+        logging.info(f"Using {torch.cuda.device_count()} GPUs for data parallel training")
+        config['TRAINING']['USE_DATA_PARALLEL'] = True
+    else:
+        config['TRAINING']['USE_DATA_PARALLEL'] = False
     
     try:
         # 1. 데이터셋 준비 (선택)

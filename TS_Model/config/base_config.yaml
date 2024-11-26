@@ -56,7 +56,7 @@ MODEL:
 TRAINING:
   # 학습 파라미터
   BATCH_SIZE: 64
-  EPOCHS: 500
+  EPOCHS: 50
   EARLY_STOPPING: 25
   LEARNING_RATE: 0.005
   MOMENTUM: 0.9
@@ -65,7 +65,7 @@ TRAINING:
   USE_CUDA: true
   SEED: 42
   NUM_WORKERS: 32
-
+  USE_DATA_PARALLEL: false
 PORTFOLIO:
   # 목적함수 설정
   OBJECTIVE: 'sharpe_ratio'  # ['mean_variance', 'minimum_variance', 'sharpe_ratio']

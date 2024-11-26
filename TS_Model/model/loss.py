@@ -55,7 +55,8 @@ def max_sharpe(returns: torch.Tensor, weights: torch.Tensor, risk_free_rate: flo
     # Sharpe ratio 계산
     sharpe = (annual_return - risk_free_rate) / port_vol
     
-    return -sharpe.mean()  # 최대화를 위해 음수 반환
+    # 스케일 조정 (예: 100을 곱하여 -100 ~ 100 범위로 조정)
+    return -sharpe.mean() * 100  # 최대화를 위해 음수 반환
 
 def mean_variance(returns: torch.Tensor, weights: torch.Tensor, risk_aversion: float = 1.0) -> torch.Tensor:
     """
@@ -82,7 +83,8 @@ def mean_variance(returns: torch.Tensor, weights: torch.Tensor, risk_aversion: f
     # 효용함수 = 기대수익률 - (위험회피계수/2) * 분산
     utility = port_return - (risk_aversion / 2) * port_var
     
-    return -utility.mean()
+    # 스케일 조정
+    return -utility.mean() * 100
 
 # 기존 인터페이스와의 호환성을 위한 별칭
 sharpe_ratio_loss = max_sharpe

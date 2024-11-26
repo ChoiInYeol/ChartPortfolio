@@ -9,17 +9,14 @@ for MODEL in "GRU" "TCN" "TRANSFORMER"; do
         # 학습 모드
         echo "Training ${MODEL} with use_prob=${USE_PROB}"
         python main.py \
-            --mode train \
-            --config_path ${CONFIG_PATH} \
-            --model_type ${MODEL} \
-            --use_prob ${USE_PROB}
+            --config ${CONFIG_PATH} \
+            --mode train
         
-        # 추론 모드
+        # 추론 모드 
         echo "Inferencing ${MODEL} with use_prob=${USE_PROB}"
         python main.py \
+            --config ${CONFIG_PATH} \
             --mode inference \
-            --config_path ${CONFIG_PATH} \
-            --model_type ${MODEL} \
-            --use_prob ${USE_PROB}
+            --model_path "models/${MODEL}_latest.pth"
     done
 done

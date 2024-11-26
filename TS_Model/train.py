@@ -255,9 +255,19 @@ class Trainer:
                     weights = self.model(returns)
                 loss = self.criterion(returns, weights)
             
-            total_loss += loss.item()
+            # loss 값 스케일 조정 (로깅용)
+            display_loss = loss.item() * 100  # 예: 100을 곱하여 표시
+            total_loss += display_loss
         
-        return total_loss / len(dataloader)
+        avg_loss = total_loss / len(dataloader)
+        
+        # 로그 포맷 지정
+        if is_training:
+            logger.info(f"Training Loss: {avg_loss:.2f}")  # 소수점 2자리까지만 표시
+        else:
+            logger.info(f"Validation Loss: {avg_loss:.2f}")
+        
+        return avg_loss
 
     def _save_checkpoint(self, epoch: int, loss: float):
         """체크포인트를 저장합니다."""
