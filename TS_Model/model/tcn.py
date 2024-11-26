@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn.utils import weight_norm
 import torch.nn.functional as F
-from typing import List, Dict, Any
+from typing import Optional, List
 
 
 class PortfolioTCN(nn.Module):
@@ -14,9 +14,9 @@ class PortfolioTCN(nn.Module):
         kernel_size: int,
         n_dropout: float,
         n_timestep: int,
-        constraints: Dict[str, Any] = None,
         lb: float = 0.0,
-        ub: float = 0.1
+        ub: float = 0.1,
+        n_select: Optional[int] = None
     ):
         """
         TCN 기반 포트폴리오 최적화 모델
@@ -28,16 +28,16 @@ class PortfolioTCN(nn.Module):
             kernel_size: 컨볼루션 커널 크기
             n_dropout: 드롭아웃 비율
             n_timestep: 시계열 길이
-            constraints: 포트폴리오 제약조건
             lb: 최소 포트폴리오 비중
             ub: 최대 포트폴리오 비중
+            n_select: 선택할 종목 수 (None인 경우 n_stocks 사용)
         """
         super().__init__()
         self.input_size = n_feature
         self.n_stocks = n_output
-        self.constraints = constraints or {}
         self.lb = lb
         self.ub = ub
+        self.n_select = n_select if n_select is not None else n_output
         
         # Score Block (h1)
         self.tcn = TemporalConvNet(
@@ -47,7 +47,16 @@ class PortfolioTCN(nn.Module):
             dropout=n_dropout
         )
         
-        # 점수 생성을 위한 레이어
+        # 종목 선택을 위한 attention 레이어
+        self.attention = nn.Sequential(
+            nn.Linear(num_channels[-1], num_channels[-1]),
+            nn.LayerNorm(num_channels[-1]),
+            nn.SiLU(),
+            nn.Dropout(n_dropout),
+            nn.Linear(num_channels[-1], n_output)
+        )
+        
+        # 선택된 종목의 비중 결정을 위한 레이어
         self.score_layers = nn.Sequential(
             nn.Linear(num_channels[-1], num_channels[-1]),
             nn.LayerNorm(num_channels[-1]),
@@ -58,12 +67,13 @@ class PortfolioTCN(nn.Module):
         
         self.tempmaxpool = nn.MaxPool1d(n_timestep)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, x_probs: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
         순전파
         
         Args:
             x: 입력 시퀀스 [batch_size, seq_len, n_stocks]
+            x_probs: 상승확률 (사용하지 않음)
             
         Returns:
             포트폴리오 비중 [batch_size, n_stocks]
@@ -72,70 +82,74 @@ class PortfolioTCN(nn.Module):
         output = self.tcn(x.transpose(1, 2))
         output = self.tempmaxpool(output).squeeze(-1)
         
-        # 자산별 점수 생성
+        # 종목 선택
+        attention_scores = self.attention(output)
+        attention_weights = torch.sigmoid(attention_scores)
+        
+        # Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
+        
+        # 마스크 생성
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
+        
+        # 선택된 종목에 대한 비중 계산
         scores = self.score_layers(output)
+        weights = F.softmax(scores, dim=-1)
         
-        # Portfolio Block (h2)
-        weights = self.convert_scores_to_weights(scores)
+        # 선택되지 않은 종목은 0으로 마스킹
+        masked_weights = weights * mask
         
-        return weights
-    
-    def convert_scores_to_weights(self, scores: torch.Tensor) -> torch.Tensor:
+        # 비중 재조정
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
+        
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(w, self.lb, self.ub) 
+            for w in normalized_weights
+        ])
+        
+        return final_weights
+
+    def rebalance(self, weight: torch.Tensor, lb: float, ub: float) -> torch.Tensor:
         """
-        점수를 포트폴리오 가중치로 변환합니다.
-        모든 제약조건을 순차적으로 적용하되, 각 단계에서 제약조건들이 유지되도록 합니다.
+        포트폴리오 비중 재조정
         
         Args:
-            scores: 자산별 점수 [batch_size, n_stocks]
+            weight: 초기 비중
+            lb: 최소 비중
+            ub: 최대 비중
             
         Returns:
-            제약조건을 만족하는 포트폴리오 가중치 [batch_size, n_stocks]
+            재조정된 비중
         """
-        device = scores.device
+        # 선택된 종목만 재조정
+        selected_mask = (weight > 0).float()
+        weight = weight * selected_mask
         
-        # 1. Cardinality 제약 적용 (상위 k개 종목 선택)
-        if 'CARDINALITY' in self.constraints:
-            k = self.constraints['CARDINALITY']
-            values, indices = torch.topk(scores.abs(), k, dim=-1)
-            mask = torch.zeros_like(scores).scatter_(-1, indices, 1.0)
-            scores = scores * mask
-        
-        # 2. Long-only 제약 적용
-        if self.constraints.get('LONG_ONLY', True):
-            scores = scores.clone()
-            scores[scores < 0] = -float('inf')  # 음수 점수를 -inf로 설정하여 softmax 후 0이 되도록
-        
-        # 3. Maximum position 제약 적용
-        if 'MAX_POSITION' in self.constraints:
-            max_pos = self.constraints['MAX_POSITION']
-            max_log = torch.log(torch.tensor(max_pos, device=device)) + 1
-            scores = torch.clamp(scores, max=max_log)
-        
-        # 4. 가중치 변환 및 정규화
-        weights = torch.softmax(scores, dim=-1)
-        
-        # 5. Maximum position 추가 검증 및 조정
-        if 'MAX_POSITION' in self.constraints:
-            max_pos = self.constraints['MAX_POSITION']
-            weights = torch.clamp(weights, max=max_pos)
-            # 정규화
-            weights = weights / weights.sum(dim=-1, keepdim=True)
-        
-        # 6. Minimum position 제약 적용
-        if 'MIN_POSITION' in self.constraints:
-            min_pos = self.constraints['MIN_POSITION']
-            weights[weights < min_pos] = 0
-            # 다시 정규화
-            weights = weights / weights.sum(dim=-1, keepdim=True)
-        
-        # 7. Leverage 제약 확인
-        if 'LEVERAGE' in self.constraints:
-            leverage = self.constraints['LEVERAGE']
-            leverage_tensor = torch.tensor(leverage, device=device)
-            if not torch.allclose(weights.sum(dim=-1), leverage_tensor, rtol=1e-3):
-                weights = weights * leverage
-        
-        return weights
+        weight_clamped = torch.clamp(weight, lb, ub)
+        total_excess = weight_clamped.sum() - 1.0
+
+        while abs(total_excess) > 1e-6:
+            if total_excess > 0:
+                # 초과분 처리
+                adjustable = (weight_clamped > lb) & (selected_mask == 1)
+                if not adjustable.any():
+                    break
+                adjustment = total_excess / adjustable.sum()
+                weight_clamped[adjustable] -= adjustment
+            else:
+                # 부족분 처리
+                adjustable = (weight_clamped < ub) & (selected_mask == 1)
+                if not adjustable.any():
+                    break
+                adjustment = -total_excess / adjustable.sum()
+                weight_clamped[adjustable] += adjustment
+            
+            weight_clamped = torch.clamp(weight_clamped, lb, ub)
+            total_excess = weight_clamped.sum() - 1.0
+
+        return weight_clamped
+
 
 class PortfolioTCNWithProb(PortfolioTCN):
     def __init__(
@@ -144,31 +158,56 @@ class PortfolioTCNWithProb(PortfolioTCN):
         n_output: int,
         num_channels: List[int],
         kernel_size: int,
-        hidden_size: int,
-        level: int,
-        channels: List[int],
         n_dropout: float,
         n_timestep: int,
-        constraints: Dict[str, Any] = None,
         lb: float = 0.0,
-        ub: float = 0.1
+        ub: float = 0.1,
+        n_select: Optional[int] = None
     ):
-        """상승확률을 활용하는 TCN 기반 포트폴리오 최적화 모델"""
+        """
+        상승확률을 활용하는 TCN 기반 포트폴리오 최적화 모델
+        
+        Args:
+            n_feature: 입력 특성 수 (n_stocks와 동일)
+            n_output: 출력 차원 (n_stocks와 동일)
+            num_channels: TCN 채널 수 리스트
+            kernel_size: 컨볼루션 커널 크기
+            n_dropout: 드롭아웃 비율
+            n_timestep: 시계열 길이
+            lb: 최소 포트폴리오 비중
+            ub: 최대 포트폴리오 비중
+            n_select: 선택할 종목 수 (None인 경우 n_stocks 사용)
+        """
         super().__init__(
             n_feature, n_output, num_channels,
-            kernel_size, n_dropout, n_timestep, constraints,
-            lb, ub
+            kernel_size, n_dropout, n_timestep,
+            lb, ub, n_select
         )
         
         # 상승확률 인코딩을 위한 레이어
         self.prob_encoder = nn.Sequential(
             nn.Linear(n_output, num_channels[-1]),
+            nn.LayerNorm(num_channels[-1]),
             nn.SiLU(),
             nn.Dropout(n_dropout)
         )
         
-        # 결합된 특성을 처리하기 위한 레이어
-        self.score_layer = nn.Linear(num_channels[-1] * 2, n_output)
+        # 결합된 특성을 처리하기 위한 레이어 수정
+        self.attention = nn.Sequential(
+            nn.Linear(num_channels[-1] * 2, num_channels[-1]),
+            nn.LayerNorm(num_channels[-1]),
+            nn.SiLU(),
+            nn.Dropout(n_dropout),
+            nn.Linear(num_channels[-1], n_output)
+        )
+        
+        self.score_layers = nn.Sequential(
+            nn.Linear(num_channels[-1] * 2, num_channels[-1]),
+            nn.LayerNorm(num_channels[-1]),
+            nn.SiLU(),
+            nn.Dropout(n_dropout),
+            nn.Linear(num_channels[-1], n_output)
+        )
 
     def forward(self, x_returns: torch.Tensor, x_probs: torch.Tensor) -> torch.Tensor:
         """
@@ -191,13 +230,33 @@ class PortfolioTCNWithProb(PortfolioTCN):
         # 특성 결합
         combined = torch.cat([output, prob_features], dim=1)
         
-        # 자산별 점수 생성
-        scores = self.score_layer(combined)
+        # 종목 선택
+        attention_scores = self.attention(combined)
+        attention_weights = torch.sigmoid(attention_scores)
         
-        # Portfolio Block (h2)
-        weights = self.convert_scores_to_weights(scores)
+        # Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
         
-        return weights
+        # 마스크 생성
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
+        
+        # 선택된 종목에 대한 비중 계산
+        scores = self.score_layers(combined)
+        weights = F.softmax(scores, dim=-1)
+        
+        # 선택되지 않은 종목은 0으로 마스킹
+        masked_weights = weights * mask
+        
+        # 비중 재조정
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
+        
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(w, self.lb, self.ub) 
+            for w in normalized_weights
+        ])
+        
+        return final_weights
 
 
 class Chomp1d(nn.Module):

@@ -20,11 +20,11 @@ DATA:
   # 데이터 처리
   N_STOCKS: 50  # 처리할 종목 수
   PROB_NORMALIZE: 'standardize'  # 확률값 정규화 방법 ['standardize', 'minmax']
-
+  SCALING_FACTOR: 20  # 스케일링 팩터
 USE_CUDA: true
 
 MODEL:
-  TYPE: 'TRANSFORMER'  # ['GRU', 'TCN', 'TRANSFORMER']
+  TYPE: 'TCN'  # ['GRU', 'TCN', 'TRANSFORMER']
   USE_PROB: false  # 확률 기반 모델 사용 여부
   N_STOCKS: 50  # 추가
   
@@ -57,7 +57,7 @@ TRAINING:
   # 학습 파라미터
   BATCH_SIZE: 64
   EPOCHS: 500
-  EARLY_STOPPING: 50
+  EARLY_STOPPING: 25
   LEARNING_RATE: 0.005
   MOMENTUM: 0.9
   
@@ -76,7 +76,7 @@ PORTFOLIO:
   CONSTRAINTS:
     LONG_ONLY: true
     MAX_POSITION: 0.2
-    MIN_POSITION: 0.02
+    MIN_POSITION: 0
     CARDINALITY: 50
     LEVERAGE: 1.0
   

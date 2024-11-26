@@ -20,6 +20,8 @@ import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
+import traceback
+
 # Configure logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -104,35 +106,35 @@ class Trainer:
                 n_stocks=self.config['DATA']['N_STOCKS'],
                 dropout_p=self.config['MODEL']['DROPOUT'],
                 bidirectional=self.config['MODEL']['BIDIRECTIONAL'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
                 lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
-                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION'],
+                n_select=self.config['PORTFOLIO']['CONSTRAINTS'].get('CARDINALITY')
             )
         elif model_type == "TCN":
             model_class = PortfolioTCNWithProb if use_prob else PortfolioTCN
             model = model_class(
-                n_feature=self.config['DATA']['N_STOCKS'],  # 수정
-                n_output=self.config['DATA']['N_STOCKS'],   # 수정
+                n_feature=self.config['DATA']['N_STOCKS'],
+                n_output=self.config['DATA']['N_STOCKS'],
                 num_channels=self.config['MODEL']['TCN']['num_channels'],
                 kernel_size=self.config['MODEL']['TCN']['kernel_size'],
                 n_dropout=self.config['MODEL']['TCN']['n_dropout'],
                 n_timestep=self.config['MODEL']['TCN']['n_timestep'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
                 lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
-                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION'],
+                n_select=self.config['PORTFOLIO']['CONSTRAINTS'].get('CARDINALITY')
             )
         elif model_type == "TRANSFORMER":
             model_class = PortfolioTransformerWithProb if use_prob else PortfolioTransformer
             model = model_class(
-                n_feature=self.config['DATA']['N_STOCKS'],  # 수정
+                n_feature=self.config['DATA']['N_STOCKS'],
                 n_timestep=self.config['MODEL']['TRANSFORMER']['n_timestep'],
-                n_output=self.config['MODEL']['TRANSFORMER']['n_output'],
                 n_layer=self.config['MODEL']['TRANSFORMER']['n_layer'],
                 n_head=self.config['MODEL']['TRANSFORMER']['n_head'],
                 n_dropout=self.config['MODEL']['TRANSFORMER']['n_dropout'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
+                n_output=self.config['DATA']['N_STOCKS'],
                 lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
-                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION'],
+                n_select=self.config['PORTFOLIO']['CONSTRAINTS'].get('CARDINALITY')
             )
         else:
             raise ValueError(f"Unknown model type: {model_type}")
@@ -342,34 +344,65 @@ class Trainer:
             
             with open(dates_path, "rb") as f:
                 self.dates_dict = pickle.load(f)
-            # Train 데이터
+            
+            # 스케일링 팩터 설정 (config에서 가져오거나 기본값 사용)
+            scale_factor = self.config.get('DATA', {}).get('SCALING_FACTOR', 20)
+            logging.info(f"Using scaling factor: {scale_factor}")
+            
+            def process_data(data, normalize=True):
+                """
+                데이터 스케일링 및 정규화
+                Args:
+                    data: 원본 데이터
+                    normalize: 정규화 여부
+                """
+                # 스케일링
+                scaled_data = data.astype("float32") * scale_factor
+                
+                if normalize:
+                    # 시계열별 정규화 (각 시퀀스를 독립적으로 정규화)
+                    mean = np.mean(scaled_data, axis=1, keepdims=True)
+                    std = np.std(scaled_data, axis=1, keepdims=True)
+                    normalized_data = (scaled_data - mean) / (std + 1e-8)
+                    return normalized_data
+                return scaled_data
+            
+            # Train 데이터 처리
             train_data = data_dict['train']
-            self.train_x = train_data[0].astype("float32")
-            self.train_y = train_data[1].astype("float32")
-            self.train_prob = train_data[2].astype("float32")
+            self.train_x = process_data(train_data[0])  # 입력 시퀀스는 정규화
+            self.train_y = process_data(train_data[1], normalize=False)  # 타겟은 스케일링만
+            self.train_prob = train_data[2].astype("float32")  # 확률은 그대로 사용
             self.train_dates = self.dates_dict['train']
             
-            # Validation 데이터
+            # Validation 데이터 처리
             val_data = data_dict['val']
-            self.val_x = val_data[0].astype("float32")
-            self.val_y = val_data[1].astype("float32")
+            self.val_x = process_data(val_data[0])
+            self.val_y = process_data(val_data[1], normalize=False)
             self.val_prob = val_data[2].astype("float32")
             self.val_dates = self.dates_dict['val']
             
-            # Test 데이터
+            # Test 데이터 처리
             test_data = data_dict['test']
-            self.test_x = test_data[0].astype("float32")
-            self.test_y = test_data[1].astype("float32")
+            self.test_x = process_data(test_data[0])
+            self.test_y = process_data(test_data[1], normalize=False)
             self.test_prob = test_data[2].astype("float32")
             self.test_dates = self.dates_dict['test']
             
-            logging.info("Data loading completed")
+            # 데이터 통계 확인
+            logging.info("Data loading, scaling, and normalization completed")
+            logging.info(f"Train data statistics:")
+            logging.info(f"X - mean: {self.train_x.mean():.4f}, std: {self.train_x.std():.4f}")
+            logging.info(f"Y - mean: {self.train_y.mean():.4f}, std: {self.train_y.std():.4f}")
+            logging.info(f"X range: [{self.train_x.min():.4f}, {self.train_x.max():.4f}]")
+            logging.info(f"Y range: [{self.train_y.min():.4f}, {self.train_y.max():.4f}]")
+            
             logging.info(f"Train data shape - X: {self.train_x.shape}, Y: {self.train_y.shape}, Prob: {self.train_prob.shape}")
             logging.info(f"Val data shape - X: {self.val_x.shape}, Y: {self.val_y.shape}, Prob: {self.val_prob.shape}")
             logging.info(f"Test data shape - X: {self.test_x.shape}, Y: {self.test_y.shape}, Prob: {self.test_prob.shape}")
             
         except Exception as e:
             logging.error(f"Error loading data: {str(e)}")
+            logging.error(f"Traceback: {traceback.format_exc()}")
             raise
 
     def dataloader(self, x, y, probs, is_train=True):
@@ -486,8 +519,16 @@ class Trainer:
             elif model_type == "TRANSFORMER":
                 model_config = f"{model_type}_L{self.config['MODEL']['TRANSFORMER']['n_layer']}_H{self.config['MODEL']['TRANSFORMER']['n_head']}"
             
+            # 목적함수 추가
+            objective = self.config['PORTFOLIO']['OBJECTIVE']
+            model_config += f"_{objective}"
+            
+            # 확률 사용 여부 추가 
             if self.config['MODEL']['USE_PROB']:
                 model_config += "_prob"
+                
+            # Loss와 Epoch 추가
+            model_config += f"_e{len(self.epochs)}_loss{self.best_val_loss:.4f}"
             
             # 저장 경로 설정
             history_path = os.path.join(
@@ -596,35 +637,65 @@ class Trainer:
         """
         if not self.distributed or self.local_rank == 0:  # 마스터 노드에서만 실행
             try:
-                checkpoints = [f for f in os.listdir(self.model_dir) if f.endswith('.pth')]
+                # 체크포인트 파일 목록 가져오기
+                checkpoints = []
+                for f in os.listdir(self.model_dir):
+                    if f.endswith('.pth'):
+                        try:
+                            # 체크포인트 파일명 파싱 시도
+                            parts = f.split('_')
+                            if len(parts) >= 5:  # 최소 필요한 부분이 있는지 확인
+                                checkpoints.append(f)
+                        except:
+                            continue
+                            
                 if not checkpoints:
+                    logger.info("No checkpoints found to cleanup")
                     return
                 
                 # 현재 설정과 일치하는 체크포인트 필터링
                 matching_checkpoints = []
                 for ckpt in checkpoints:
-                    parts = ckpt.split('_')
-                    # 형식: {epoch}_{model}_{loss}_{use_prob}_{loss_type}.pth
-                    if (parts[1] == self.config['MODEL']['TYPE'] and  # 모델 타입
-                        parts[3] == ('prob' if self.use_prob else 'no_prob') and  # prob 사용 여부
-                        parts[4].split('.')[0] == self.config['PORTFOLIO']['OBJECTIVE']):  # loss 타입
-                        matching_checkpoints.append(ckpt)
+                    try:
+                        parts = ckpt.split('_')
+                        model_type = parts[1]
+                        prob_setting = parts[3]
+                        loss_type = parts[4].split('.')[0]
+                        
+                        if (model_type == self.config['MODEL']['TYPE'] and
+                            prob_setting == ('prob' if self.use_prob else 'no_prob') and
+                            loss_type == self.config['PORTFOLIO']['OBJECTIVE']):
+                            matching_checkpoints.append(ckpt)
+                    except:
+                        continue
                 
                 if not matching_checkpoints:
+                    logger.info("No matching checkpoints found")
                     return
                 
                 # loss 값을 기준으로 정렬하여 가장 좋은 것 선택
-                best_checkpoint = min(matching_checkpoints, 
-                                    key=lambda x: float(x.split('_')[2]))
+                try:
+                    best_checkpoint = min(matching_checkpoints,
+                                        key=lambda x: float(x.split('_')[2]))
+                except ValueError as e:
+                    logger.error(f"Error parsing loss values: {str(e)}")
+                    return
                 
                 # 나머지 체크포인트 삭제
+                deleted_count = 0
                 for ckpt in matching_checkpoints:
                     if ckpt != best_checkpoint:
-                        checkpoint_path = os.path.join(self.model_dir, ckpt)
-                        os.remove(checkpoint_path)
-                        logger.info(f"Removed checkpoint: {checkpoint_path}")
+                        try:
+                            checkpoint_path = os.path.join(self.model_dir, ckpt)
+                            os.remove(checkpoint_path)
+                            deleted_count += 1
+                            logger.info(f"Removed checkpoint: {checkpoint_path}")
+                        except OSError as e:
+                            logger.error(f"Error removing {ckpt}: {str(e)}")
+                            continue
                 
-                logger.info(f"Kept best checkpoint: {best_checkpoint}")
+                logger.info(f"Cleanup complete - Kept: {best_checkpoint}, Removed: {deleted_count} files")
                 
             except Exception as e:
                 logger.error(f"Error during checkpoint cleanup: {str(e)}")
+                logger.error(f"Traceback: {traceback.format_exc()}")
