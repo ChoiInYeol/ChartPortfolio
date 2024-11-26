@@ -9,6 +9,11 @@ import inquirer
 from train import Trainer
 from inference import Inference
 from pathlib import Path
+from typing import List, Optional, Dict, Any
+import pandas as pd
+import torch.nn as nn
+import torch.optim as optim
+from model import PortfolioGRU, PortfolioGRUWithProb, PortfolioTCN, PortfolioTCNWithProb, PortfolioTransformer, PortfolioTransformerWithProb
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -27,14 +32,68 @@ def set_seed(seed: int):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def load_config(config_path: str) -> dict:
-    """설정 파일 로드"""
-    if config_path.endswith('.json'):
-        with open(config_path, "r") as f:
-            return json.load(f)
-    else:
-        with open(config_path, "r") as f:
-            return yaml.safe_load(f)
+def load_config(config_path: str) -> Dict:
+    """설정 파일을 로드합니다."""
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+    return config
+
+def setup_experiment_config() -> Dict:
+    """실험 설정을 위한 사용자 입력을 받습니다."""
+    questions = [
+        inquirer.List('model',
+                     message="Select model type",
+                     choices=['GRU', 'TCN', 'TRANSFORMER'],
+                     default='GRU'),
+        
+        inquirer.List('objective',
+                     message="Select portfolio objective",
+                     choices=['mean_variance', 'minimum_variance', 'sharpe_ratio'],
+                     default='sharpe_ratio'),
+        
+        # 포트폴리오 제약조건 설정
+        inquirer.Confirm('long_only',
+                        message="Use long-only constraint?",
+                        default=True),
+        
+        inquirer.Text('max_position',
+                     message="Maximum position limit (0-1, enter for none)",
+                     default=''),
+        
+        inquirer.Text('cardinality',
+                     message="Cardinality constraint (enter for none)",
+                     default=''),
+        
+        inquirer.Text('leverage',
+                     message="Leverage constraint (default: 1.0)",
+                     default='1.0'),
+        
+        # 학습 파라미터 설정
+        inquirer.Text('risk_aversion',
+                     message="Risk aversion parameter (for mean-variance)",
+                     default='1.0'),
+        
+        inquirer.Text('learning_rate',
+                     message="Learning rate",
+                     default='0.001'),
+        
+        inquirer.Confirm('use_validation',
+                        message="Use validation set?",
+                        default=True),
+    ]
+    
+    answers = inquirer.prompt(questions)
+    
+    # 숫자형 변환
+    if answers['max_position']:
+        answers['max_position'] = float(answers['max_position'])
+    if answers['cardinality']:
+        answers['cardinality'] = int(answers['cardinality'])
+    answers['leverage'] = float(answers['leverage'])
+    answers['risk_aversion'] = float(answers['risk_aversion'])
+    answers['learning_rate'] = float(answers['learning_rate'])
+    
+    return answers
 
 def get_available_datasets() -> dict:
     """
@@ -181,40 +240,145 @@ def work(config, selections):
         logger.error(f"Error occurred: {str(e)}")
         raise
 
+def create_model(config: Dict[str, Any], device: torch.device) -> nn.Module:
+    """설정에 따라 모델을 생성합니다."""
+    model_type = config['model']['type']
+    use_prob = config['model'].get('use_prob', False)
+    
+    if model_type == 'gru':
+        if use_prob:
+            model = PortfolioGRUWithProb(
+                n_layers=config['model']['n_layers'],
+                hidden_dim=config['model']['hidden_dim'],
+                n_stocks=config['data']['n_stocks'],
+                dropout_p=config['model']['dropout'],
+                bidirectional=config['model'].get('bidirectional', False),
+                constraints=config['portfolio_constraints']
+            )
+        else:
+            model = PortfolioGRU(
+                n_layers=config['model']['n_layers'],
+                hidden_dim=config['model']['hidden_dim'],
+                n_stocks=config['data']['n_stocks'],
+                dropout_p=config['model']['dropout'],
+                bidirectional=config['model'].get('bidirectional', False),
+                constraints=config['portfolio_constraints']
+            )
+    
+    elif model_type == 'tcn':
+        if use_prob:
+            model = PortfolioTCNWithProb(
+                n_feature=config['data']['n_features'],
+                n_output=config['data']['n_stocks'],
+                num_channels=config['model']['num_channels'],
+                kernel_size=config['model']['kernel_size'],
+                n_dropout=config['model']['dropout'],
+                n_timestep=config['data']['seq_len'],
+                constraints=config['portfolio_constraints']
+            )
+        else:
+            model = PortfolioTCN(
+                n_feature=config['data']['n_features'],
+                n_output=config['data']['n_stocks'],
+                num_channels=config['model']['num_channels'],
+                kernel_size=config['model']['kernel_size'],
+                n_dropout=config['model']['dropout'],
+                n_timestep=config['data']['seq_len'],
+                constraints=config['portfolio_constraints']
+            )
+    
+    elif model_type == 'transformer':
+        if use_prob:
+            model = PortfolioTransformerWithProb(
+                n_feature=config['data']['n_features'],
+                n_timestep=config['data']['seq_len'],
+                n_layer=config['model']['n_layers'],
+                n_head=config['model']['n_heads'],
+                n_dropout=config['model']['dropout'],
+                n_output=config['data']['n_stocks'],
+                constraints=config['portfolio_constraints']
+            )
+        else:
+            model = PortfolioTransformer(
+                n_feature=config['data']['n_features'],
+                n_timestep=config['data']['seq_len'],
+                n_layer=config['model']['n_layers'],
+                n_head=config['model']['n_heads'],
+                n_dropout=config['model']['dropout'],
+                n_output=config['data']['n_stocks'],
+                constraints=config['portfolio_constraints']
+            )
+    
+    else:
+        raise ValueError(f"지원하지 않는 모델 타입입니다: {model_type}")
+    
+    return model.to(device)
+
+def main():
+    """메인 실행 함수"""
+    # 설정 로드
+    config = load_config()
+    
+    # 데이터 로더 생성
+    train_loader, val_loader = create_data_loaders(config)
+    
+    # 모델 생성
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = create_model(config, device)
+    
+    # 옵티마이저와 손실 함수 설정
+    optimizer = optim.Adam(model.parameters(), lr=config['training']['learning_rate'])
+    criterion = PortfolioLoss(config['training']['loss_weights'])
+    
+    # Trainer 생성 및 학습 실행
+    trainer = Trainer(
+        model=model,
+        optimizer=optimizer,
+        criterion=criterion,
+        device=device,
+        use_prob=config['model'].get('use_prob', False)
+    )
+    
+    # 학습 수행
+    trainer.set_data()
+    model, history = trainer.train()
+    
+    # 학습 결과 저장
+    model_path = result_dir / f"model_{config['objective']}.pth"
+    torch.save({
+        'model_state_dict': model.state_dict(),
+        'config': config,
+        'history': history
+    }, model_path)
+    
+    # 추론 수행
+    inferencer = Inference(config, model_path)
+    weights = inferencer.infer()
+    
+    # 가중치 저장
+    inferencer.save_weights(weights)
+    
+    # 포트폴리오 성과 분석
+    metrics = inferencer.calculate_portfolio_metrics(weights)
+    logging.info("Portfolio Metrics:")
+    logging.info(metrics)
+    
+    # 시각화
+    visualizer = PortfolioVisualizer()
+    
+    # 포트폴리오 가중치 시각화
+    visualizer.plot_weight_evolution(
+        weights,
+        result_dir,
+        f"{config['model']}_{config['objective']}"
+    )
+    
+    # 포트폴리오 성과 시각화
+    visualizer.plot_portfolio_performance(
+        weights,
+        result_dir,
+        f"{config['model']}_{config['objective']}"
+    )
+
 if __name__ == "__main__":
-    try:
-        # 사용자 선택 받기
-        selections = get_user_selections()
-        
-        # 설정 파일 로드
-        config = load_config(selections['config_path'])
-        
-        # 결과 디렉토리 생성
-        os.makedirs(config['RESULT_DIR'], exist_ok=True)
-        
-        # 로그 파일 설정
-        log_file = os.path.join(config['RESULT_DIR'], 'main.log')
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.INFO)
-        logger.addHandler(file_handler)
-        
-        logger.info("Configuration loaded successfully")
-        logger.info(f"Using config file: {selections['config_path']}")
-        
-        # 시드 고정
-        set_seed(config["SEED"])
-        logger.info(f"Random seed set to {config['SEED']}")
-        
-        # 선택 사항 로깅
-        logger.info("User selections:")
-        logger.info(f"- Modes: {selections['modes']}")
-        logger.info(f"- Models: {selections['models']}")
-        logger.info(f"- Dataset: {selections['dataset']}")
-        logger.info(f"- Use probability data: {selections['use_prob']}")
-        
-        # 실행
-        work(config, selections)
-        
-    except Exception as e:
-        logger.error(f"Program failed: {str(e)}")
-        raise
+    main()

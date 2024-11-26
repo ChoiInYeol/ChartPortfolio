@@ -3,11 +3,11 @@ import os
 import torch
 import numpy as np
 import logging
-from model.gru import GRU, GRUWithProb
-from model.transformer import Transformer, TransformerWithProb
-from model.tcn import TCN, TCNWithProb
+from model.gru import PortfolioGRU, PortfolioGRUWithProb
+from model.transformer import PortfolioTransformer, PortfolioTransformerWithProb
+from model.tcn import PortfolioTCN, PortfolioTCNWithProb 
 from model.sam import SAM
-from model.loss import max_sharpe, equal_risk_parity
+from model.loss import sharpe_ratio_objective, mean_variance_objective, minimum_variance_objective
 from tqdm import tqdm
 from typing import Dict, Any
 import torch.distributed as dist
@@ -71,15 +71,19 @@ class Trainer:
         elif loss_type == "sharpe_ratio":
             return lambda returns, weights: sharpe_ratio_objective(
                 returns, weights,
-                risk_free_rate=self.config.get("RISK_FREE_RATE", 0.0)
+                risk_free_rate=self.config.get("RISK_FREE_RATE", 0.02)
             )
         else:
             raise ValueError(f"Unknown loss function: {loss_type}")
 
     def _create_model(self) -> torch.nn.Module:
         """모델을 생성하고 이전 체크포인트를 로드합니다."""
-        if self.config["MODEL"] == "GRU":
-            model = PortfolioGRU(
+        model_type = self.config["MODEL"]
+        model_class = None
+        
+        if model_type == "GRU":
+            model_class = PortfolioGRUWithProb if self.use_prob else PortfolioGRU
+            model = model_class(
                 n_layers=self.config["N_LAYER"],
                 hidden_dim=self.config["HIDDEN_DIM"],
                 n_stocks=self.config["N_STOCK"],
@@ -92,8 +96,40 @@ class Trainer:
                     'leverage': self.config.get("LEVERAGE", 1.0)
                 }
             )
+        elif model_type == "TCN":
+            model_class = PortfolioTCNWithProb if self.use_prob else PortfolioTCN
+            model = model_class(
+                n_feature=self.config["N_FEATURE"],
+                n_output=self.config["N_STOCK"],
+                num_channels=self.config["NUM_CHANNELS"],
+                kernel_size=self.config["KERNEL_SIZE"],
+                n_dropout=self.config["DROPOUT"],
+                n_timestep=self.config["SEQ_LEN"],
+                constraints={
+                    'long_only': self.config.get("LONG_ONLY", True),
+                    'max_position': self.config.get("MAX_POSITION"),
+                    'cardinality': self.config.get("CARDINALITY"),
+                    'leverage': self.config.get("LEVERAGE", 1.0)
+                }
+            )
+        elif model_type == "TRANSFORMER":
+            model_class = PortfolioTransformerWithProb if self.use_prob else PortfolioTransformer
+            model = model_class(
+                n_feature=self.config["N_FEATURE"],
+                n_timestep=self.config["SEQ_LEN"],
+                n_layer=self.config["N_LAYER"],
+                n_head=self.config["N_HEAD"],
+                n_dropout=self.config["DROPOUT"],
+                n_output=self.config["N_STOCK"],
+                constraints={
+                    'long_only': self.config.get("LONG_ONLY", True),
+                    'max_position': self.config.get("MAX_POSITION"),
+                    'cardinality': self.config.get("CARDINALITY"),
+                    'leverage': self.config.get("LEVERAGE", 1.0)
+                }
+            )
         else:
-            raise ValueError(f"Unknown model type: {self.config['MODEL']}")
+            raise ValueError(f"Unknown model type: {model_type}")
 
         model = model.to(self.device)
         
@@ -145,22 +181,34 @@ class Trainer:
         
         for batch in dataloader:
             returns = batch[0].to(self.device)
+            probs = batch[2].to(self.device) if self.use_prob else None
             
             if is_training:
                 self.optimizer.zero_grad()
                 
                 # First forward-backward step
-                weights = self.model(returns)
+                if self.use_prob:
+                    weights = self.model(returns, probs)
+                else:
+                    weights = self.model(returns)
+                    
                 loss = self.criterion(returns, weights)
                 loss.backward()
                 self.optimizer.first_step(zero_grad=True)
                 
                 # Second forward-backward step
-                weights = self.model(returns)
+                if self.use_prob:
+                    weights = self.model(returns, probs)
+                else:
+                    weights = self.model(returns)
+                    
                 self.criterion(returns, weights).backward()
                 self.optimizer.second_step(zero_grad=True)
             else:
-                weights = self.model(returns)
+                if self.use_prob:
+                    weights = self.model(returns, probs)
+                else:
+                    weights = self.model(returns)
                 loss = self.criterion(returns, weights)
             
             total_loss += loss.item()

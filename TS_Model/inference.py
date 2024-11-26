@@ -4,38 +4,39 @@ import numpy as np
 import pandas as pd
 import pickle
 import logging
-from model.gru import GRU
+from model.gru import PortfolioGRU
 from model.transformer import Transformer
 from model.tcn import TCN
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 import traceback
 import fcntl
 import time
 from pathlib import Path
+import json
+from torch import nn
 
 # Configure logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 class Inference:
-    def __init__(self, config: Dict[str, Any], model_path: str, use_prob: bool = False, local_rank: int = -1):
+    def __init__(self, config: Dict[str, Any], model_path: str, local_rank: int = -1):
         """
         추론 클래스 초기화
         
         Args:
             config: 설정 딕셔너리
             model_path: 모델 가중치 파일 경로
-            use_prob: 상승확률 데이터 사용 여부
             local_rank: 분산 학습을 위한 로컬 랭크
         """
         self.config = config
         self.model_path = model_path
-        self.use_prob = use_prob
         self.local_rank = local_rank
         self.distributed = local_rank != -1
 
+        # 디바이스 설정
         if self.distributed:
             if not dist.is_initialized():
                 torch.cuda.set_device(local_rank)
@@ -44,234 +45,82 @@ class Inference:
         else:
             self.device = torch.device("cuda" if config["USE_CUDA"] else "cpu")
 
-        self.model_name = config["MODEL"]
-        self.len_train = config['TRAIN_LEN']
-        self.len_pred = config['PRED_LEN']
-        self.n_stock = config['N_STOCK']
-        self.lb = config['LB']
-        self.ub = config['UB']
-
-        # Initialize logging to file
-        if not self.distributed or self.local_rank == 0:
-            model_identifier = f"{self.model_name}_{self.config['LOSS_FUNCTION']}_{self.len_train}_{self.len_pred}"
-            log_filename = os.path.join(config['RESULT_DIR'], config["MODEL"], f"inference_{model_identifier}.log")
-            file_handler = logging.FileHandler(log_filename)
-            file_handler.setLevel(logging.INFO)
-            logger.addHandler(file_handler)
-            logger.info(f"Configuration: {self.config}")
-            logger.info(f"Model Path: {self.model_path}")
-
+        # 모델 초기화
         self.model = self._load_model()
+        
+        # 결과 저장 디렉토리 생성
+        self.result_dir = os.path.join(config['RESULT_DIR'], config["MODEL"])
+        os.makedirs(self.result_dir, exist_ok=True)
 
     def _load_model(self) -> torch.nn.Module:
         """모델 로드 및 초기화"""
-        if self.model_name.lower() == "gru":
-            if self.use_prob:
-                from model.gru import GRUWithProb
-                model = GRUWithProb(
-                    n_layers=self.config["N_LAYER"],
-                    hidden_dim=self.config["HIDDEN_DIM"],
-                    n_stocks=self.n_stock,
-                    dropout_p=self.config["DROPOUT"],
-                    bidirectional=self.config["BIDIRECTIONAL"],
-                    lb=self.lb,
-                    ub=self.ub
-                )
-            else:
-                from model.gru import GRU
-                model = GRU(
-                    n_layers=self.config["N_LAYER"],
-                    hidden_dim=self.config["HIDDEN_DIM"],
-                    n_stocks=self.n_stock,
-                    dropout_p=self.config["DROPOUT"],
-                    bidirectional=self.config["BIDIRECTIONAL"],
-                    lb=self.lb,
-                    ub=self.ub
-                )
-        elif self.model_name.lower() == "transformer":
-            if self.use_prob:
-                from model.transformer import TransformerWithProb
-                model = TransformerWithProb(
-                    n_feature=self.n_stock,
-                    n_timestep=self.len_train,
-                    n_layer=self.config["TRANSFORMER"]["n_layer"],
-                    n_head=self.config["TRANSFORMER"]["n_head"],
-                    n_dropout=self.config["TRANSFORMER"]["n_dropout"],
-                    n_output=self.n_stock,
-                    lb=self.lb,
-                    ub=self.ub
-                )
-            else:
-                from model.transformer import Transformer
-                model = Transformer(
-                    n_feature=self.n_stock,
-                    n_timestep=self.len_train,
-                    n_layer=self.config["TRANSFORMER"]["n_layer"],
-                    n_head=self.config["TRANSFORMER"]["n_head"],
-                    n_dropout=self.config["TRANSFORMER"]["n_dropout"],
-                    n_output=self.n_stock,
-                    lb=self.lb,
-                    ub=self.ub
-                )
-        elif self.model_name.lower() == "tcn":
-            if self.use_prob:
-                from model.tcn import TCNWithProb
-                model = TCNWithProb(
-                    n_feature=self.n_stock,
-                    n_output=self.n_stock,
-                    num_channels=self.config["TCN"]["channels"],
-                    kernel_size=self.config["TCN"]["kernel_size"],
-                    n_dropout=self.config["TCN"]["n_dropout"],
-                    n_timestep=self.config["TCN"]["n_timestep"],
-                    lb=self.lb,
-                    ub=self.ub
-                )
-            else:
-                from model.tcn import TCN
-                model = TCN(
-                    n_feature=self.n_stock,
-                    n_output=self.n_stock,
-                    num_channels=self.config["TCN"]["channels"],
-                    kernel_size=self.config["TCN"]["kernel_size"],
-                    n_dropout=self.config["TCN"]["n_dropout"],
-                    n_timestep=self.config["TCN"]["n_timestep"],
-                    lb=self.lb,
-                    ub=self.ub
-                )
+        model_type = self.config["MODEL"]
+        model_class = None
+        
+        if model_type == "GRU":
+            model_class = PortfolioGRUWithProb if self.use_prob else PortfolioGRU
+            model = model_class(
+                n_layers=self.config["N_LAYER"],
+                hidden_dim=self.config["HIDDEN_DIM"],
+                n_stocks=self.config["N_STOCK"],
+                dropout_p=self.config["DROPOUT"],
+                bidirectional=self.config["BIDIRECTIONAL"],
+                constraints={
+                    'long_only': self.config.get("LONG_ONLY", True),
+                    'max_position': self.config.get("MAX_POSITION"),
+                    'cardinality': self.config.get("CARDINALITY"),
+                    'leverage': self.config.get("LEVERAGE", 1.0)
+                }
+            )
+        elif model_type == "TCN":
+            model_class = PortfolioTCNWithProb if self.use_prob else PortfolioTCN
+            model = model_class(
+                n_feature=self.config["N_FEATURE"],
+                n_output=self.config["N_STOCK"],
+                num_channels=self.config["NUM_CHANNELS"],
+                kernel_size=self.config["KERNEL_SIZE"],
+                n_dropout=self.config["DROPOUT"],
+                n_timestep=self.config["SEQ_LEN"],
+                constraints={
+                    'long_only': self.config.get("LONG_ONLY", True),
+                    'max_position': self.config.get("MAX_POSITION"),
+                    'cardinality': self.config.get("CARDINALITY"),
+                    'leverage': self.config.get("LEVERAGE", 1.0)
+                }
+            )
+        elif model_type == "TRANSFORMER":
+            model_class = PortfolioTransformerWithProb if self.use_prob else PortfolioTransformer
+            model = model_class(
+                n_feature=self.config["N_FEATURE"],
+                n_timestep=self.config["SEQ_LEN"],
+                n_layer=self.config["N_LAYER"],
+                n_head=self.config["N_HEAD"],
+                n_dropout=self.config["DROPOUT"],
+                n_output=self.config["N_STOCK"],
+                constraints={
+                    'long_only': self.config.get("LONG_ONLY", True),
+                    'max_position': self.config.get("MAX_POSITION"),
+                    'cardinality': self.config.get("CARDINALITY"),
+                    'leverage': self.config.get("LEVERAGE", 1.0)
+                }
+            )
         else:
-            raise ValueError(f"Unsupported model type: {self.model_name}")
+            raise ValueError(f"Unknown model type: {model_type}")
 
         model = model.to(self.device)
-        if self.distributed:
-            model = DDP(model, device_ids=[self.local_rank], output_device=self.local_rank)
-        
+
+        # 모델 가중치 로드
         try:
-            # 모델 파일 목록 가져오기
-            pth_files = [f for f in os.listdir(self.model_path) if f.endswith('.pth')]
-            if not pth_files:
-                raise FileNotFoundError("No .pth files found")
-            
-            # False_GRU_13_loss_0.4678.pth 형식의 파일 찾기
-            target_model = None
-            for pth_file in pth_files:
-                if pth_file.startswith(f"{str(self.use_prob)}_{self.model_name.upper()}"):
-                    target_model = pth_file
-                    break
-                
-            if target_model is None:
-                raise FileNotFoundError(f"No matching model found for {self.use_prob}_{self.model_name}")
-            
-            model_path = os.path.join(self.model_path, target_model)
-            logger.info(f"Loading model: {target_model}")
-            
-            # 모델 로드
-            checkpoint = torch.load(model_path, map_location=self.device)
+            checkpoint = torch.load(self.model_path, map_location=self.device)
             model.load_state_dict(checkpoint['model_state_dict'])
             model.eval()
-            
-            return model
+            logger.info(f"Model loaded from {self.model_path}")
             
         except Exception as e:
             logger.error(f"Error loading model: {str(e)}")
             raise
 
-    def _load_test_data(self):
-        """테스트 데이터 로드"""
-        logger.info("Loading test data...")
-        
-        try:
-            # dataset.pkl 파일에서 데이터 로드
-            with open(self.config['DATASET_PATH'], "rb") as f:
-                data_dict = pickle.load(f)
-            
-            # date.pkl 파일에서 날짜 정보 로드
-            with open(self.config['DATES_PATH'], "rb") as f:
-                dates_dict = pickle.load(f)
-            
-            # 데이터 스케일링
-            scale = self.config["PRED_LEN"]
-            
-            # Test 데이터 추출 및 스케일링
-            test_data = data_dict['test']
-            self.test_x = test_data[0].astype("float32") * scale
-            self.test_y = test_data[1].astype("float32") * scale
-            self.test_prob = test_data[2].astype("float32")
-            
-            # 각 시퀀스의 마지막 날짜만 추출
-            try:
-                # 각 리스트의 마지막 Timestamp만 선택
-                self.test_dates = [dates[-1] for dates in dates_dict['test']]
-                logger.info(f"First few dates after processing: {self.test_dates[:5]}")
-                logger.info(f"Total dates: {len(self.test_dates)}")
-            except Exception as e:
-                logger.error(f"Error processing dates: {str(e)}")
-                logger.error(f"Date data type: {type(dates_dict['test'])}")
-                logger.error(f"First few raw dates: {dates_dict['test'][:5]}")
-                raise
-            
-            # 데이터 검증
-            logger.info("Validating test data...")
-            logger.info(f"Test data shape - X: {self.test_x.shape}, Y: {self.test_y.shape}, Prob: {self.test_prob.shape}")
-            logger.info(f"Test dates length: {len(self.test_dates)}")
-            
-            # NaN 체크
-            if (np.isnan(self.test_x).any() or 
-                np.isnan(self.test_y).any() or 
-                np.isnan(self.test_prob).any()):
-                raise ValueError("NaN values detected in test data")
-            
-            logger.info("Test data loading completed")
-            
-        except Exception as e:
-            logger.error(f"Error loading test data: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
-            raise
-
-    def _load_best_model(self):
-        """
-        설정과 일치하는 가장 좋은 성능의 모델 로드
-        """
-        pth_files = [f for f in os.listdir(self.model_path) if f.endswith('.pth')]
-        if not pth_files:
-            raise FileNotFoundError("No .pth files found in the specified model path.")
-        
-        valid_models = []
-        for pth_file in pth_files:
-            try:
-                # 파일명 파싱 규칙 수정
-                # 새로운 format: {use_prob}_{model_type}_{epoch}_loss_{loss}.pth
-                parts = pth_file.split('_')
-                if len(parts) < 5:  # 최소 필요한 부분 확인
-                    continue
-                    
-                use_prob = parts[0].lower() == 'true'
-                model_type = parts[1].lower()
-                loss = float(parts[-1].replace('.pth', ''))
-                
-                # 현재 설정과 일치하는지 확인
-                if (model_type == self.config["MODEL"].lower() and 
-                    use_prob == self.use_prob):
-                    valid_models.append((loss, pth_file))
-                    
-            except (IndexError, ValueError) as e:
-                logger.warning(f"Skipping invalid model file {pth_file}: {str(e)}")
-                continue
-        
-        if not valid_models:
-            raise FileNotFoundError(
-                f"No matching model found for configuration:\n"
-                f"Model: {self.config['MODEL']}\n"
-                f"use_prob: {self.use_prob}"
-            )
-        
-        # loss가 가장 작은 모델 선택
-        best_model = min(valid_models, key=lambda x: x[0])[1]
-        model_path = os.path.join(self.model_path, best_model)
-        
-        logger.info(f"Selected best model: {best_model}")
-        logger.info(f"Model loss: {min(valid_models)[0]:.4f}")
-        
-        return model_path
+        return model
 
     def infer(self) -> np.ndarray:
         """추론 수행"""
@@ -283,36 +132,18 @@ class Inference:
             with torch.no_grad():
                 for i in range(len(self.test_x)):
                     x = torch.from_numpy(self.test_x[i]).float().unsqueeze(0).to(self.device)
-                    
                     if self.use_prob:
-                        # prob 차원을 [batch_size, pred_len, n_stocks]로 맞춤
-                        prob = torch.from_numpy(self.test_prob[i]).float().to(self.device)
-                        prob = prob.unsqueeze(0)  # [1, n_stocks] -> [1, 1, n_stocks]
-                        
-                        # 입력 데이터 shape 로깅
-                        logger.debug(f"Input shapes - x: {x.shape}, prob: {prob.shape}")
-                        
-                        # 차원 검증
-                        if x.dim() != 3 or prob.dim() != 3:
-                            raise ValueError(
-                                f"Invalid input dimensions. "
-                                f"Expected 3D tensors, got x: {x.dim()}D, prob: {prob.dim()}D"
-                            )
-                        
-                        outputs = self.model(x, prob)
+                        probs = torch.from_numpy(self.test_prob[i]).float().unsqueeze(0).to(self.device)
+                        weights = self.model(x, probs)
                     else:
-                        outputs = self.model(x)
-                    
-                    weights = outputs.cpu().numpy().squeeze(0)
-                    weights_list.append(weights)
+                        weights = self.model(x)
+                    weights_list.append(weights.cpu().numpy().squeeze(0))
             
             return np.array(weights_list)
             
         except Exception as e:
             logger.error(f"Error during inference: {str(e)}")
             logger.error(f"Traceback: {traceback.format_exc()}")
-            logger.error(f"Input shapes - x: {x.shape if 'x' in locals() else 'N/A'}, "
-                        f"prob: {prob.shape if 'prob' in locals() else 'N/A'}")
             return np.array([])
 
     def save_weights(self, weights_array: np.ndarray):
@@ -322,112 +153,82 @@ class Inference:
             return
         
         try:
-            # 프로젝트 루트 경로 설정
-            current_path = Path(__file__).resolve()
-            project_root = current_path.parent.parent
-            data_dir = project_root / 'Data'
-            
             # 주식 이름 로드
-            tickers = pd.read_csv(data_dir / 'return_df.csv', index_col=0).columns[:self.n_stock]
-            logger.info(f"Loaded {len(tickers)} tickers from {data_dir / 'return_df.csv'}")
+            tickers = pd.read_csv(
+                os.path.join(self.config['DATA_DIR'], 'return_df.csv'),
+                index_col=0
+            ).columns[:self.config["N_STOCK"]]
             
             # 날짜 인덱스 사용
-            if not isinstance(self.test_dates, pd.DatetimeIndex):
-                logger.warning(f"Converting dates from type {type(self.test_dates)} to DatetimeIndex")
-                try:
-                    date_index = pd.DatetimeIndex(self.test_dates)
-                except Exception as e:
-                    logger.error(f"Error converting dates: {str(e)}")
-                    logger.error(f"First few dates: {self.test_dates[:5]}")
-                    raise
-            else:
-                date_index = self.test_dates
+            date_index = pd.DatetimeIndex(self.test_dates)
             
             # 차원 확인
-            logger.info(f"Weights array shape: {weights_array.shape}")
-            logger.info(f"Expected shape: ({len(date_index)}, {len(tickers)})")
-            
             if weights_array.shape != (len(date_index), len(tickers)):
                 logger.error("Dimension mismatch!")
-                logger.error(f"Got shape {weights_array.shape}, expected {(len(date_index), len(tickers))}")
                 return
-            
-            # 사용된 모델 파일명에서 loss 값 추출
-            model_files = [f for f in os.listdir(self.model_path) if f.endswith('.pth')]
-            used_model = None
-            for file in model_files:
-                parts = file.split('_')
-                if (parts[0].lower() == str(self.use_prob).lower() and 
-                    parts[1] == self.model_name):
-                    used_model = file
-                    break
-            
-            if used_model:
-                model_loss = float(used_model.split('_loss_')[-1].replace('.pth', ''))
-            else:
-                model_loss = 0.0
             
             # 가중치 파일명 생성
             weights_filename = (
-                f"weights_"
-                f"{self.use_prob}_{self.model_name}_"
-                f"t{self.len_train}_p{self.len_pred}_"
-                f"loss{model_loss:.4f}.csv"
+                f"portfolio_weights_"
+                f"{self.config['MODEL']}_"
+                f"loss{self.config['LOSS_FUNCTION']}.csv"
             )
             
-            weights_path = os.path.join(
-                self.config['RESULT_DIR'],
-                self.config["MODEL"],
-                weights_filename
+            weights_path = os.path.join(self.result_dir, weights_filename)
+            
+            # DataFrame 생성 및 저장
+            df_weights = pd.DataFrame(
+                weights_array,
+                columns=tickers,
+                index=date_index
             )
-            
-            # DataFrame 생성 전 데이터 검증
-            if np.isnan(weights_array).any():
-                logger.warning("NaN values found in weights array")
-            if np.isinf(weights_array).any():
-                logger.warning("Inf values found in weights array")
-            
-            # CSV 파일에 헤더와 인덱스 추가
-            df_weights = pd.DataFrame(weights_array, columns=tickers, index=date_index)
             df_weights.to_csv(weights_path)
             
             logger.info(f"Weights saved to {weights_path}")
-            logger.info(f"Model parameters:")
-            logger.info(f"- Use prob: {self.use_prob}")
-            logger.info(f"- Model: {self.model_name}")
-            logger.info(f"- Train length: {self.len_train}")
-            logger.info(f"- Pred length: {self.len_pred}")
-            logger.info(f"- Model loss: {model_loss:.4f}")
             
         except Exception as e:
             logger.error(f"Error saving weights: {str(e)}")
-            logger.error(f"Weights array info: shape={weights_array.shape}, dtype={weights_array.dtype}")
             raise
-    
-    def set_data(self):
-        """데이터 로드"""
+
+    def calculate_portfolio_metrics(self, weights_array: np.ndarray):
+        """포트폴리오 성과 지표 계산"""
         try:
-            # 설정된 경로에서 데이터 로드
-            with open(self.config['DATASET_PATH'], "rb") as f:
-                data_dict = pickle.load(f)
+            # 수익률 데이터 로드
+            returns = pd.read_csv(
+                os.path.join(self.config['DATA_DIR'], 'return_df.csv'),
+                index_col=0,
+                parse_dates=True
+            ).loc[self.test_dates]
             
-            with open(self.config['DATES_PATH'], "rb") as f:
-                dates_dict = pickle.load(f)
+            # 포트폴리오 수익률 계산
+            portfolio_returns = (weights_array * returns).sum(axis=1)
             
-            # Test 데이터만 사용
-            test_data = data_dict['test']
-            self.test_x = test_data[0].astype("float32")
-            self.test_y = test_data[1].astype("float32")
-            self.test_prob = test_data[2].astype("float32")
-            self.test_dates = dates_dict['test']
+            # 성과 지표 계산
+            metrics = {
+                'Total Return': (1 + portfolio_returns).prod() - 1,
+                'Annual Return': portfolio_returns.mean() * 252,
+                'Annual Volatility': portfolio_returns.std() * np.sqrt(252),
+                'Sharpe Ratio': portfolio_returns.mean() / portfolio_returns.std() * np.sqrt(252),
+                'Max Drawdown': (portfolio_returns.cumsum() - portfolio_returns.cumsum().cummax()).min(),
+                'Turnover': np.abs(weights_array[1:] - weights_array[:-1]).sum(axis=1).mean()
+            }
             
-            logger.info("Data loading completed")
-            logger.info(f"Test data shape - X: {self.test_x.shape}, Y: {self.test_y.shape}, Prob: {self.test_prob.shape}")
-        
+            # 결과 저장
+            metrics_path = os.path.join(
+                self.result_dir,
+                f"portfolio_metrics_{self.config['MODEL']}.json"
+            )
+            with open(metrics_path, 'w') as f:
+                json.dump(metrics, f, indent=4)
+            
+            logger.info(f"Portfolio metrics saved to {metrics_path}")
+            
+            return metrics
+            
         except Exception as e:
-            logger.error(f"Error loading data: {str(e)}")
+            logger.error(f"Error calculating portfolio metrics: {str(e)}")
             raise
-    
+
     def __del__(self):
         """소멸자에서 process group 정리"""
         if self.distributed and dist.is_initialized():
@@ -437,3 +238,52 @@ def cleanup_inf():
     """분산 처리 정리"""
     if dist.is_initialized():
         dist.destroy_process_group()
+
+class ModelInference:
+    def __init__(
+        self,
+        model: nn.Module,
+        device: torch.device,
+        use_prob: bool = False
+    ):
+        """
+        모델 추론을 위한 클래스
+        
+        Args:
+            model: 학습된 모델
+            device: 추론 디바이스
+            use_prob: 확률 기반 모델 사용 여부
+        """
+        self.model = model
+        self.device = device
+        self.use_prob = use_prob
+        self.model.eval()
+
+    def predict(
+        self,
+        x_returns: torch.Tensor,
+        x_probs: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        """
+        포트폴리오 가중치를 예측합니다.
+        
+        Args:
+            x_returns: 수익률 시퀀스 [batch_size, seq_len, n_stocks]
+            x_probs: 상승확률 [batch_size, pred_len, n_stocks] (확률 기반 모델인 경우)
+            
+        Returns:
+            예측된 포트폴리오 가중치 [batch_size, n_stocks]
+        """
+        self.model.eval()
+        with torch.no_grad():
+            x_returns = x_returns.to(self.device)
+            
+            if self.use_prob:
+                if x_probs is None:
+                    raise ValueError("확률 기반 모델에는 x_probs가 필요합니다.")
+                x_probs = x_probs.to(self.device)
+                pred = self.model(x_returns, x_probs)
+            else:
+                pred = self.model(x_returns)
+                
+        return pred

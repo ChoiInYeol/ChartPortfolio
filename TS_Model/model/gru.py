@@ -109,5 +109,67 @@ class PortfolioGRU(nn.Module):
         
         return weights
 
+class PortfolioGRUWithProb(PortfolioGRU):
+    def __init__(
+        self,
+        n_layers: int,
+        hidden_dim: int,
+        n_stocks: int,
+        dropout_p: float = 0.3,
+        bidirectional: bool = False,
+        constraints: Dict[str, Any] = None
+    ):
+        """상승확률을 활용하는 GRU 기반 포트폴리오 최적화 모델"""
+        super().__init__(
+            n_layers, hidden_dim, n_stocks,
+            dropout_p, bidirectional, constraints
+        )
+        
+        # 상승확률 인코딩을 위한 레이어
+        self.prob_encoder = nn.Sequential(
+            nn.Linear(n_stocks, hidden_dim),
+            nn.SiLU(),
+            nn.Dropout(dropout_p)
+        )
+        
+        # 결합된 특성을 처리하기 위한 레이어
+        self.score_layer = nn.Linear(hidden_dim * (self.scale + 1), n_stocks)
+
+    def forward(self, x_returns: torch.Tensor, x_probs: torch.Tensor) -> torch.Tensor:
+        """
+        순전파
+        
+        Args:
+            x_returns: 수익률 시퀀스 [batch_size, seq_len, n_stocks]
+            x_probs: 상승확률 [batch_size, pred_len, n_stocks]
+            
+        Returns:
+            포트폴리오 비중 [batch_size, n_stocks]
+        """
+        # GRU로 수익률 시퀀스 처리
+        batch_size = x_returns.size(0)
+        init_h = torch.zeros(
+            self.n_layers * self.scale,
+            batch_size,
+            self.hidden_dim
+        ).to(x_returns.device)
+        
+        x, _ = self.gru(x_returns, init_h)
+        h_returns = x[:, -1, :]
+        
+        # 상승확률 처리 (첫 번째 예측 시점의 확률 사용)
+        h_probs = self.prob_encoder(x_probs[:, 0, :])
+        
+        # 특성 결합
+        combined = torch.cat([h_returns, h_probs], dim=1)
+        
+        # 자산별 점수 생성
+        scores = self.score_layer(self.dropout(combined))
+        
+        # Portfolio Block (h2)
+        weights = self.convert_scores_to_weights(scores)
+        
+        return weights
+
 if __name__ == "__main__":
     pass
