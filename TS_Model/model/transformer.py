@@ -281,37 +281,59 @@ class PortfolioTransformer(nn.Module):
         return weights
     
     def convert_scores_to_weights(self, scores: torch.Tensor) -> torch.Tensor:
-        """점수를 포트폴리오 가중치로 변환합니다."""
-        if self.constraints.get('long_only', True):
-            # Long-only constraint with softmax
-            weights = torch.softmax(scores, dim=-1)
-            
-        else:
-            # General case allowing short positions with tanh
-            weights = torch.tanh(scores)  # [-1, 1] 범위로 제한
-            
-            # Normalize to satisfy leverage constraint
-            leverage = self.constraints.get('leverage', 1.0)
-            weights = leverage * weights / weights.abs().sum(dim=-1, keepdim=True)
+        """
+        점수를 포트폴리오 가중치로 변환합니다.
+        모든 제약조건을 순차적으로 적용하되, 각 단계에서 제약조건들이 유지되도록 합니다.
         
-        if 'max_position' in self.constraints:
-            # Maximum position constraint using generalized sigmoid
-            u = self.constraints['max_position']
-            a = (1 - u) / (self.n_stocks * u - 1)
+        Args:
+            scores: 자산별 점수 [batch_size, n_stocks]
             
-            def phi_a(x):
-                return (a + 1) / (1 + torch.exp(-x))
-            
-            weights = torch.sign(scores) * phi_a(scores.abs())
-            weights = weights / weights.sum(dim=-1, keepdim=True)
+        Returns:
+            제약조건을 만족하는 포트폴리오 가중치 [batch_size, n_stocks]
+        """
+        device = scores.device
         
-        if 'cardinality' in self.constraints:
-            # Cardinality constraint using top-k selection
-            k = self.constraints['cardinality']
+        # 1. Cardinality 제약 적용 (상위 k개 종목 선택)
+        if 'CARDINALITY' in self.constraints:
+            k = self.constraints['CARDINALITY']
             values, indices = torch.topk(scores.abs(), k, dim=-1)
             mask = torch.zeros_like(scores).scatter_(-1, indices, 1.0)
-            weights = weights * mask
+            scores = scores * mask
+        
+        # 2. Long-only 제약 적용
+        if self.constraints.get('LONG_ONLY', True):
+            scores = scores.clone()
+            scores[scores < 0] = -float('inf')  # 음수 점수를 -inf로 설정하여 softmax 후 0이 되도록
+        
+        # 3. Maximum position 제약 적용
+        if 'MAX_POSITION' in self.constraints:
+            max_pos = self.constraints['MAX_POSITION']
+            max_log = torch.log(torch.tensor(max_pos, device=device)) + 1
+            scores = torch.clamp(scores, max=max_log)
+        
+        # 4. 가중치 변환 및 정규화
+        weights = torch.softmax(scores, dim=-1)
+        
+        # 5. Maximum position 추가 검증 및 조정
+        if 'MAX_POSITION' in self.constraints:
+            max_pos = self.constraints['MAX_POSITION']
+            weights = torch.clamp(weights, max=max_pos)
+            # 정규화
             weights = weights / weights.sum(dim=-1, keepdim=True)
+        
+        # 6. Minimum position 제약 적용
+        if 'MIN_POSITION' in self.constraints:
+            min_pos = self.constraints['MIN_POSITION']
+            weights[weights < min_pos] = 0
+            # 다시 정규화
+            weights = weights / weights.sum(dim=-1, keepdim=True)
+        
+        # 7. Leverage 제약 확인
+        if 'LEVERAGE' in self.constraints:
+            leverage = self.constraints['LEVERAGE']
+            leverage_tensor = torch.tensor(leverage, device=device)
+            if not torch.allclose(weights.sum(dim=-1), leverage_tensor, rtol=1e-3):
+                weights = weights * leverage
         
         return weights
 
