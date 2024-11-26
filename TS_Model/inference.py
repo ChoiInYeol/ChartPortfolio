@@ -87,24 +87,28 @@ class ModelInference:
         elif model_type == "TCN":
             model_class = PortfolioTCNWithProb if use_prob else PortfolioTCN
             model = model_class(
-                n_timestep=self.config['MODEL']['TCN']['n_timestep'],
-                n_output=self.config['MODEL']['TCN']['n_output'],
+                n_feature=self.config['DATA']['N_STOCKS'],  # 수정
+                n_output=self.config['DATA']['N_STOCKS'],   # 수정
+                num_channels=self.config['MODEL']['TCN']['num_channels'],
                 kernel_size=self.config['MODEL']['TCN']['kernel_size'],
                 n_dropout=self.config['MODEL']['TCN']['n_dropout'],
-                hidden_size=self.config['MODEL']['TCN']['hidden_size'],
-                level=self.config['MODEL']['TCN']['level'],
-                channels=self.config['MODEL']['TCN']['channels'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS']
+                n_timestep=self.config['MODEL']['TCN']['n_timestep'],
+                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
+                lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
             )
         elif model_type == "TRANSFORMER":
             model_class = PortfolioTransformerWithProb if use_prob else PortfolioTransformer
             model = model_class(
+                n_feature=self.config['DATA']['N_STOCKS'],  # 수정
                 n_timestep=self.config['MODEL']['TRANSFORMER']['n_timestep'],
                 n_output=self.config['MODEL']['TRANSFORMER']['n_output'],
                 n_layer=self.config['MODEL']['TRANSFORMER']['n_layer'],
                 n_head=self.config['MODEL']['TRANSFORMER']['n_head'],
                 n_dropout=self.config['MODEL']['TRANSFORMER']['n_dropout'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS']
+                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
+                lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
             )
         else:
             raise ValueError(f"Unknown model type: {model_type}")

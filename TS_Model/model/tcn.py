@@ -14,28 +14,30 @@ class PortfolioTCN(nn.Module):
         kernel_size: int,
         n_dropout: float,
         n_timestep: int,
-        constraints: Dict[str, Any] = None
+        constraints: Dict[str, Any] = None,
+        lb: float = 0.0,
+        ub: float = 0.1
     ):
         """
         TCN 기반 포트폴리오 최적화 모델
         
         Args:
-            n_feature: 입력 특성 수
-            n_output: 출력 차원 (종목 수)
-            num_channels: TCN 채널 수 리스트
+            n_feature: 입력 특성 수 (n_stocks와 동일)
+            n_output: 출력 차원 (n_stocks와 동일)
+            num_channels: TCN 채널 수 리스트 (예: [64, 64, 64])
             kernel_size: 컨볼루션 커널 크기
             n_dropout: 드롭아웃 비율
             n_timestep: 시계열 길이
             constraints: 포트폴리오 제약조건
-                - long_only: bool
-                - max_position: float
-                - cardinality: int
-                - leverage: float
+            lb: 최소 포트폴리오 비중
+            ub: 최대 포트폴리오 비중
         """
         super().__init__()
         self.input_size = n_feature
         self.n_stocks = n_output
         self.constraints = constraints or {}
+        self.lb = lb
+        self.ub = ub
         
         # Score Block (h1)
         self.tcn = TemporalConvNet(
@@ -45,9 +47,16 @@ class PortfolioTCN(nn.Module):
             dropout=n_dropout
         )
         
-        self.score_layer = nn.Linear(num_channels[-1], n_output)
+        # 점수 생성을 위한 레이어
+        self.score_layers = nn.Sequential(
+            nn.Linear(num_channels[-1], num_channels[-1]),
+            nn.LayerNorm(num_channels[-1]),
+            nn.SiLU(),
+            nn.Dropout(n_dropout),
+            nn.Linear(num_channels[-1], n_output)
+        )
+        
         self.tempmaxpool = nn.MaxPool1d(n_timestep)
-        self.swish = nn.SiLU()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -64,7 +73,7 @@ class PortfolioTCN(nn.Module):
         output = self.tempmaxpool(output).squeeze(-1)
         
         # 자산별 점수 생성
-        scores = self.score_layer(output)
+        scores = self.score_layers(output)
         
         # Portfolio Block (h2)
         weights = self.convert_scores_to_weights(scores)
@@ -135,14 +144,20 @@ class PortfolioTCNWithProb(PortfolioTCN):
         n_output: int,
         num_channels: List[int],
         kernel_size: int,
+        hidden_size: int,
+        level: int,
+        channels: List[int],
         n_dropout: float,
         n_timestep: int,
-        constraints: Dict[str, Any] = None
+        constraints: Dict[str, Any] = None,
+        lb: float = 0.0,
+        ub: float = 0.1
     ):
         """상승확률을 활용하는 TCN 기반 포트폴리오 최적화 모델"""
         super().__init__(
             n_feature, n_output, num_channels,
-            kernel_size, n_dropout, n_timestep, constraints
+            kernel_size, n_dropout, n_timestep, constraints,
+            lb, ub
         )
         
         # 상승확률 인코딩을 위한 레이어

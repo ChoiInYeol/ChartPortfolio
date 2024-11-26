@@ -18,14 +18,15 @@ DATA:
   PRED_WINDOW: 20  # 예측 기간 (이전 PRED_LEN)
   
   # 데이터 처리
-  N_STOCKS: 369  # 처리할 종목 수
+  N_STOCKS: 50  # 처리할 종목 수
   PROB_NORMALIZE: 'standardize'  # 확률값 정규화 방법 ['standardize', 'minmax']
 
 USE_CUDA: true
 
 MODEL:
-  TYPE: 'GRU'  # ['GRU', 'TCN', 'TRANSFORMER']
+  TYPE: 'TRANSFORMER'  # ['GRU', 'TCN', 'TRANSFORMER']
   USE_PROB: false  # 확률 기반 모델 사용 여부
+  N_STOCKS: 50  # 추가
   
   # GRU parameters
   N_LAYER: 1
@@ -36,25 +37,26 @@ MODEL:
   # TCN parameters
   TCN:
     n_timestep: 60
-    n_output: ${MODEL.N_STOCKS}
+    n_feature: 50  # n_stocks와 동일
+    n_output: 50   # n_stocks와 동일
     kernel_size: 4
     n_dropout: 0.1
     hidden_size: 64
     level: 3
-    channels: [64, 64, 64]
+    num_channels: [64, 64, 64]    # channels 대신 num_channels 사용
   
   # TRANSFORMER parameters
   TRANSFORMER:
     n_timestep: 60
-    n_output: ${MODEL.N_STOCKS}
+    n_output: 50 # n_stocks와 동일
     n_layer: 6
     n_head: 5
     n_dropout: 0.1
 
 TRAINING:
   # 학습 파라미터
-  BATCH_SIZE: 32
-  EPOCHS: 1000
+  BATCH_SIZE: 64
+  EPOCHS: 500
   EARLY_STOPPING: 50
   LEARNING_RATE: 0.005
   MOMENTUM: 0.9
@@ -62,7 +64,7 @@ TRAINING:
   # 하드웨어 설정
   USE_CUDA: true
   SEED: 42
-  NUM_WORKERS: 4
+  NUM_WORKERS: 32
 
 PORTFOLIO:
   # 목적함수 설정
@@ -74,8 +76,8 @@ PORTFOLIO:
   CONSTRAINTS:
     LONG_ONLY: true
     MAX_POSITION: 0.2
-    MIN_POSITION: 0.0
-    CARDINALITY: 20
+    MIN_POSITION: 0.02
+    CARDINALITY: 50
     LEVERAGE: 1.0
   
   # 거래비용

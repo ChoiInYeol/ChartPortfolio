@@ -1,161 +1,106 @@
 import torch
 import numpy as np
 import logging
-from typing import Optional
+from typing import Optional, Tuple
+import torch.nn.functional as F
 
 logger = logging.getLogger(__name__)
 
-def batch_covariance(returns: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
+def batch_covariance(x: torch.Tensor) -> torch.Tensor:
     """
-    배치의 공분산 행렬을 계산합니다.
+    배치 공분산 계산
 
     Args:
-        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
-        eps: 수치 안정성을 위한 작은 값
+        x: (batch_size, n_samples, n_features)
 
     Returns:
-        공분산 행렬 [batch_size, n_stocks, n_stocks]
+        cov: (batch_size, n_features, n_features)
     """
-    B, T, N = returns.shape
-    returns_centered = returns - returns.mean(dim=1, keepdim=True)
-    cov = torch.bmm(returns_centered.transpose(1, 2), returns_centered) / (T - 1)
-    # 수치 안정성을 위해 대각선에 작은 값 추가
-    cov = cov + torch.eye(N, device=returns.device) * eps
+    x_mean = x.mean(dim=1, keepdim=True)
+    x_centered = x - x_mean
+    cov = torch.matmul(x_centered.transpose(1, 2), x_centered) / (x.size(1) - 1)
     return cov
 
-def portfolio_return(returns: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
-    """
-    포트폴리오 수익률을 계산합니다.
-    
-    Args:
-        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
-        weights: 포트폴리오 가중치 [batch_size, n_stocks]
-        
-    Returns:
-        포트폴리오 수익률 [batch_size, time_steps]
-    """
-    weights = weights.unsqueeze(1)  # [batch_size, 1, n_stocks]
-    portfolio_rets = torch.bmm(weights, returns.transpose(1, 2)).squeeze(1)
-    return portfolio_rets
-
-def portfolio_variance(returns: torch.Tensor, weights: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
-    """
-    포트폴리오 분산을 계산합니다.
-    
-    Args:
-        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
-        weights: 포트폴리오 가중치 [batch_size, n_stocks]
-        eps: 수치 안정성을 위한 작은 값
-        
-    Returns:
-        포트폴리오 분산 [batch_size]
-    """
-    covmat = batch_covariance(returns, eps)  # [B, N, N]
-    weights = weights.unsqueeze(2)  # [B, N, 1]
-    port_var = torch.bmm(torch.bmm(weights.transpose(1, 2), covmat), weights).squeeze()
-    return port_var
-
-def sharpe_ratio_loss(
+def max_sharpe(
     returns: torch.Tensor,
     weights: torch.Tensor,
     risk_free_rate: float = 0.02,
-    annualization_factor: float = 12,
-    eps: float = 1e-8
+    annualization_factor: float = 12
 ) -> torch.Tensor:
-    """
-    Sharpe ratio를 최대화하는 손실 함수입니다.
+    """Sharpe ratio 손실 함수"""
+    weights = weights.unsqueeze(1)  # (batch_size, 1, n_assets)
+    mean_return = returns.mean(dim=1).unsqueeze(2)  # (batch_size, n_assets, 1)
+    covmat = batch_covariance(returns)  # (batch_size, n_assets, n_assets)
 
-    Args:
-        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
-        weights: 포트폴리오 가중치 [batch_size, n_stocks]
-        risk_free_rate: 무위험 수익률 (연율화)
-        annualization_factor: 연율화 계수 (월간 데이터의 경우 12)
-        eps: 수치 안정성을 위한 작은 값
+    port_return = torch.matmul(weights, mean_return)  # (batch_size, 1, 1)
+    port_vol = torch.matmul(
+        weights, torch.matmul(covmat, weights.transpose(2, 1))
+    )  # (batch_size, 1, 1)
 
-    Returns:
-        negative Sharpe ratio (손실값)
-    """
-    # 입력값 검증
-    if torch.isnan(returns).any() or torch.isnan(weights).any():
-        logger.warning("NaN detected in inputs")
-        return torch.tensor(1e6, device=returns.device, dtype=returns.dtype, requires_grad=True)
-    
-    # 연간 기대수익률 계산
-    port_return = portfolio_return(returns, weights).mean(dim=1)  # [B]
-    annual_return = port_return * annualization_factor
-    
-    # 연간 변동성 계산
-    port_vol = torch.sqrt(portfolio_variance(returns, weights) * annualization_factor + eps)
-    
-    # Sharpe ratio 계산
-    sharpe = (annual_return - risk_free_rate) / port_vol
-    return -sharpe.mean()
+    sharpe_ratio = (port_return * annualization_factor - risk_free_rate) / (
+        torch.sqrt(port_vol * annualization_factor)
+    )
+    return -sharpe_ratio.mean()
 
-def mean_variance_loss(
+
+def mean_variance(
     returns: torch.Tensor,
     weights: torch.Tensor,
     risk_aversion: float = 1.0
 ) -> torch.Tensor:
-    """
-    평균-분산 최적화를 위한 손실 함수입니다.
+    """평균-분산 손실 함수"""
+    weights = weights.unsqueeze(1)  # (batch_size, 1, n_assets)
+    mean_return = returns.mean(dim=1).unsqueeze(2)  # (batch_size, n_assets, 1)
+    covmat = batch_covariance(returns)  # (batch_size, n_assets, n_assets)
 
-    Args:
-        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
-        weights: 포트폴리오 가중치 [batch_size, n_stocks]
-        risk_aversion: 위험 회피 계수
+    port_return = torch.matmul(weights, mean_return)  # (batch_size, 1, 1)
+    port_var = torch.matmul(
+        weights, torch.matmul(covmat, weights.transpose(2, 1))
+    )  # (batch_size, 1, 1)
 
-    Returns:
-        negative utility (손실값)
-    """
-    port_return = portfolio_return(returns, weights).mean(dim=1)  # [B]
-    port_var = portfolio_variance(returns, weights)  # [B]
-    
-    # 효용함수 = 기대수익률 - (위험회피계수/2) * 분산
     utility = port_return - (risk_aversion / 2) * port_var
     return -utility.mean()
 
-def minimum_variance_loss(returns: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
-    """
-    최소 분산 최적화를 위한 손실 함수입니다.
-    
-    Args:
-        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
-        weights: 포트폴리오 가중치 [batch_size, n_stocks]
-        
-    Returns:
-        포트폴리오 분산 (손실값)
-    """
-    return portfolio_variance(returns, weights).mean()
 
-def equal_risk_contribution_loss(returns: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
-    """
-    동일 위험 기여도를 목표로 하는 손실 함수입니다.
+def min_variance(
+    returns: torch.Tensor,
+    weights: torch.Tensor
+) -> torch.Tensor:
+    """최소 분산 손실 함수"""
+    weights = weights.unsqueeze(1)  # (batch_size, 1, n_assets)
+    covmat = batch_covariance(returns)  # (batch_size, n_assets, n_assets)
 
-    Args:
-        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
-        weights: 포트폴리오 가중치 [batch_size, n_stocks]
+    port_var = torch.matmul(
+        weights, torch.matmul(covmat, weights.transpose(2, 1))
+    )  # (batch_size, 1, 1)
+    return port_var.mean()
 
-    Returns:
-        위험 기여도 차이의 MSE
-    """
-    B, T, N = returns.shape
-    weights = weights.unsqueeze(1)  # [B, 1, N]
-    
-    # 공분산 행렬 계산
-    covmat = batch_covariance(returns)  # [B, N, N]
-    
-    # 포트폴리오 변동성
-    port_var = torch.bmm(weights, torch.bmm(covmat, weights.transpose(1, 2)))  # [B, 1, 1]
-    port_vol = torch.sqrt(port_var + 1e-8)  # 수치 안정성
-    
-    # 한계 위험 기여도
-    mrc = torch.bmm(covmat, weights.transpose(1, 2)) / port_vol  # [B, N, 1]
-    
-    # 위험 기여도
-    rc = (weights * mrc.transpose(1, 2)).squeeze()  # [B, N]
-    target_rc = torch.full_like(rc, 1.0 / N)  # 목표 위험 기여도
-    
-    return torch.mean((rc - target_rc) ** 2)
+def equal_risk_contribution_loss(
+    returns: torch.Tensor,
+    weights: torch.Tensor,
+    eps: float = 1e-8
+) -> torch.Tensor:
+    """동일 위험 기여도 손실 함수"""
+    batch_size, n_samples, n_assets = returns.size()
+    weights = weights.unsqueeze(1)  # (batch_size, 1, n_assets)
+    covmat = batch_covariance(returns)  # (batch_size, n_assets, n_assets)
+
+    port_vol = torch.sqrt(
+        torch.matmul(weights, torch.matmul(covmat, weights.transpose(2, 1)))
+    )  # (batch_size, 1, 1)
+    mrc = (1 / port_vol) * torch.matmul(covmat, weights.transpose(2, 1))  # (batch_size, n_assets, 1)
+    rc = weights.transpose(2, 1) * mrc  # (batch_size, n_assets, 1)
+    rc = rc.squeeze(2)  # (batch_size, n_assets)
+
+    target = torch.ones_like(rc) * (1 / n_assets)  # (batch_size, n_assets)
+    risk_diffs = rc - target
+    sum_risk_diffs_squared = torch.mean(risk_diffs.pow(2))
+    return sum_risk_diffs_squared
+
+# 기존 인터페이스와의 호환성을 위한 별칭
+sharpe_ratio_loss = max_sharpe
+mean_variance_loss = mean_variance
+minimum_variance_loss = min_variance
 
 if __name__ == "__main__":
     pass

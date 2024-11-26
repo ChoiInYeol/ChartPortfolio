@@ -104,29 +104,35 @@ class Trainer:
                 n_stocks=self.config['DATA']['N_STOCKS'],
                 dropout_p=self.config['MODEL']['DROPOUT'],
                 bidirectional=self.config['MODEL']['BIDIRECTIONAL'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS']
+                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
+                lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
             )
         elif model_type == "TCN":
             model_class = PortfolioTCNWithProb if use_prob else PortfolioTCN
             model = model_class(
-                n_timestep=self.config['MODEL']['TCN']['n_timestep'],
-                n_output=self.config['MODEL']['TCN']['n_output'],
+                n_feature=self.config['DATA']['N_STOCKS'],  # 수정
+                n_output=self.config['DATA']['N_STOCKS'],   # 수정
+                num_channels=self.config['MODEL']['TCN']['num_channels'],
                 kernel_size=self.config['MODEL']['TCN']['kernel_size'],
                 n_dropout=self.config['MODEL']['TCN']['n_dropout'],
-                hidden_size=self.config['MODEL']['TCN']['hidden_size'],
-                level=self.config['MODEL']['TCN']['level'],
-                channels=self.config['MODEL']['TCN']['channels'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS']
+                n_timestep=self.config['MODEL']['TCN']['n_timestep'],
+                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
+                lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
             )
         elif model_type == "TRANSFORMER":
             model_class = PortfolioTransformerWithProb if use_prob else PortfolioTransformer
             model = model_class(
+                n_feature=self.config['DATA']['N_STOCKS'],  # 수정
                 n_timestep=self.config['MODEL']['TRANSFORMER']['n_timestep'],
                 n_output=self.config['MODEL']['TRANSFORMER']['n_output'],
                 n_layer=self.config['MODEL']['TRANSFORMER']['n_layer'],
                 n_head=self.config['MODEL']['TRANSFORMER']['n_head'],
                 n_dropout=self.config['MODEL']['TRANSFORMER']['n_dropout'],
-                constraints=self.config['PORTFOLIO']['CONSTRAINTS']
+                constraints=self.config['PORTFOLIO']['CONSTRAINTS'],
+                lb=self.config['PORTFOLIO']['CONSTRAINTS']['MIN_POSITION'],
+                ub=self.config['PORTFOLIO']['CONSTRAINTS']['MAX_POSITION']
             )
         else:
             raise ValueError(f"Unknown model type: {model_type}")
@@ -137,10 +143,20 @@ class Trainer:
         if os.path.exists(self.model_dir):
             checkpoint_path = self._find_latest_checkpoint()
             if checkpoint_path:
-                checkpoint = torch.load(checkpoint_path, map_location=self.device)
-                model.load_state_dict(checkpoint['model_state_dict'])
-                self.best_loss = checkpoint['loss']
-                logger.info(f"Loaded checkpoint from {checkpoint_path}")
+                try:
+                    checkpoint = torch.load(checkpoint_path, map_location=self.device)
+                    if 'model_state_dict' in checkpoint:
+                        model.load_state_dict(checkpoint['model_state_dict'])
+                        self.best_loss = checkpoint.get('loss', float('inf'))
+                        logger.info(f"Successfully loaded checkpoint from {checkpoint_path}")
+                    else:
+                        logger.warning(f"Checkpoint at {checkpoint_path} does not contain model state dict")
+                except Exception as e:
+                    logger.error(f"Error loading checkpoint from {checkpoint_path}: {str(e)}")
+            else:
+                logger.info("No checkpoint found, starting from scratch")
+        else:
+            logger.info(f"Model directory {self.model_dir} does not exist, starting from scratch")
         
         return model
 
@@ -154,44 +170,52 @@ class Trainer:
         
         epochs = tqdm(range(self.config["TRAINING"]["EPOCHS"]), desc="Training")
         
-        for epoch in epochs:
-            if self.distributed:
-                train_loader.sampler.set_epoch(epoch)
-            
-            # Training
-            self.model.train()
-            train_loss = self._run_epoch(train_loader, is_training=True)
-            
-            # Validation
-            self.model.eval()
-            with torch.no_grad():
-                val_loss = self._run_epoch(val_loader, is_training=False)
-            
-            # 학습 이력 저장
-            self.train_losses.append(train_loss)
-            self.val_losses.append(val_loss)
-            self.epochs.append(epoch)
-            
-            # 로깅
-            epochs.set_postfix({
-                'train_loss': f'{train_loss:.4f}',
-                'val_loss': f'{val_loss:.4f}'
-            })
-            
-            # Early Stopping 체크
-            if val_loss < self.best_val_loss:
-                self.best_val_loss = val_loss
-                self.patience_counter = 0
-                self._save_checkpoint(epoch, val_loss)
-            else:
-                self.patience_counter += 1
+        try:
+            for epoch in epochs:
+                if self.distributed:
+                    train_loader.sampler.set_epoch(epoch)
                 
-            if self.patience_counter >= self.patience:
-                logger.info(f'Early stopping triggered after {epoch + 1} epochs')
-                break
+                # Training
+                self.model.train()
+                train_loss = self._run_epoch(train_loader, is_training=True)
                 
-        # 학습 종료 후 학습 이력 저장
-        self._save_training_history()
+                # Validation
+                self.model.eval()
+                with torch.no_grad():
+                    val_loss = self._run_epoch(val_loader, is_training=False)
+                
+                # 학습 이력 저장
+                self.train_losses.append(train_loss)
+                self.val_losses.append(val_loss)
+                self.epochs.append(epoch)
+                
+                # 로깅
+                epochs.set_postfix({
+                    'train_loss': f'{train_loss:.4f}',
+                    'val_loss': f'{val_loss:.4f}'
+                })
+                
+                # Early Stopping 체크
+                if val_loss < self.best_val_loss:
+                    self.best_val_loss = val_loss
+                    self.patience_counter = 0
+                    self._save_checkpoint(epoch, val_loss)
+                else:
+                    self.patience_counter += 1
+                    
+                if self.patience_counter >= self.patience:
+                    logger.info(f'Early stopping triggered after {epoch + 1} epochs')
+                    break
+                    
+            # 학습 종료 후 학습 이력 저장
+            self._save_training_history()
+            
+            # 최고 성능의 체크포인트만 남기고 나머지 삭제
+            self._cleanup_checkpoints()
+            
+        except Exception as e:
+            logger.error(f"Error during training: {str(e)}")
+            raise
 
     def _run_epoch(self, dataloader, is_training=True):
         """한 에폭을 실행합니다."""
@@ -257,29 +281,52 @@ class Trainer:
 
     def _find_latest_checkpoint(self):
         """현재 설정과 일치하는 체크포인트 중 loss가 가장 낮은 것을 찾습니다."""
-        checkpoints = [f for f in os.listdir(self.model_dir) if f.endswith('.pth')]
-        if not checkpoints:
+        try:
+            checkpoints = [f for f in os.listdir(self.model_dir) if f.endswith('.pth')]
+            if not checkpoints:
+                logger.info("체크포인트를 찾을 수 없습니다.")
+                return None
+            
+            # 현재 설정과 일치하는 체크포인트 필터링
+            matching_checkpoints = []
+            for ckpt in checkpoints:
+                try:
+                    parts = ckpt.split('_')
+                    if len(parts) < 5:  # 최소 필요한 부분이 있는지 확인
+                        continue
+                        
+                    # 형식: {epoch}_{model}_{loss}_{use_prob}_{loss_type}.pth
+                    if (parts[1] == self.config['MODEL']['TYPE'] and  # 모델 타입
+                        parts[3] == ('prob' if self.use_prob else 'no_prob') and  # prob 사용 여부
+                        parts[4].split('.')[0] == self.config['PORTFOLIO']['OBJECTIVE']):  # loss 타입
+                        
+                        # loss 값이 유효한 float인지 확인
+                        float(parts[2])  
+                        matching_checkpoints.append(ckpt)
+                        
+                except (IndexError, ValueError) as e:
+                    logger.warning(f"체크포인트 {ckpt} 파싱 중 오류 발생: {str(e)}")
+                    continue
+            
+            if not matching_checkpoints:
+                logger.info("현재 설정과 일치하는 체크포인트가 없습니다.")
+                return None
+            
+            # loss 값을 기준으로 정렬하여 가장 낮은 것 선택
+            best_checkpoint = min(matching_checkpoints, 
+                                key=lambda x: float(x.split('_')[2]))
+            
+            checkpoint_path = os.path.join(self.model_dir, best_checkpoint)
+            if not os.path.exists(checkpoint_path):
+                logger.error(f"체크포인트 파일이 존재하지 않습니다: {checkpoint_path}")
+                return None
+                
+            logger.info(f"최적의 체크포인트를 찾았습니다: {best_checkpoint}")
+            return checkpoint_path
+            
+        except Exception as e:
+            logger.error(f"체크포인트 검색 중 오류 발생: {str(e)}")
             return None
-        
-        # 현재 설정과 일치하는 체크포인트 필터링
-        matching_checkpoints = []
-        for ckpt in checkpoints:
-            parts = ckpt.split('_')
-            # 형식: {epoch}_{model}_{loss}_{use_prob}_{loss_type}.pth
-            if (parts[1] == self.config['MODEL']['TYPE'] and  # 모델 타입
-                parts[3] == ('prob' if self.use_prob else 'no_prob') and  # prob 사용 여부
-                parts[4].split('.')[0] == self.config['PORTFOLIO']['OBJECTIVE']):  # loss 타입
-                matching_checkpoints.append(ckpt)
-        
-        if not matching_checkpoints:
-            return None
-        
-        # loss 값을 기준으로 정렬하여 가장 낮은 것 선택
-        best_checkpoint = min(matching_checkpoints, 
-                            key=lambda x: float(x.split('_')[2]))
-        
-        logger.info(f"Found best matching checkpoint: {best_checkpoint}")
-        return os.path.join(self.model_dir, best_checkpoint)
 
     def set_data(self):
         """데이터 로드 및 전처리"""
@@ -428,10 +475,24 @@ class Trainer:
                 'val_loss': self.val_losses
             })
             
+            # 모델 설정에 따른 파일명 생성
+            model_type = self.config["MODEL"]["TYPE"]
+            if model_type == "GRU":
+                model_config = f"{model_type}_L{self.config['MODEL']['N_LAYER']}_H{self.config['MODEL']['HIDDEN_DIM']}"
+                if self.config['MODEL']['BIDIRECTIONAL']:
+                    model_config += "_bi"
+            elif model_type == "TCN":
+                model_config = f"{model_type}_L{self.config['MODEL']['TCN']['level']}_H{self.config['MODEL']['TCN']['hidden_size']}"
+            elif model_type == "TRANSFORMER":
+                model_config = f"{model_type}_L{self.config['MODEL']['TRANSFORMER']['n_layer']}_H{self.config['MODEL']['TRANSFORMER']['n_head']}"
+            
+            if self.config['MODEL']['USE_PROB']:
+                model_config += "_prob"
+            
             # 저장 경로 설정
             history_path = os.path.join(
                 self.model_dir,
-                f'training_history_{self.config["MODEL"]["TYPE"]}.csv'
+                f'training_history_{model_config}.csv'
             )
             
             history_df.to_csv(history_path, index=False)
@@ -528,3 +589,42 @@ class Trainer:
         except Exception as e:
             logger.error(f"Error saving {data_type} weights: {str(e)}")
             raise
+
+    def _cleanup_checkpoints(self):
+        """
+        학습 종료 후 최고 성능의 체크포인트만 남기고 나머지 삭제
+        """
+        if not self.distributed or self.local_rank == 0:  # 마스터 노드에서만 실행
+            try:
+                checkpoints = [f for f in os.listdir(self.model_dir) if f.endswith('.pth')]
+                if not checkpoints:
+                    return
+                
+                # 현재 설정과 일치하는 체크포인트 필터링
+                matching_checkpoints = []
+                for ckpt in checkpoints:
+                    parts = ckpt.split('_')
+                    # 형식: {epoch}_{model}_{loss}_{use_prob}_{loss_type}.pth
+                    if (parts[1] == self.config['MODEL']['TYPE'] and  # 모델 타입
+                        parts[3] == ('prob' if self.use_prob else 'no_prob') and  # prob 사용 여부
+                        parts[4].split('.')[0] == self.config['PORTFOLIO']['OBJECTIVE']):  # loss 타입
+                        matching_checkpoints.append(ckpt)
+                
+                if not matching_checkpoints:
+                    return
+                
+                # loss 값을 기준으로 정렬하여 가장 좋은 것 선택
+                best_checkpoint = min(matching_checkpoints, 
+                                    key=lambda x: float(x.split('_')[2]))
+                
+                # 나머지 체크포인트 삭제
+                for ckpt in matching_checkpoints:
+                    if ckpt != best_checkpoint:
+                        checkpoint_path = os.path.join(self.model_dir, ckpt)
+                        os.remove(checkpoint_path)
+                        logger.info(f"Removed checkpoint: {checkpoint_path}")
+                
+                logger.info(f"Kept best checkpoint: {best_checkpoint}")
+                
+            except Exception as e:
+                logger.error(f"Error during checkpoint cleanup: {str(e)}")

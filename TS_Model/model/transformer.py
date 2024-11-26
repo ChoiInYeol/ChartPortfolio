@@ -220,42 +220,47 @@ class PortfolioTransformer(nn.Module):
         n_head: int,
         n_dropout: float,
         n_output: int,
+        lb: float = 0.0,
+        ub: float = 0.2,
         constraints: Dict[str, Any] = None
     ):
         """
         Transformer 기반 포트폴리오 최적화 모델
-        
-        Args:
-            n_feature: 입력 특성 수
-            n_timestep: 시계열 길이
-            n_layer: Transformer 레이어 수
-            n_head: Attention 헤드 수
-            n_dropout: 드롭아웃 비율
-            n_output: 출력 차원 (종목 수)
-            constraints: 포트폴리오 제약조건
-                - long_only: bool
-                - max_position: float
-                - cardinality: int
-                - leverage: float
         """
         super().__init__()
+        
+        # 입력 검증
+        if not isinstance(n_feature, int) or n_feature <= 0:
+            raise ValueError(f"Invalid n_feature: {n_feature}")
+        if not isinstance(n_output, int) or n_output <= 0:
+            raise ValueError(f"Invalid n_output: {n_output}")
+            
         self.n_stocks = n_output
         self.constraints = constraints or {}
+        self.lb = lb
+        self.ub = ub
         
         # Score Block (h1)
-        encoder_layer = nn.TransformerEncoderLayer(
+        self.encoder_layer = nn.TransformerEncoderLayer(
             d_model=n_feature,
             nhead=n_head,
             dim_feedforward=4*n_feature,
             dropout=n_dropout,
             batch_first=True
         )
+        
         self.transformer = nn.TransformerEncoder(
-            encoder_layer,
+            self.encoder_layer,
             num_layers=n_layer
         )
         
-        self.score_layer = nn.Linear(n_feature, n_output)
+        # 명시적으로 파라미터 지정
+        self.score_layer = nn.Linear(
+            in_features=n_feature,
+            out_features=n_output,
+            bias=True
+        )
+        
         self.swish = nn.SiLU()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -338,7 +343,7 @@ class PortfolioTransformer(nn.Module):
         return weights
 
 
-class PortfolioTransformerWithProb(PortfolioTransformer):
+class PortfolioTransformerWithProb(nn.Module):
     def __init__(
         self,
         n_feature: int,
@@ -347,23 +352,55 @@ class PortfolioTransformerWithProb(PortfolioTransformer):
         n_head: int,
         n_dropout: float,
         n_output: int,
+        lb: float = 0.0,
+        ub: float = 0.2,
         constraints: Dict[str, Any] = None
     ):
-        """상승확률을 활용하는 Transformer 기반 포트폴리오 최적화 모델"""
-        super().__init__(
-            n_feature, n_timestep, n_layer,
-            n_head, n_dropout, n_output, constraints
+        """
+        확률 정보를 활용하는 Transformer 기반 포트폴리오 최적화 모델
+        """
+        super().__init__()
+        
+        # 입력 검증
+        if not isinstance(n_feature, int) or n_feature <= 0:
+            raise ValueError(f"Invalid n_feature: {n_feature}")
+        if not isinstance(n_output, int) or n_output <= 0:
+            raise ValueError(f"Invalid n_output: {n_output}")
+            
+        self.n_stocks = n_output
+        self.constraints = constraints or {}
+        self.lb = lb
+        self.ub = ub
+        
+        # Transformer for returns
+        self.encoder_layer = nn.TransformerEncoderLayer(
+            d_model=n_feature,
+            nhead=n_head,
+            dim_feedforward=4*n_feature,
+            dropout=n_dropout,
+            batch_first=True
         )
         
-        # 상승확률 인코딩을 위한 레이어
+        self.transformer = nn.TransformerEncoder(
+            self.encoder_layer,
+            num_layers=n_layer
+        )
+        
+        # Probability encoder with explicit parameters
         self.prob_encoder = nn.Sequential(
-            nn.Linear(n_output, n_feature),
+            nn.Linear(in_features=n_output, out_features=n_feature, bias=True),
             nn.SiLU(),
             nn.Dropout(n_dropout)
         )
         
-        # 결합된 특성을 처리하기 위한 레이어
-        self.score_layer = nn.Linear(n_feature * 2, n_output)
+        # Combined score layer with explicit parameters
+        self.score_layer = nn.Linear(
+            in_features=n_feature * 2,
+            out_features=n_output,
+            bias=True
+        )
+        
+        self.swish = nn.SiLU()
 
     def forward(self, x_returns: torch.Tensor, x_probs: torch.Tensor) -> torch.Tensor:
         """

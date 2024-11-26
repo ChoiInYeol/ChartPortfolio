@@ -29,8 +29,12 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
             index_col=0, parse_dates=True
         )
         
-        # NaN 값 처리
-        returns_df = returns_df.fillna(0)  # 수익률의 NaN을 0으로 채움
+        # NaN 값 처리 개선
+        returns_df = returns_df.fillna(method='ffill').fillna(method='bfill')
+        
+        # 로그 수익률 변환 (이미 로그 수익률이 아닌 경우)
+        if not is_log_returns(returns_df):  # 적절한 검증 함수 필요
+            returns_df = np.log(returns_df + 1)
         
         # NaN 처리 결과 로깅
         logging.info(f"데이터 로드 완료")
@@ -47,28 +51,29 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
 
 def filter_sp500_stocks(returns_df: pd.DataFrame, probs_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    SP500 종목만 필터링합니다.
+    시가총액 상위 50개 종목만 필터링합니다.
     
     Args:
         returns_df: 전체 수익률 데이터
         probs_df: 전체 상승확률 데이터
         
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: SP500 종목으로 필터링된 (수익률, 상승확률) 데이터
+        Tuple[pd.DataFrame, pd.DataFrame]: 시가총액 상위 50개 종목으로 필터링된 (수익률, 상승확률) 데이터
     """
     try:
-        # SP500 종목 리스트 로드
-        sp500_symbols = pd.read_csv(
-            "/home/indi/codespace/ImagePortOpt/Data/raw_data/sp500_20180101.csv"
-        )['Symbol'].tolist()
+        # 시가총액 상위 50개 종목 리스트 로드
+        market_caps_df = pd.read_csv(
+            "/home/indi/codespace/ImagePortOpt/TS_Model/data/market_caps_20180101.csv"
+        )
+        top_50_symbols = market_caps_df['Symbol'].tolist()[:50]
         
-        # SP500 종목 중 데이터가 있는 종목만 필터링
-        available_symbols = [sym for sym in sp500_symbols if sym in returns_df and sym in probs_df]
+        # 시가총액 상위 50개 종목 중 데이터가 있는 종목만 필터링
+        available_symbols = [sym for sym in top_50_symbols if sym in returns_df and sym in probs_df]
         filtered_returns = returns_df[available_symbols]
         filtered_probs = probs_df[available_symbols]
         
-        logging.info(f"SP500 필터링 완료")
-        logging.info(f"필터링된 종목 수: {len(sp500_symbols)}")
+        logging.info(f"시가총액 상위 50개 종목 필터링 완료")
+        logging.info(f"필터링된 종목 수: {len(available_symbols)}")
         logging.info(f"필터링된 수익률 데이터 shape: {filtered_returns.shape}")
         logging.info(f"필터링된 상승확률 데이터 shape: {filtered_probs.shape}")
         
@@ -83,7 +88,7 @@ def filter_sp500_stocks(returns_df: pd.DataFrame, probs_df: pd.DataFrame) -> Tup
         return filtered_returns, filtered_probs
         
     except Exception as e:
-        logging.error(f"SP500 필터링 중 오류 발생: {str(e)}")
+        logging.error(f"시가총액 상위 50개 종목 필터링 중 오류 발생: {str(e)}")
         raise
 
 def normalize_probabilities(probs: np.ndarray, method: str = 'standardize') -> np.ndarray:
