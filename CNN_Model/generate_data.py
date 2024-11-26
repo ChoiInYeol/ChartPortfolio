@@ -71,7 +71,7 @@ if __name__ == "__main__":
     generate_training_data(
         year_list=test_years,
         ws_list=test_ws,
-        freq='week',     # 일별 데이터 생성
+        freq='month',     # 일별 데이터 생성
         chart_type='bar'
     ) 
     
@@ -80,6 +80,6 @@ if __name__ == "__main__":
     generate_training_data(
         year_list=cf.IS_YEARS + cf.OOS_YEARS,
         ws_list=[20],
-        freq='week',
+        freq='month',
         chart_type='bar',
     )

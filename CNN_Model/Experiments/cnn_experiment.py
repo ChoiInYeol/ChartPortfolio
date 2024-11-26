@@ -18,7 +18,6 @@ from .cnn_utils import (
     get_portfolio_dir,
     get_train_validate_dataloaders_dict,
     save_training_metrics,
-    load_model_state_dict_from_save_path,
     get_dataloader_for_year,
     load_ensemble_res,
     calculate_oos_metrics,
@@ -26,7 +25,8 @@ from .cnn_utils import (
     load_portfolio_obj,
     release_dataloader_memory,
     get_model_checkpoint_path,
-    load_ensemble_model_paths
+    load_ensemble_model_paths,
+    generate_performance_metrics_table
 )
 from .cnn_train import CNNTrainer
 from .cnn_inference import CNNInference
@@ -177,14 +177,29 @@ class Experiment:
         val_df = pd.DataFrame(columns=["MCC", "loss", "accy", "diff", "epoch"])
         train_df = pd.DataFrame(columns=["MCC", "loss", "accy", "diff", "epoch"])
         
+        # 전체 학습 과정의 메트릭을 저장할 데이터 구조
+        all_confusion_matrices = {}
+        all_sample_stats = {}
+        all_learning_curves = {}
+        
         for model_num in ensem_range:
             print(f"Start Training Ensem Number {model_num}", end=" ")
             model_save_path = self._get_model_checkpoint_path(model_num)
             
             if os.path.exists(model_save_path) and pretrained:
                 print(f"Found pretrained model {model_save_path}")
-                validate_metrics = torch.load(model_save_path, map_location=self.device, weights_only=True)
+                checkpoint = torch.load(model_save_path, map_location=self.device)
+                validate_metrics = {k: v for k, v in checkpoint.items() if k != "model_state_dict"}
+                
+                if "training_summary" in checkpoint:
+                    training_summary = checkpoint["training_summary"]
+                    all_confusion_matrices[f"model_{model_num}"] = training_summary["confusion_matrices"]
+                    all_sample_stats[f"model_{model_num}"] = training_summary["sample_stats"]
+                    all_learning_curves[f"model_{model_num}"] = training_summary["learning_curves"]
             else:
+                # 새로운 모델 학습
+                self.trainer.model = self.model_obj.init_model().to(self.device)
+                
                 dataloaders_dict = get_train_validate_dataloaders_dict(
                     ws=self.ws,
                     pw=self.pw,
@@ -220,18 +235,33 @@ class Experiment:
                     enable_tqdm=self.enable_tqdm
                 )
                 
+                # 학습 결과 저장
+                if "training_summary" in validate_metrics:
+                    training_summary = validate_metrics.pop("training_summary")
+                    all_confusion_matrices[f"model_{model_num}"] = training_summary["confusion_matrices"]
+                    all_sample_stats[f"model_{model_num}"] = training_summary["sample_stats"]
+                    all_learning_curves[f"model_{model_num}"] = training_summary["learning_curves"]
+                
                 for column in train_metrics.keys():
                     train_df.loc[model_num, column] = train_metrics[column]
-
+            
             for column in validate_metrics.keys():
-                if column == "model_state_dict":
-                    continue
-                val_df.loc[model_num, column] = validate_metrics[column]
-
+                if column not in ["model_state_dict", "training_summary"]:
+                    val_df.loc[model_num, column] = validate_metrics[column]
+        
         val_df = val_df.astype(np.float64).round(3)
         val_df.loc["Mean"] = val_df.mean().round(3)
         
-        save_training_metrics(self.model_dir, val_df, train_df, self.ensem)
+        # 모든 메트릭 저장
+        save_training_metrics(
+            self.model_dir,
+            val_df,
+            train_df,
+            self.ensem,
+            confusion_matrices=all_confusion_matrices,
+            sample_stats=all_sample_stats,
+            learning_curves=all_learning_curves
+        )
 
     def calculate_portfolio(
         self,
@@ -239,7 +269,7 @@ class Experiment:
         delay_list: List[int] = [0],
         is_ensem_res: bool = True,
         cut: int = 10,
-        freq: str = 'week' # 'day', 'week', 'month', 'quarter', 'year'
+        freq: str = 'month' # 'day', 'week', 'month', 'quarter', 'year'
     ) -> None:
         """
         포트폴리오를 계산하고 결과를 저장합니다.
@@ -336,7 +366,21 @@ class Experiment:
         )
         save_oos_metrics(oos_metrics, self.oos_metrics_path)
         print("OOS Metrics:", oos_metrics)
-
+        
+        # 성과 지표 LaTeX 표 생성
+        metrics_df = generate_performance_metrics_table(
+            model_dir=self.model_dir,
+            is_years=self.is_years,
+            oos_years=self.oos_years,
+            ensem_res_dir=self.ensem_res_dir,
+            ensem=self.ensem,
+            ws=self.ws,
+            pw=self.pw,
+            ohlc_len=self.ohlc_len,
+            freq=freq,
+            country=self.country
+        )
+        
         # 포트폴리오 매니저 초기화 및 포트폴리오 생성
         if self.delayed_ret != 0:
             delay_list = delay_list + [self.delayed_ret]

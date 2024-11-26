@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 import inquirer
 from datetime import datetime
+from scipy import stats
 
 class StockDataDownloader:
     """주식 데이터 다운로드 및 처리를 위한 클래스"""
@@ -287,207 +288,18 @@ class StockDataDownloader:
         except Exception as e:
             logging.error(f"SPY 데이터 다운로드 실패: {e}")
 
-def create_return_df():
-    """
-    SP500 2018년 구성종목들의 수익률 데이터프레임을 생성합니다.
-    
-    Returns:
-        pd.DataFrame: 인덱스는 날짜, 컬럼은 종목코드인 수익률 데이터프레임
-    """
-    import pandas as pd
-    from pathlib import Path
-    
-    # 파일 경로 설정
-    data_dir = Path(__file__).parent
-    sp500_path = data_dir / 'sp500_20180101.csv'
-    symbol_permno_path = data_dir / 'symbol_permno.csv'
-    filtered_stocks_path = data_dir / 'filtered_stock.csv'
-    
-    # SP500 2018년 구성종목 로드
-    sp500_tickers = pd.read_csv(sp500_path)['Symbol'].tolist()
-    
-    # Symbol-PERMNO 매핑 로드
-    symbol_permno = pd.read_csv(symbol_permno_path)
-    
-    # SP500 종목들의 PERMNO 값 추출
-    sp500_permnos = symbol_permno[symbol_permno['Symbol'].isin(sp500_tickers)]['PERMNO'].tolist()
-    
-    # filtered_stock.csv에서 수익률 데이터 로드
-    stocks_df = pd.read_csv(filtered_stocks_path, parse_dates=['date'])
-    
-    # PERMNO를 Symbol로 변환하기 위한 매핑 딕셔너리 생성
-    permno_to_symbol = dict(zip(symbol_permno['PERMNO'], symbol_permno['Symbol']))
-    
-    # SP500 구성종목만 필터링 (PERMNO 기준) 및 복사본 생성
-    target_stocks = stocks_df[stocks_df['PERMNO'].isin(sp500_permnos)].copy()
-    
-    # PERMNO를 Symbol로 변환
-    target_stocks.loc[:, 'Symbol'] = target_stocks['PERMNO'].map(permno_to_symbol)
-    
-    # 수익률 데이터를 피벗 테이블로 변환
-    return_df = target_stocks.pivot(
-        index='date',
-        columns='Symbol',
-        values='RET'
-    )
-    
-    # 결과 저장
-    return_df.to_csv(data_dir / 'return_df.csv')
-    print(f"수익률 데이터 생성 완료: {return_df.shape}")
-    print(f"기간: {return_df.index.min()} ~ {return_df.index.max()}")
-    print(f"종목 수: {len(return_df.columns)}")
-    
-    return return_df
-
-def setup_logging(log_dir='logs'):
-    """로깅 설정을 초기화합니다."""
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    log_file = os.path.join(log_dir, f'stock_filter_{timestamp}.log')
-    
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
-            logging.StreamHandler()
-        ]
-    )
-    
-    logging.info("로깅 시작")
-    return log_file
-
-def detect_abnormal_stocks(returns, prices, price_jumps_threshold=0.5, recovery_window=5, price_gap_threshold=10):
-    """주가 데이터의 이상치를 탐지하는 향상된 함수입니다."""
-    stocks_to_remove = set()
-    
-    # 전체 기간 수익률이 -100% 이하인 종목 탐지
-    for stock in prices.columns:
-        price_series = prices[stock].dropna()
-        if len(price_series) < 2:
-            continue
-            
-        total_return = (price_series.iloc[-1] / price_series.iloc[0]) - 1
-        if total_return <= -1.0:
-            stocks_to_remove.add(stock)
-            logging.info(f"PERMNO {stock}: 전체 기간 수익률 {total_return:.1%}로 제거 대상")
-    
-    # 급격한 가격 하락 후 빠른 회복 패턴 탐지
-    for stock in prices.columns:
-        price_series = prices[stock].dropna()
-        if len(price_series) < recovery_window:
-            continue
-            
-        for i in range(len(price_series) - recovery_window):
-            window = price_series.iloc[i:i+recovery_window]
-            initial_price = window.iloc[0]
-            min_price = window.min()
-            final_price = window.iloc[-1]
-            
-            if (min_price < initial_price * 0.1 and final_price > initial_price * 0.8):
-                stocks_to_remove.add(stock)
-                break
-    
-    # 연속된 거래일 간의 비정상적인 가격 변동 탐지
-    for stock in prices.columns:
-        price_series = prices[stock].dropna()
-        daily_changes = price_series.pct_change().abs()
-        
-        if (daily_changes > price_gap_threshold).any():
-            stocks_to_remove.add(stock)
-    
-    # 이동평균을 이용한 이상치 탐지
-    window_size = 20
-    for stock in prices.columns:
-        price_series = prices[stock].dropna()
-        if len(price_series) < window_size:
-            continue
-            
-        rolling_mean = price_series.rolling(window=window_size).mean()
-        rolling_std = price_series.rolling(window=window_size).std()
-        
-        z_scores = (price_series - rolling_mean) / rolling_std
-        if (abs(z_scores) > 5).any():
-            stocks_to_remove.add(stock)
-    
-    logging.info(f"이상치 탐지 결과:")
-    logging.info(f"- 전체 기간 수익률 -100% 이하 종목 수: {len([s for s in stocks_to_remove if (prices[s].iloc[-1] / prices[s].iloc[0] - 1) <= -1.0])}개")
-    logging.info(f"- 총 제거 대상 종목 수: {len(stocks_to_remove)}개")
-    
-    return list(stocks_to_remove)
-
-def filter_stocks(
-    input_file, 
-    output_file, 
-    min_trading_days=1000,
-    start_date='2001-01-01', 
-    end_date='2024-08-01',
-    price_jumps_threshold=0.5,
-    recovery_window=5,
-    price_gap_threshold=10
-):
-    """이상치 데이터를 가진 종목을 제거하여 주식 데이터를 필터링합니다."""
-    try:
-        logging.info(f"데이터 필터링 시작: {input_file}")
-        logging.info(f"파라미터 - 최소거래일: {min_trading_days}, 시작일: {start_date}, 종료일: {end_date}")
-    
-        df = pd.read_csv(input_file, parse_dates=['date'])
-        initial_count = len(df)
-        logging.info(f"초기 데이터 수: {initial_count:,}행")
-    
-        df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
-        date_filtered_count = len(df)
-        logging.info(f"날짜 필터링 후 데이터 수: {date_filtered_count:,}행 (제거됨: {initial_count - date_filtered_count:,}행)")
-    
-        trading_days = df.groupby('PERMNO')['date'].count()
-        valid_permnos = trading_days[trading_days >= min_trading_days].index
-        df = df[df['PERMNO'].isin(valid_permnos)]
-        
-        logging.info(f"거래일수 기준 필터링 후 주식 수: {len(valid_permnos):,}개")
-    
-        prices_df = df.pivot(index='date', columns='PERMNO', values='PRC').abs()
-        returns_df = df.pivot(index='date', columns='PERMNO', values='RET')
-        
-        logging.info(f"피벗 데이터 형태 - 가격: {prices_df.shape}, 수익률: {returns_df.shape}")
-    
-        stocks_to_remove = detect_abnormal_stocks(
-            returns=returns_df,
-            prices=prices_df,
-            price_jumps_threshold=price_jumps_threshold,
-            recovery_window=recovery_window,
-            price_gap_threshold=price_gap_threshold
-        )
-        
-        df_cleaned = df[~df['PERMNO'].isin(stocks_to_remove)]
-        final_count = len(df_cleaned)
-        logging.info(f"이상치 종목 제거 후 데이터 수: {final_count:,}행 (제거됨: {initial_count - final_count:,}행)")
-    
-        df_cleaned.to_csv(output_file, index=False)
-        logging.info(f"최종 데이터 저장 완료: {output_file}")
-    
-        return df_cleaned
-    
-    except Exception as e:
-        logging.error(f"에러 발생: {str(e)}", exc_info=True)
-        raise
-
 def main():
-    """메인 실행 함수"""
+    """Main execution function for data download"""
     tasks = [
-        ("1. 종목 정보 추출 (full_ticker.csv 생성)", "extract_symbols"),
-        ("2. 데이터 다운로드 및 필터링 (filtered_ticker.csv 생성)", "filter_stocks"),
-        ("3. S&P 500 종목 확인 및 다운로드", "check_sp500"),
-        ("4. 최종 데이터셋 생성 (Data.csv)", "create_dataset"),
-        ("5. SPY ETF 데이터 다운로드", "download_spy"),
-        ("6. 이상치 데이터 필터링 (filtered_stock.csv)", "filter_abnormal"),
-        ("7. 수익률 데이터프레임 생성 (return_df.csv)", "create_return")
+        ("1. Extract symbols (create full_ticker.csv)", "extract_symbols"),
+        ("2. Download and filter stocks (create filtered_ticker.csv)", "filter_stocks"),
+        ("3. Check and download S&P 500 stocks", "check_sp500"),
+        ("4. Create final dataset (Data.csv)", "create_dataset")
     ]
     
     questions = [
         inquirer.Checkbox('tasks',
-                         message="실행할 작업을 선택하세요 (스페이스바로 선택, 엔터로 확인)",
+                         message="Select tasks to execute (Space to select, Enter to confirm)",
                          choices=[task[0] for task in tasks])
     ]
     
@@ -495,19 +307,19 @@ def main():
     selected_tasks = answers['tasks']
     
     if not selected_tasks:
-        print("작업이 선택되지 않았습니다.")
+        print("No tasks selected.")
         return
         
     downloader = StockDataDownloader()
     
     for task_name in selected_tasks:
         task_id = task_name.split('.')[0]
-        print(f"\n{task_name} 실행 중...")
+        print(f"\nExecuting {task_name}...")
         
         if task_id == "1":
             if os.path.exists('full_ticker.csv'):
                 symbols = pd.read_csv('full_ticker.csv')
-                print(f"이미 다운로드된 종목 수: {len(symbols)}")
+                print(f"Already downloaded symbols: {len(symbols)}")
             else:
                 symbols = downloader.get_exchange_symbols()
                 symbols.to_csv('full_ticker.csv', index=False)
@@ -515,7 +327,7 @@ def main():
         elif task_id == "2":
             if os.path.exists('filtered_ticker.csv'):
                 filtered_symbols = pd.read_csv('filtered_ticker.csv')
-                print(f"이미 다운로드된 종목 수: {len(filtered_symbols)}")
+                print(f"Already downloaded symbols: {len(filtered_symbols)}")
             else:
                 symbols = pd.read_csv('full_ticker.csv')
                 filtered_symbols = downloader.download_and_filter_stocks(symbols)
@@ -528,32 +340,9 @@ def main():
             filtered_symbols = pd.read_csv('filtered_ticker.csv')
             if len(filtered_symbols) > 0:
                 downloader.create_final_dataset(filtered_symbols)
-                print(f"새로 추가된 종목 수: {len(filtered_symbols)}")
-                
-        elif task_id == "5":
-            downloader.download_spy()
-            
-        elif task_id == "6":
-            try:
-                filter_stocks(
-                    input_file='Data.csv',
-                    output_file='filtered_stock.csv',
-                    min_trading_days=1000,
-                    start_date='2001-01-01',
-                    end_date='2024-10-01',
-                    price_jumps_threshold=0.75,
-                    recovery_window=5,
-                    price_gap_threshold=10
-                )
-                print("이상치 필터링 완료")
-            except Exception as e:
-                print(f"이상치 필터링 실패: {str(e)}")
-            
-        elif task_id == "7":
-            create_return_df()
+                print(f"New symbols added: {len(filtered_symbols)}")
     
-    print("\n선택한 모든 작업이 완료되었습니다.")
+    print("\nAll selected tasks completed.")
 
 if __name__ == "__main__":
     main()
-    

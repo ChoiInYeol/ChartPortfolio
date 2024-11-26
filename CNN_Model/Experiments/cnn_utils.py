@@ -19,6 +19,7 @@ from Data.chart_dataset import EquityDataset, TS1DDataset
 from Data import equity_data as eqd
 from Misc import utilities as ut
 import torch.nn as nn
+import math
 
 # 데이터 관련 함수들
 def get_df_from_dataloader(dataloader: DataLoader) -> pd.DataFrame:
@@ -127,18 +128,67 @@ def load_model_state_dict_from_save_path(model_save_path: str, device: torch.dev
     return new_state_dict
 
 # 메트릭 관련 함수들
-def save_training_metrics(model_dir: str, val_df: pd.DataFrame, train_df: Optional[pd.DataFrame], ensem: int) -> None:
-    """학습 메트릭을 저장합니다."""
+def save_training_metrics(
+    model_dir: str,
+    val_df: pd.DataFrame,
+    train_df: Optional[pd.DataFrame],
+    ensem: int,
+    confusion_matrices: Optional[Dict] = None,
+    sample_stats: Optional[Dict] = None,
+    learning_curves: Optional[Dict] = None
+) -> None:
+    """학습 메트릭을 저장합니다.
+    
+    Args:
+        model_dir: 모델 디렉토리 경로
+        val_df: 검증 메트릭 데이터프레임
+        train_df: 학습 메트릭 데이터프레임
+        ensem: 앙상블 수
+        confusion_matrices: 혼동 행렬 데이터
+        sample_stats: 샘플 통계 데이터
+        learning_curves: 학습 곡선 데이터
+    """
     metrics = {
         "validation": val_df.to_dict(),
-        "train": train_df.to_dict() if train_df is not None else None
+        "train": train_df.to_dict() if train_df is not None else None,
+        "confusion_matrices": confusion_matrices,
+        "sample_stats": sample_stats,
+        "learning_curves": learning_curves
     }
     
+    # YAML 파일로 저장
     yaml_path = os.path.join(model_dir, f"training_metrics_ensem{ensem}.yaml")
     with open(yaml_path, 'w') as yaml_file:
         yaml.dump(metrics, yaml_file, default_flow_style=False)
     
-    print(f"학습 메트릭이 {yaml_path}에 저장되었습니다.")
+    # CSV 파일들로도 저장
+    metrics_dir = os.path.join(model_dir, "detailed_metrics")
+    os.makedirs(metrics_dir, exist_ok=True)
+    
+    if val_df is not None:
+        val_df.to_csv(os.path.join(metrics_dir, f"validation_metrics_ensem{ensem}.csv"))
+    if train_df is not None:
+        train_df.to_csv(os.path.join(metrics_dir, f"training_metrics_ensem{ensem}.csv"))
+        
+    # 혼동 행렬 저장
+    if confusion_matrices:
+        confusion_path = os.path.join(metrics_dir, f"confusion_matrices_ensem{ensem}.yaml")
+        with open(confusion_path, 'w') as f:
+            yaml.dump(confusion_matrices, f)
+            
+    # 샘플 통계 저장
+    if sample_stats:
+        stats_path = os.path.join(metrics_dir, f"sample_stats_ensem{ensem}.yaml")
+        with open(stats_path, 'w') as f:
+            yaml.dump(sample_stats, f)
+            
+    # 학습 곡선 저장
+    if learning_curves:
+        curves_path = os.path.join(metrics_dir, f"learning_curves_ensem{ensem}.yaml")
+        with open(curves_path, 'w') as f:
+            yaml.dump(learning_curves, f)
+    
+    print(f"학습 메트릭이 {metrics_dir} 디렉토리에 저장되었습니다.")
 
 def calculate_oos_up_prob(ensem_res: pd.DataFrame) -> pd.Series:
     """OOS 상승 확률을 계산합니다."""
@@ -253,50 +303,70 @@ def load_ensemble_res(
     country: str,
     multiindex: bool = False
 ) -> pd.DataFrame:
-    """앙상블 결과를 로드합니다."""
-    year_list = ([] if year is None else [year] if isinstance(year, int) else year)
+    """앙상블 결과를 로드합니다.
+
+    Args:
+        year: 로드할 연도 또는 연도의 리스트. None인 경우 모든 연도 로드.
+        ensem_res_dir: 앙상블 결과 파일이 저장된 디렉토리 경로.
+        ensem: 앙상블 모델 수.
+        ws: 윈도우 크기.
+        pw: 예측 윈도우 크기.
+        ohlc_len: OHLC 데이터 길이.
+        freq: 주기 (예: 'monthly', 'daily').
+        country: 국가 (예: 'USA').
+        multiindex: 멀티인덱스로 로드할지 여부.
+
+    Returns:
+        앙상블 결과 데이터프레임.
+    """
+    import glob
+
     df_list = []
-    
-    # 경로 확인 및 출력
-    print(f"Checking ensemble results in directory: {ensem_res_dir}")
-    
-    for y in year_list:
-        ohlc_str = f"{ohlc_len}ohlc" if ohlc_len != ws else ""
-        print(f"Loading {ws}d{pw}p{ohlc_str} ensem results for year {y} with freq {freq}")
-        
-        freq_surfix = f"_{freq}"
-        ensem_res_path = os.path.join(ensem_res_dir, f"ensem{ensem}_res_{y}{freq_surfix}.csv")
-        
-        # 파일 존재 여부 확인 및 상세 경로 출력
+
+    # year가 None인 경우 디렉토리 내의 모든 파일 로드
+    if year is None:
+        pattern = os.path.join(ensem_res_dir, f"ensem{ensem}_res_*_{freq}.csv")
+        file_list = glob.glob(pattern)
+        print(f"Loading all ensemble result files from {ensem_res_dir}")
+    else:
+        year_list = [year] if isinstance(year, int) else year
+        file_list = []
+        for y in year_list:
+            ensem_res_path = os.path.join(ensem_res_dir, f"ensem{ensem}_res_{y}_{freq}.csv")
+            file_list.append(ensem_res_path)
+
+    if not file_list:
+        raise FileNotFoundError(f"No ensemble result files found in {ensem_res_dir}")
+
+    for ensem_res_path in file_list:
         if os.path.exists(ensem_res_path):
             print(f"Loading from {ensem_res_path}")
             try:
                 df = pd.read_csv(
                     ensem_res_path,
                     parse_dates=["ending_date"],
-                    index_col=0,
                     engine="python",
                 )
-                df.StockID = df.StockID.astype(str)
+                df["StockID"] = df["StockID"].astype(str)
                 df_list.append(df)
             except Exception as e:
                 print(f"Error loading file {ensem_res_path}: {str(e)}")
         else:
             print(f"Warning: File not found at {ensem_res_path}")
-    
+
     if not df_list:
-        raise FileNotFoundError(f"No ensemble results found in {ensem_res_dir} for years {year_list}")
-    
+        raise FileNotFoundError(f"No ensemble results found in {ensem_res_dir}")
+
     whole_ensemble_res = pd.concat(df_list, ignore_index=True)
     whole_ensemble_res.rename(columns={"ending_date": "Date"}, inplace=True)
     whole_ensemble_res.set_index(["Date", "StockID"], inplace=True)
-    
+
     if country == "USA":
         whole_ensemble_res = whole_ensemble_res[["up_prob", "MarketCap"]]
-        
+
     if not multiindex:
         whole_ensemble_res.reset_index(inplace=True, drop=False)
-        
+
     whole_ensemble_res.dropna(inplace=True)
     return whole_ensemble_res
 
@@ -322,12 +392,13 @@ def load_ensemble_res_with_period_ret(
         ohlc_len=ohlc_len,
         country=country
     )
-    
+
     period_ret = eqd.get_period_ret(freq, country=country)
     print(f"Loading ensem res with {freq} return of no delay")
-    ensem_res["period_ret"] = period_ret[f"next_{freq}_ret"]
-    ensem_res.dropna(inplace=True)
-    
+    ensem_res = ensem_res.reset_index()
+    ensem_res = ensem_res.merge(period_ret, on=["Date", "StockID"], how="left")
+    # ensem_res.dropna(inplace=True)
+
     return ensem_res
 
 # 메트릭 관련 함수들
@@ -528,7 +599,7 @@ def get_exp_params(
     transfer_learning: Optional[str],
     margin: Optional[float] = None
 ) -> Dict[str, Any]:
-    """실험 파라미터 딕셔너리를 생성합니��."""
+    """실험 파라미터 딕셔너리를 생성합니다."""
     params = {
         "window_size": ws,
         "prediction_window": pw,
@@ -579,3 +650,127 @@ def get_model_checkpoint_path(model_dir: str, model_num: int, country: str, tl: 
 def load_ensemble_model_paths(ensem: int, model_dir: str, country: str, tl: Optional[str]) -> List[str]:
     """앙상블 모델 경로 리스트를 반환합니다."""
     return [get_model_checkpoint_path(model_dir, i, country, tl) for i in range(ensem)]
+
+def generate_performance_metrics_table(
+    model_dir: str,
+    is_years: List[int],
+    oos_years: List[int],
+    ensem_res_dir: str,
+    ensem: int,
+    ws: int,
+    pw: int,
+    ohlc_len: int,
+    freq: str,
+    country: str
+) -> pd.DataFrame:
+    """IS/OOS 성과 지표를 DataFrame으로 생성합니다."""
+    
+    def calculate_detailed_metrics(results: Dict[str, int]) -> Dict[str, float]:
+        """상세 분류 메트릭을 계산합니다."""
+        TP = float(results.get('TP', 0))
+        TN = float(results.get('TN', 0))
+        FP = float(results.get('FP', 0))
+        FN = float(results.get('FN', 0))
+        
+        total = TP + TN + FP + FN
+        
+        if total == 0:
+            return {
+                'Total Samples': 0,
+                'True Up %': 0.0,
+                'Predicted Up %': 0.0,
+                'Accuracy %': 0.0,
+                'Precision %': 0.0,
+                'Recall %': 0.0,
+                'F1 Score': 0.0,
+                'MCC': 0.0,
+                'True Positives': 0,
+                'True Negatives': 0,
+                'False Positives': 0,
+                'False Negatives': 0
+            }
+        
+        # 기본 비율 계산
+        true_up_ratio = 100 * (TP + FN) / total
+        pred_up_ratio = 100 * (TP + FP) / total
+        accuracy = 100 * (TP + TN) / total
+        precision = 100 * TP / (TP + FP) if (TP + FP) > 0 else 0.0
+        recall = 100 * TP / (TP + FN) if (TP + FN) > 0 else 0.0
+        
+        # F1 Score
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+        f1 = f1 / 100  # percentage to decimal
+        
+        # MCC
+        try:
+            numerator = (TP * TN) - (FP * FN)
+            denominator = np.sqrt(
+                max(
+                    (TP + FP) * (TP + FN) * (TN + FP) * (TN + FN),
+                    np.finfo(float).eps
+                )
+            )
+            mcc = numerator / denominator if denominator > 0 else 0.0
+            mcc = max(min(mcc, 1.0), -1.0)
+        except Exception as e:
+            print(f"MCC calculation warning: {e}")
+            mcc = 0.0
+        
+        return {
+            'Total Samples': int(total),
+            'True Up %': true_up_ratio,
+            'Predicted Up %': pred_up_ratio,
+            'Accuracy %': accuracy,
+            'Precision %': precision,
+            'Recall %': recall,
+            'F1 Score': f1,
+            'MCC': mcc,
+            'True Positives': int(TP),
+            'True Negatives': int(TN),
+            'False Positives': int(FP),
+            'False Negatives': int(FN)
+        }
+    
+    # IS와 OOS 데이터 로드
+    is_results = load_ensemble_res_with_period_ret(
+        year=is_years,
+        freq=freq,
+        country=country,
+        ensem_res_dir=ensem_res_dir,
+        ensem=ensem,
+        ws=ws,
+        pw=pw,
+        ohlc_len=ohlc_len
+    )
+    
+    oos_results = load_ensemble_res_with_period_ret(
+        year=oos_years,
+        freq=freq,
+        country=country,
+        ensem_res_dir=ensem_res_dir,
+        ensem=ensem,
+        ws=ws,
+        pw=pw,
+        ohlc_len=ohlc_len
+    )
+    
+    # 메트릭 계산
+    is_metrics = calculate_detailed_metrics(is_results)
+    oos_metrics = calculate_detailed_metrics(oos_results)
+    
+    # DataFrame 생성
+    metrics_df = pd.DataFrame({
+        'Metric': list(is_metrics.keys()),
+        'In-Sample': list(is_metrics.values()),
+        'Out-of-Sample': list(oos_metrics.values())
+    })
+    
+    # 저장
+    metrics_dir = os.path.join(model_dir, "detailed_metrics")
+    os.makedirs(metrics_dir, exist_ok=True)
+    csv_path = os.path.join(metrics_dir, f"performance_metrics_{country}_{ws}d{pw}p.csv")
+    
+    metrics_df.to_csv(csv_path, index=False)
+    print(f"성과 지표가 {csv_path}에 저장되었습니다.")
+    
+    return metrics_df

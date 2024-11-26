@@ -113,5 +113,107 @@ def mean_variance(y_return: torch.Tensor, weights: torch.Tensor, risk_aversion: 
     
     return -utility.mean()
 
+def portfolio_return(returns: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
+    """포트폴리오 수익률을 계산합니다.
+    
+    Args:
+        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
+        weights: 포트폴리오 가중치 [batch_size, n_stocks]
+        
+    Returns:
+        포트폴리오 수익률 [batch_size]
+    """
+    # weights를 [batch_size, 1, n_stocks]로 확장
+    weights = weights.unsqueeze(1)
+    
+    # 포트폴리오 수익률 계산 [batch_size, time_steps]
+    portfolio_rets = torch.bmm(weights, returns.transpose(1, 2)).squeeze(1)
+    
+    return portfolio_rets
+
+def portfolio_variance(returns: torch.Tensor, weights: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
+    """포트폴리오 분산을 계산합니다.
+    
+    Args:
+        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
+        weights: 포트폴리오 가중치 [batch_size, n_stocks]
+        eps: 수치 안정성을 위한 작은 값
+        
+    Returns:
+        포트폴리오 분산 [batch_size]
+    """
+    # 공분산 행렬 계산
+    B, T, N = returns.shape
+    returns_centered = returns - returns.mean(dim=1, keepdim=True)
+    cov = torch.bmm(returns_centered.transpose(1, 2), returns_centered) / (T - 1)
+    
+    # 수치 안정성을 위해 대각선에 작은 값 추가
+    cov = cov + torch.eye(N, device=returns.device) * eps
+    
+    # 포트폴리오 분산 계산
+    weights = weights.unsqueeze(2)  # [B, N, 1]
+    port_var = torch.bmm(torch.bmm(weights.transpose(1, 2), cov), weights).squeeze()
+    
+    return port_var
+
+def mean_variance_objective(
+    returns: torch.Tensor,
+    weights: torch.Tensor,
+    risk_aversion: float = 1.0
+) -> torch.Tensor:
+    """평균-분산 목적함수를 계산합니다.
+    
+    Args:
+        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
+        weights: 포트폴리오 가중치 [batch_size, n_stocks]
+        risk_aversion: 위험 회피 계수
+        
+    Returns:
+        negative utility (손실값)
+    """
+    port_return = portfolio_return(returns, weights).mean(dim=1)
+    port_var = portfolio_variance(returns, weights)
+    
+    utility = port_return - (risk_aversion / 2) * port_var
+    return -utility.mean()
+
+def sharpe_ratio_objective(
+    returns: torch.Tensor,
+    weights: torch.Tensor,
+    risk_free_rate: float = 0.0,
+    eps: float = 1e-8
+) -> torch.Tensor:
+    """Sharpe ratio 목적함수를 계산합니다.
+    
+    Args:
+        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
+        weights: 포트폴리오 가중치 [batch_size, n_stocks]
+        risk_free_rate: 무위험 수익률
+        eps: 수치 안정성을 위한 작은 값
+        
+    Returns:
+        negative Sharpe ratio (손실값)
+    """
+    port_return = portfolio_return(returns, weights).mean(dim=1)
+    port_std = torch.sqrt(portfolio_variance(returns, weights) + eps)
+    
+    sharpe = (port_return - risk_free_rate) / port_std
+    return -sharpe.mean()
+
+def minimum_variance_objective(
+    returns: torch.Tensor,
+    weights: torch.Tensor
+) -> torch.Tensor:
+    """최소 분산 목적함수를 계산합니다.
+    
+    Args:
+        returns: 수익률 텐서 [batch_size, time_steps, n_stocks]
+        weights: 포트폴리오 가중치 [batch_size, n_stocks]
+        
+    Returns:
+        포트폴리오 분산 (손실값)
+    """
+    return portfolio_variance(returns, weights).mean()
+
 if __name__ == "__main__":
     pass

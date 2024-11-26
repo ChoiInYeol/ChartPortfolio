@@ -1,12 +1,25 @@
 from Experiments.cnn_experiment import Experiment
 from Model import cnn_model
 from Misc import config as cf
+from Data import dgp_config as dcf
+from Experiments.cnn_utils import (
+    get_portfolio_dir,
+    save_exp_params_to_yaml,
+    save_training_metrics,
+    calculate_oos_up_prob,
+    load_ensemble_res,
+    load_ensemble_res_with_period_ret,
+    save_oos_metrics
+)
 
 from typing import Optional
 import torch
 import os
 import sys
-
+import logging
+from datetime import datetime
+from pathlib import Path
+import pandas as pd
 def set_device(gpu_ids: str) -> torch.device:
     """
     GPU ID를 설정하고 디바이스를 반환합니다.
@@ -85,166 +98,101 @@ def create_model_object(
     
     return model_obj
 
-def process_ensemble_results(exp: Experiment):
+def process_and_save_results(exp: Experiment) -> None:
     """
-    앙상블 결과를 처리하고 ImagePortOpt/Data 폴더에 저장합니다.
-    
-    Args:
-        exp (Experiment): 실험 객체
-    """
-    import pandas as pd
-    import logging
-    from datetime import datetime
-    from pathlib import Path
-    
-    # 로깅 설정
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
-    
-    # 현재 실행 경로(CNN_Model)에서 상위로 올라가서 Data 폴더 경로 설정
-    current_path = Path(__file__).resolve()  # experiment.py의 절대 경로
-    project_root = current_path.parent.parent  # ImagePortOpt 폴더
-    data_dir = project_root / 'Data'
-    data_dir.mkdir(exist_ok=True)
-    
-    logger.info(f"Data directory: {data_dir}")
-    
-    # 앙상블 결과 폴더 경로
-    ensem_res_dir = Path(exp.ensem_res_dir)
-    logger.info(f"Ensemble results directory: {ensem_res_dir}")
-    
-    try:
-        # 해당 폴더의 모든 CSV 파일 처리
-        csv_files = list(ensem_res_dir.glob('*.csv'))
-        if not csv_files:
-            logger.error(f"No CSV files found in {ensem_res_dir}")
-            return
-            
-        all_results = []
-        for csv_file in csv_files:
-            logger.info(f'Processing {csv_file.name}...')
-            
-            df = pd.read_csv(
-                csv_file,
-                parse_dates=['ending_date']
-            )
-            
-            # 필요한 컬럼만 선택
-            df = df[['ending_date', 'StockID', 'up_prob', 'ret_val']]
-            
-            # 컬럼명 변경
-            df = df.rename(columns={
-                'ending_date': 'investment_date',
-                'up_prob': f'up_prob_CNN{exp.ws}'
-            })
-            
-            all_results.append(df)
-            
-        # 모든 결과 병합
-        final_df = pd.concat(all_results, ignore_index=True)
-        
-        # 중복 제거 (같은 날짜, 같은 종목에 대해)
-        final_df = final_df.drop_duplicates(subset=['investment_date', 'StockID'])
-        
-        # 정렬
-        final_df = final_df.sort_values(['investment_date', 'StockID'])
-        
-        # 저장
-        output_filename = f'ensemble_results_CNN{exp.ws}_{datetime.now().strftime("%Y%m%d")}.parquet'
-        output_path = data_dir / output_filename
-        
-        # parquet 형식으로 저장
-        final_df.to_parquet(output_path, index=False)
-        logger.info(f'Saved combined results to {output_path}')
-        logger.info(f'Final shape: {final_df.shape}')
-        
-        # CSV 형식으로도 저장
-        csv_path = data_dir / f'ensemble_results_CNN{exp.ws}_{datetime.now().strftime("%Y%m%d")}.csv'
-        final_df.to_csv(csv_path, index=False)
-        logger.info(f'Also saved as CSV to {csv_path}')
-        
-    except Exception as e:
-        logger.error(f'Error processing ensemble results: {str(e)}')
+    앙상블 결과를 처리하고 저장합니다.
 
-def create_up_prob_pivot(exp: Experiment):
-    """
-    앙상블 결과에서 up_prob를 피벗하여 저장합니다.
-    SP500(2018년 기준) 종목만 필터링하여 저장합니다.
-    
     Args:
         exp (Experiment): 실험 객체
     """
-    import pandas as pd
-    from pathlib import Path
-    import logging
-    from datetime import datetime
-    
-    # 로깅 설정
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
-    
     try:
-        # 현재 실행 경로에서 Data 폴더 경로 설정
-        current_path = Path(__file__).resolve()
-        project_root = current_path.parent.parent
-        data_dir = project_root / 'Data'
-        
-        # SP500 종목 로드
-        sp500_df = pd.read_csv(data_dir / 'sp500_20180101.csv')
-        sp500_symbols = set(sp500_df['Symbol'].tolist())
-        logger.info(f"Loaded {len(sp500_symbols)} SP500 symbols")
-        
-        # 최신 앙상블 결과 파일 찾기
-        ensemble_files = list(data_dir.glob(f'ensemble_results_CNN{exp.ws}_*.csv'))
-        if not ensemble_files:
-            logger.error("앙상블 결과 파일을 찾을 수 없습니다.")
-            return
-            
-        latest_file = max(ensemble_files, key=lambda x: x.stat().st_mtime)
-        logger.info(f"Processing {latest_file.name}")
-        
-        # 데이터 로드
-        df = pd.read_csv(latest_file, parse_dates=['investment_date'])
-        
-        # Symbol-PERMNO 매핑 로드
-        symbol_permno = pd.read_csv(data_dir / 'symbol_permno.csv')
-        permno_to_symbol = dict(zip(symbol_permno['PERMNO'], symbol_permno['Symbol']))
-        
-        # PERMNO를 Symbol로 변환
-        df['Symbol'] = df['StockID'].map(permno_to_symbol)
-        
-        # SP500 종목만 필터링
-        df = df[df['Symbol'].isin(sp500_symbols)]
-        logger.info(f"Filtered to {df['Symbol'].nunique()} SP500 stocks")
-        
-        # up_prob 피벗
-        up_prob_df = df.pivot(
-            index='investment_date',
-            columns='Symbol',
-            values=f'up_prob_CNN{exp.ws}'
+        # 앙상블 결과 로드 (IS와 OOS 모두 포함)
+        ensem_res = load_ensemble_res_with_period_ret(
+            year=None,  # 모든 연도 로드
+            freq=exp.train_freq,
+            country=exp.country,
+            ensem_res_dir=exp.ensem_res_dir,
+            ensem=exp.ensem,
+            ws=exp.ws,
+            pw=exp.pw,
+            ohlc_len=exp.ohlc_len
         )
-        
-        # SP500에 있지만 데이터에 없는 종목 확인
-        missing_symbols = sp500_symbols - set(up_prob_df.columns)
-        if missing_symbols:
-            logger.warning(f"Missing {len(missing_symbols)} SP500 symbols: {sorted(missing_symbols)}")
-        
-        # 파일명 생성
-        freq = exp.train_freq if hasattr(exp, 'train_freq') else 'unknown'
-        model_dim = "1D" if exp.model_obj.ts1d_model else "2D"
-        output_filename = f"{model_dim}_{freq}_{exp.ws}D_{exp.pw}P_up_prob_df.csv"
-        output_path = data_dir / output_filename
-        
+
+        # 상승확률 메트릭 계산 (필요에 따라)
+        # up_prob_metrics = calculate_oos_up_prob(ensem_res)
+
+        # 앙상블 결과에서 필요한 컬럼만 선택
+        ensem_res = ensem_res.reset_index()  # 멀티인덱스를 컬럼으로 변환
+
+        # Date를 datetime으로 변환
+        ensem_res['Date'] = pd.to_datetime(ensem_res['Date'])
+
+        # S&P 500 인덱스 데이터에서 거래일 로드
+        trading_days = pd.read_csv(
+            os.path.join(dcf.FILTERED_DATA_DIR, 'snp500_index.csv'),
+            parse_dates=['Date']
+        )['Date'].sort_values().values
+
+        # 다음 거래일 매핑 함수
+        def get_next_trading_day(date):
+            next_days = trading_days[trading_days > date]
+            return next_days[0] if len(next_days) > 0 else None
+
+        # ending_date의 다음 거래일을 investment_date로 설정
+        ensem_res['investment_date'] = ensem_res['Date'].apply(get_next_trading_day)
+
+        # None 값이 있는 경우 제거 (마지막 거래일 이후의 데이터)
+        ensem_res = ensem_res.dropna(subset=['investment_date'])
+
+        # 최종 컬럼 선택 및 정렬
+        ensem_res = ensem_res[['investment_date', 'StockID', 'up_prob']]
+        ensem_res = ensem_res.sort_values(['investment_date', 'StockID'])
+
+        # StockID를 문자열로 변환
+        ensem_res['StockID'] = ensem_res['StockID'].astype(str)
+
+        # symbol_permno.csv 로드 및 전처리
+        symbol_permno = pd.read_csv(os.path.join(dcf.RAW_DATA_DIR, 'symbol_permno.csv'))
+        symbol_permno['PERMNO'] = symbol_permno['PERMNO'].astype(str)  # PERMNO를 문자열로 변환
+        symbol_permno.rename(columns={'PERMNO': 'StockID'}, inplace=True)  # PERMNO 컬럼을 StockID로 변경
+
+        # 매핑 수행
+        ensem_res = ensem_res.merge(symbol_permno, on='StockID', how='left')
+
+        # Symbol이 없는 행 제거
+        ensem_res = ensem_res.dropna(subset=['Symbol'])
+
+        # 필요한 컬럼만 선택하고 investment_date를 인덱스로 설정
+        ensem_res = ensem_res[['investment_date', 'Symbol', 'up_prob']]
+        ensem_res.set_index('investment_date', inplace=True)
+
+        # pivot 테이블 생성
+        ensem_res = ensem_res.pivot_table(index=ensem_res.index, columns='Symbol', values='up_prob')
+
         # 결과 저장
-        up_prob_df.to_csv(output_path)
-        logger.info(f"Saved up_prob pivot to {output_path}")
-        logger.info(f"Model type: {model_dim}")
-        logger.info(f"Shape: {up_prob_df.shape}")
-        logger.info(f"Period: {up_prob_df.index.min()} ~ {up_prob_df.index.max()}")
-        logger.info(f"Number of stocks: {len(up_prob_df.columns)}")
-        
+        output_path = os.path.join(exp.model_dir, 'ensem_res.csv')
+        ensem_res.to_csv(output_path)
+        print(f"Processed ensemble results saved to {output_path}")
+        print(f"Final shape: {ensem_res.shape}")
+
+        # 메트릭 저장 (필요에 따라)
+        # metrics_dir = Path(exp.model_dir) / "metrics"
+        # metrics_dir.mkdir(exist_ok=True)
+        # exp_params = {
+        #     "model_info": {
+        #         "window_size": exp.ws,
+        #         "prediction_window": exp.pw,
+        #         "train_freq": exp.train_freq,
+        #         "ensemble_size": exp.ensem,
+        #     },
+        #     "metrics": up_prob_metrics.to_dict() if up_prob_metrics is not None else {}
+        # }
+        # save_exp_params_to_yaml(str(metrics_dir), exp_params)
+        # print(f"Results processed and saved to {metrics_dir}")
+
     except Exception as e:
-        logger.error(f"Error creating up_prob pivot: {str(e)}")
+        print(f"Error processing results: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     # GPU ID를 명령줄 인자로 받기
@@ -276,7 +224,7 @@ if __name__ == "__main__":
         ws=ws,
         pw=pw,
         model_obj=model_obj,
-        train_freq="week",
+        train_freq="month",
         ensem=5,
         lr=1e-5,
         drop_prob=0.50,
@@ -288,22 +236,24 @@ if __name__ == "__main__":
         is_years=cf.IS_YEARS,
         oos_years=cf.OOS_YEARS,
         country="USA",
-        chart_type="bar"
+        chart_type="bar",
+        delayed_ret=0
     )
 
-    # 모델 학습
-    exp.train_empirical_ensem_model()
+    # # 모델 학습
+    # exp.train_empirical_ensem_model()
 
     # 포트폴리오 계산
     exp.calculate_portfolio(
         load_saved_data=True,
-        delay_list=[0],
+        delay_list=[0, 1],
+        freq='month',
         is_ensem_res=True,
         cut=10
     )
     
-    # 앙상블 결과 처리 및 저장
-    process_ensemble_results(exp)
-
-    # 앙상블 결과에서 up_prob를 피벗하여 저장
-    create_up_prob_pivot(exp)
+    # 결과 처리 및 저장
+    print("Processing and saving results...")
+    process_and_save_results(exp)
+    
+    print("실험이 성공적으로 완료되었습니다.")

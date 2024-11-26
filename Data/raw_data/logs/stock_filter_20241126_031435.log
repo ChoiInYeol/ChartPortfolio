@@ -1,0 +1,9 @@
+2024-11-26 03:14:35,833 - INFO - Logging started
+2024-11-26 03:14:35,833 - INFO - Starting stock data filtering process
+2024-11-26 03:14:43,553 - INFO - Stocks with sufficient trading days: 2114
+2024-11-26 03:14:52,754 - INFO - Removed 3 stocks based on mean_ret
+2024-11-26 03:14:52,754 - INFO - Removed 2 stocks based on std_ret
+2024-11-26 03:14:52,755 - INFO - Removed 45 stocks based on skew_ret
+2024-11-26 03:14:52,755 - INFO - Removed 34 stocks based on kurt_ret
+2024-11-26 03:15:18,470 - INFO - Filtering complete. Remaining stocks: 2069
+2024-11-26 03:15:18,470 - INFO - Filtered data saved to filtered_stock.csv

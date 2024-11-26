@@ -21,6 +21,8 @@ WORK_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 
 # Data 폴더는 최상위에서 참조
 DATA_DIR = op.join(WORK_DIR, "Data")  # 공통 데이터 폴더
+RAW_DATA_DIR = op.join(DATA_DIR, "raw_data")  # 원본 데이터 폴더
+FILTERED_DATA_DIR = op.join(DATA_DIR, "processed")  # 필터링된 데이터 폴더
 
 # CNN_Model 관련 경로 설정
 CNN_DIR = op.join(WORK_DIR, "CNN_Model")
@@ -38,9 +40,6 @@ STOCKS_USA_TS_DIR = op.join(STOCKS_SAVEPATH, "stocks_USA_ts")
 PORTFOLIO_DIR = op.join(WORK_DIR, "portfolio")
 LOG_DIR = op.join(WORK_DIR, "log")
 LATEX_DIR = op.join(WORK_DIR, "latex")
-
-# 원본 데이터는 최상위 Data 폴더 참조
-RAW_DATA_DIR = DATA_DIR
 
 # 필요한 디렉토리 생성
 for dir_path in [

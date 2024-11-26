@@ -38,22 +38,7 @@ class CNNTrainer:
         early_stop: bool = True,
         enable_tqdm: bool = False
     ) -> Tuple[Dict[str, float], Dict[str, float], nn.Module]:
-        """
-        단일 모델을 학습합니다.
-
-        Args:
-            dataloaders_dict: 학습 및 검증용 데이터로더
-            model_save_path: 모델 저장 경로
-            optimizer: 옵티마이저
-            max_epoch: 최대 에폭 수
-            early_stop: 조기 종료 여부
-            enable_tqdm: tqdm 진행바 사용 여부
-
-        Returns:
-            train_metrics: 학습 메트릭
-            validate_metrics: 검증 메트릭
-            model: 학습된 모델
-        """
+        """단일 모델을 학습합니다."""
         print(f"Training on device {self.device} under {model_save_path}")
         
         since = time.time()
@@ -64,93 +49,128 @@ class CNNTrainer:
             "epoch": 0,
             "diff": 0.0
         }
+        
+        # 학습 과정 추적을 위한 데이터 구조
+        learning_curves = {
+            "train": {"loss": [], "accuracy": [], "mcc": []},
+            "validate": {"loss": [], "accuracy": [], "mcc": []}
+        }
+        
+        confusion_matrices = {
+            "train": {"final": None, "best": None},
+            "validate": {"final": None, "best": None}
+        }
+        
+        sample_stats = {
+            "train": {"total": 0, "positive": 0, "negative": 0},
+            "validate": {"total": 0, "positive": 0, "negative": 0}
+        }
+        
         best_model = copy.deepcopy(self.model.state_dict())
         
-        prev_weight_dict = {}
-        for name, param in self.model.named_parameters():
-            if param.requires_grad and name[-8:] == "0.weight":
-                prev_weight_dict[name] = param.data.clone()
-
+        # 학습 루프
         for epoch in range(max_epoch):
+            epoch_pbar = tqdm(total=len(dataloaders_dict['train']) + len(dataloaders_dict['validate']),
+                             desc=f'Epoch {epoch+1}/{max_epoch}')
+            
             for phase in ["train", "validate"]:
+                running_metrics = self._init_running_metrics()
+                
                 if phase == "train":
                     self.model.train()
                 else:
                     self.model.eval()
-
-                running_metrics = self._init_running_metrics()
-                
-                if enable_tqdm:
-                    data_iterator = tqdm(
-                        dataloaders_dict[phase],
-                        leave=True,
-                        unit="batch",
-                        mininterval=1.0,  # 최소 업데이트 간격 (초)
-                        miniters=100,  # 100 iteration마다 업데이트
-                        desc=f"Epoch {epoch}: {phase}"
-                    )
-                else:
-                    data_iterator = dataloaders_dict[phase]
-
-                batch_count = 0
-                for batch in data_iterator:
+                    
+                # 배치별 진행률 표시
+                for batch in dataloaders_dict[phase]:
                     inputs = batch["image"].to(self.device, dtype=torch.float)
                     labels = batch["label"].to(self.device, dtype=torch.long)
-
+                    
                     with torch.set_grad_enabled(phase == "train"):
                         outputs = self.model(inputs)
                         loss = self.loss_from_model_output(labels, outputs)
                         _, preds = torch.max(outputs, 1)
-
+                        
                         if phase == "train":
                             optimizer.zero_grad()
                             loss.backward()
                             optimizer.step()
-
+                    
                     self._update_running_metrics(loss, labels, preds, running_metrics)
                     
-                    if enable_tqdm and batch_count % 100 == 0:
-                        num_samples = (batch_count + 1) * len(labels)
-                        current_metrics = self._generate_epoch_stat(
-                            epoch,
-                            optimizer.param_groups[0]['lr'],
-                            num_samples,
-                            running_metrics
-                        )
-                        data_iterator.set_postfix({
-                            'loss': f"{current_metrics['loss']:.4f}",
-                            'MCC': f"{current_metrics['MCC']:.4f}"
-                        })
+                    # 현재 배치의 메트릭 계산
+                    batch_metrics = self._calculate_batch_metrics(running_metrics, len(dataloaders_dict[phase].dataset))
                     
-                    batch_count += 1
-                    del inputs, labels
-
-                num_samples = len(dataloaders_dict[phase].dataset)
-                epoch_stat = self._generate_epoch_stat(epoch, optimizer.param_groups[0]['lr'], num_samples, running_metrics)
-
-                if phase == "validate":
-                    if epoch_stat["loss"] < best_validate_metrics["loss"]:
-                        for metric in ["loss", "accy", "MCC", "epoch", "diff"]:
-                            best_validate_metrics[metric] = epoch_stat[metric]
-                        best_model = copy.deepcopy(self.model.state_dict())
-
-            # Early stopping check
+                    # tqdm 진행률 업데이트
+                    epoch_pbar.set_postfix({
+                        'phase': phase,
+                        'loss': f'{batch_metrics["loss"]:.4f}',
+                        'acc': f'{batch_metrics["accuracy"]:.4f}',
+                        'MCC': f'{batch_metrics["mcc"]:.4f}'
+                    })
+                    epoch_pbar.update(1)
+                
+                # 에폭 종료 시 메트릭 계산
+                epoch_metrics = self._generate_epoch_stat(
+                    epoch, 
+                    optimizer.param_groups[0]['lr'],
+                    len(dataloaders_dict[phase].dataset),
+                    running_metrics
+                )
+                
+                # 에폭 종료 시 결과 출력
+                phase_results = (
+                    f"{phase.capitalize()}: "
+                    f"Loss: {epoch_metrics['loss']:.4f}, "
+                    f"Acc: {epoch_metrics['accy']:.4f}, "
+                    f"MCC: {epoch_metrics['MCC']:.4f}"
+                )
+                tqdm.write(phase_results)
+            
+            epoch_pbar.close()
+            
+            # 학습 곡선 업데이트
+            learning_curves[phase]["loss"].append(epoch_metrics["loss"])
+            learning_curves[phase]["accuracy"].append(epoch_metrics["accy"])
+            learning_curves[phase]["mcc"].append(epoch_metrics["MCC"])
+            
+            # 혼동 행렬 저장
+            confusion_matrices[phase]["final"] = {
+                "TP": running_metrics["TP"],
+                "TN": running_metrics["TN"],
+                "FP": running_metrics["FP"],
+                "FN": running_metrics["FN"]
+            }
+            
+            # 최고 성능 모델 저장
+            if phase == "validate" and epoch_metrics["loss"] < best_validate_metrics["loss"]:
+                for metric in best_validate_metrics.keys():
+                    best_validate_metrics[metric] = epoch_metrics[metric]
+                best_model = copy.deepcopy(self.model.state_dict())
+                
+                # 최고 성능 시점의 혼동 행렬 저장
+                confusion_matrices["validate"]["best"] = confusion_matrices["validate"]["final"]
+            
+            # Early stopping 체크
             if early_stop and (epoch - best_validate_metrics["epoch"]) >= 3:
                 break
-
-        time_elapsed = time.time() - since
-        print(f"Training complete in {time_elapsed//60:.0f}m {time_elapsed%60:.0f}s")
-        print(f"Best val loss: {best_validate_metrics['loss']:.4f} at epoch {best_validate_metrics['epoch']}")
-
+        
+        # 최종 결과 저장 및 반환
+        training_summary = {
+            "confusion_matrices": confusion_matrices,
+            "sample_stats": sample_stats,
+            "learning_curves": learning_curves
+        }
+        
         self.model.load_state_dict(best_model)
         best_validate_metrics["model_state_dict"] = self.model.state_dict()
+        best_validate_metrics["training_summary"] = training_summary
         
         torch.save(best_validate_metrics, model_save_path)
         
         train_metrics = self.evaluate(dataloaders_dict["train"])
         train_metrics["epoch"] = best_validate_metrics["epoch"]
         
-        del best_validate_metrics["model_state_dict"]
         return train_metrics, best_validate_metrics, self.model
 
     def loss_from_model_output(self, labels: torch.Tensor, outputs: torch.Tensor) -> torch.Tensor:
@@ -295,3 +315,36 @@ class CNNTrainer:
         one_hot = torch.zeros(labels.size(0), 2, device=self.device)
         one_hot.scatter_(1, labels, 1)
         return one_hot
+
+    def _calculate_batch_metrics(self, running_metrics: Dict[str, float], total_samples: int) -> Dict[str, float]:
+        """
+        배치별 메트릭을 계산합니다.
+        
+        Args:
+            running_metrics: 현재까지의 누적 메트릭
+            total_samples: 전체 샘플 수
+        
+        Returns:
+            배치 메트릭 딕셔너리
+        """
+        TP, TN, FP, FN = (
+            running_metrics["TP"],
+            running_metrics["TN"],
+            running_metrics["FP"],
+            running_metrics["FN"]
+        )
+        
+        current_samples = TP + TN + FP + FN
+        
+        metrics = {
+            "loss": running_metrics["running_loss"] / current_samples,
+            "accuracy": running_metrics["running_correct"] / current_samples
+        }
+        
+        denominator = math.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN))
+        metrics["mcc"] = (
+            0.0 if denominator == 0
+            else (TP * TN - FP * FN) / denominator
+        )
+        
+        return metrics

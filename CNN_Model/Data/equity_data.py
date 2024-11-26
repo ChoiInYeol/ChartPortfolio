@@ -10,7 +10,7 @@ def safe_exp(x):
     return np.exp(np.clip(x, -10, 10))
 
 def create_spy_returns():
-    spy = pd.read_csv(op.join(dcf.RAW_DATA_DIR, "snp500_index.csv"), parse_dates=['Date'], index_col='Date')
+    spy = pd.read_csv(op.join(dcf.FILTERED_DATA_DIR, "snp500_index.csv"), parse_dates=['Date'], index_col='Date')
     spy['Return'] = spy['Adj Close'].pct_change()
     
     for freq in ['week', 'month', 'quarter', 'year']:
@@ -59,17 +59,16 @@ def create_benchmark_returns():
     """
     
     # 벤치마크 데이터 로드
-    path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
+    path = op.join(dcf.FILTERED_DATA_DIR, "filtered_stock.csv")
     df = pd.read_csv(path, parse_dates=['date'])
     df = df.sort_values('date')  # 날짜순으로 정렬
     df['Return'] = df.groupby('PERMNO')['PRC'].pct_change()
     
     # 고유한 거래일 목록 생성
-    trading_days = df['date'].unique()
-    trading_days = pd.Series(trading_days).sort_values()
+    trading_days = pd.Series(df['date'].unique()).sort_values()
     
     # S&P 500 데이터 로드
-    spy_path = op.join(dcf.RAW_DATA_DIR, "snp500_index.csv")
+    spy_path = op.join(dcf.FILTERED_DATA_DIR, "snp500_index.csv")
     spy = pd.read_csv(spy_path, parse_dates=['Date'])
     spy = spy[spy['Date'] >= trading_days.min()]
     
@@ -84,21 +83,23 @@ def create_benchmark_returns():
         benchmark_returns = pd.DataFrame(index=spy_returns.index, columns=['Return'])
         
         for date in benchmark_returns.index:
-            # 거래일 인덱스에서 현재 날짜의 위치 찾기
-            date_idx = trading_days[trading_days <= date].index[-1]
+            # 거래일 중 현재 날짜 이전의 날짜들 찾기
+            valid_days = trading_days[trading_days <= date]
             
+            if len(valid_days) == 0:
+                continue
+                
             if freq == 'week':
                 # 주간 데이터의 경우 해당 날짜 이전 5 거래일 데이터 사용
-                start_idx = max(0, date_idx - 4)  # 5일치 데이터를 위해 4를 뺌
-                period_dates = trading_days.iloc[start_idx:date_idx + 1]
+                period_dates = valid_days.tail(5)
                 period_data = df[df['date'].isin(period_dates)]
             else:
                 # 해당 월/분기/연도의 거래일 찾기
                 same_period_mask = (
-                    (trading_days.dt.year == date.year) & 
-                    (trading_days.dt.month == date.month)
+                    (valid_days.dt.year == date.year) & 
+                    (valid_days.dt.month == date.month)
                 )
-                period_dates = trading_days[same_period_mask]
+                period_dates = valid_days[same_period_mask]
                 period_data = df[df['date'].isin(period_dates)]
             
             if not period_data.empty:
@@ -161,7 +162,7 @@ def processed_US_data():
         print(f"Finish loading processed data in {(time.time() - since) / 60:.2f} min")
         return df.copy()
 
-    raw_us_data_path = op.join(dcf.RAW_DATA_DIR, "filtered_stock.csv")
+    raw_us_data_path = op.join(dcf.FILTERED_DATA_DIR, "filtered_stock.csv")
     print("Reading raw data from {}".format(raw_us_data_path))
     since = time.time()
     df = pd.read_csv(
@@ -271,9 +272,30 @@ def get_processed_US_data_by_year(year):
     return df
 
 def get_period_ret(period, country="USA"):
+    """주기별 수익률 데이터를 가져옵니다. 필요한 경우 새로 생성합니다."""
     assert country == "USA"
     assert period in ["week", "month", "quarter"]
     period_ret_path = op.join(dcf.CACHE_DIR, f"us_{period}_ret.pq")
+    
+    # 파일이 없거나 delay 컬럼이 없는 경우 새로 생성
+    need_update = False
+    if not op.exists(period_ret_path):
+        need_update = True
+    else:
+        try:
+            # 기존 파일 로드
+            period_ret = pd.read_parquet(period_ret_path)
+            # delay 컬럼 확인
+            expected_cols = [f'next_{period}_ret_{d}delay' for d in range(6)]
+            if not all(col in period_ret.columns for col in expected_cols):
+                need_update = True
+        except Exception:
+            need_update = True
+    
+    if need_update:
+        print(f"{period_ret_path} needs update. Creating it now.")
+        create_period_ret_file(period)
+    
     period_ret = pd.read_parquet(period_ret_path)
     period_ret.set_index(["Date", "StockID"], inplace=True)
     period_ret.sort_index(inplace=True)
@@ -300,6 +322,8 @@ def calculate_ret(df, start, end):
     return df
 
 def create_period_ret_file(freq):
+    """주기별 수익률 파일을 생성하고 delay 수익률도 함께 계산합니다."""
+    print(f"Creating period return file for {freq} frequency...")
     stock_path = op.join(dcf.PROCESSED_DATA_DIR, "us_ret.feather")
     if not op.exists(stock_path):
         processed_US_data()  # 필요한 경우 데이터 생성
@@ -308,28 +332,31 @@ def create_period_ret_file(freq):
     stock = stock[['Date', 'StockID', 'MarketCap', 'Close', 'Ret']]
     
     us_freq_ret = stock.copy()
+    
+    # 기본 수익률 계산
+    print("Calculating base returns...")
     us_freq_ret = calculate_next_ret(us_freq_ret, freq)
-    us_freq_ret = calculate_next_ret_delay(us_freq_ret, freq, 0)
+    
+    # delay 수익률 계산 (0부터 시작하여 여러 delay 포함)
+    print("Calculating delayed returns...")
+    for delay in range(6):  # 0부터 5일까지의 delay
+        print(f"Processing delay {delay}...")
+        us_freq_ret = calculate_next_ret_delay(us_freq_ret, freq, delay)
+    
+    # 추가 수익률 계산
+    print("Calculating additional returns...")
     us_freq_ret = calculate_ret(us_freq_ret, 6, 20)
     us_freq_ret = calculate_ret(us_freq_ret, 6, 60)
     
     period_ret_path = op.join(dcf.CACHE_DIR, f"us_{freq}_ret.pq")
     us_freq_ret.to_parquet(period_ret_path)
     print(f"Created {period_ret_path}")
-
-def get_period_ret(period, country="USA"):
-    assert country == "USA"
-    assert period in ["week", "month", "quarter"]
-    period_ret_path = op.join(dcf.CACHE_DIR, f"us_{period}_ret.pq")
     
-    if not op.exists(period_ret_path):
-        print(f"{period_ret_path} not found. Creating it now.")
-        create_period_ret_file(period)
-    
-    period_ret = pd.read_parquet(period_ret_path)
-    period_ret.set_index(["Date", "StockID"], inplace=True)
-    period_ret.sort_index(inplace=True)
-    return period_ret
+    # 데이터 확인
+    delay_cols = [f'next_{freq}_ret_{d}delay' for d in range(6)]
+    for col in delay_cols:
+        nan_count = us_freq_ret[col].isna().sum()
+        print(f"{col}: {nan_count} NaN values")
 
 if __name__ == "__main__":
     create_return_files()
