@@ -224,8 +224,13 @@ class PortfolioTCNWithProb(PortfolioTCN):
         output = self.tcn(x_returns.transpose(1, 2))
         output = self.tempmaxpool(output).squeeze(-1)
         
-        # 상승확률 처리 (첫 번째 예측 시점의 확률 사용)
-        prob_features = self.prob_encoder(x_probs[:, 0, :])
+        # 상승확률 처리
+        # 확률 데이터가 2차원이면 그대로 사용
+        if len(x_probs.shape) == 2:
+            prob_features = self.prob_encoder(x_probs)  # [batch_size, n_stocks]
+        # 3차원이면 마지막 시점의 확률 사용
+        else:
+            prob_features = self.prob_encoder(x_probs[:, -1, :])  # [batch_size, n_stocks]
         
         # 특성 결합
         combined = torch.cat([output, prob_features], dim=1)

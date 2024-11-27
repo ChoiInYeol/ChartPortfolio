@@ -1,0 +1,6 @@
+TS_Model/Result/GRU/portfolio_weights_GRU_noprob_maxsharpe.csv
+TS_Model/Result/GRU/portfolio_weights_GRU_prob_maxsharpe.csv
+TS_Model/Result/TCN/portfolio_weights_TCN_noprob_maxsharpe.csv
+TS_Model/Result/TCN/portfolio_weights_TCN_prob_maxsharpe.csv
+TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_noprob_maxsharpe.csv
+TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_prob_maxsharpe.csv

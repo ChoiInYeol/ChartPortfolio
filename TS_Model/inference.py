@@ -15,18 +15,22 @@ import pickle
 logger = logging.getLogger(__name__)
 
 class ModelInference:
-    def __init__(self, config: Dict[str, Any], model_path: str):
+    def __init__(self, config: Dict[str, Any]):
         """
         추론 클래스 초기화
         
         Args:
             config: 설정 딕셔너리
-            model_path: 모델 가중치 파일 경로
         """
         self.config = config
-        self.model_path = model_path
         self.device = torch.device("cuda" if config["USE_CUDA"] else "cpu")
         
+        # 모델 저장 디렉토리 설정
+        self.model_dir = f"/home/indi/codespace/ImagePortOpt/TS_Model/Result/{config['MODEL']['TYPE']}"
+        
+        # 가장 최신의 체크포인트 찾기
+        self.model_path = self._find_best_checkpoint()
+            
         # 모델 초기화
         self.model = self._load_model()
         
@@ -36,6 +40,67 @@ class ModelInference:
         
         # 데이터 로드
         self._load_data()
+
+    def _find_best_checkpoint(self) -> str:
+        """가장 높은 epoch의 체크포인트를 찾습니다."""
+        try:
+            if not os.path.exists(self.model_dir):
+                raise FileNotFoundError(f"모델 디렉토리를 찾을 수 없습니다: {self.model_dir}")
+            
+            # 체크포인트 파일 목록 가져오기
+            checkpoints = [f for f in os.listdir(self.model_dir) if f.endswith('.pth')]
+            if not checkpoints:
+                raise FileNotFoundError("체크포인트 파일이 없습니다.")
+            
+            # 현재 설정 로깅
+            logger.info("현재 설정:")
+            logger.info(f"- 모델 타입: {self.config['MODEL']['TYPE']}")
+            logger.info(f"- 확률 사용: {self.config['MODEL']['USEPROB']}")
+            logger.info(f"- 손실 함수: {self.config['PORTFOLIO']['OBJECTIVE']}")
+            
+            # 체크포인트 목록 로깅
+            logger.info("발견된 체크포인트 목록:")
+            for ckpt in checkpoints:
+                logger.info(f"- {ckpt}")
+            
+            # 현재 설정과 일치하는 체크포인트 필터링
+            matching_checkpoints = []
+            for ckpt in checkpoints:
+                # 파일명에서 직접 prob 설정 확인
+                if '_prob_' in ckpt:
+                    prob_setting = 'prob'
+                elif '_noprob_' in ckpt:
+                    prob_setting = 'noprob'
+                else:
+                    continue
+                
+                model_type = ckpt.split('_')[1]
+                objective = ckpt.split('_')[-1].split('.')[0]
+                
+                # 설정과 일치하는지 확인
+                if (model_type.upper() == self.config['MODEL']['TYPE'].upper() and
+                    prob_setting == ('prob' if self.config['MODEL']['USEPROB'] else 'noprob') and
+                    objective == self.config['PORTFOLIO']['OBJECTIVE']):
+                    matching_checkpoints.append(ckpt)
+                    logger.info(f"매칭된 체크포인트: {ckpt}")
+                
+            if not matching_checkpoints:
+                logger.error("현재 설정과 일치하는 체크포인트가 없습니다.")
+                logger.error(f"검색 조건: {self.config['MODEL']['TYPE']}, "
+                          f"{'prob' if self.config['MODEL']['USEPROB'] else 'noprob'}, "
+                          f"{self.config['PORTFOLIO']['OBJECTIVE']}")
+                raise FileNotFoundError("현재 설정과 일치하는 체크포인트를 찾을 수 없습니다.")
+            
+            # epoch 기준으로 정렬하여 가장 높은 것 선택
+            best_checkpoint = max(matching_checkpoints, key=lambda x: int(x.split('_')[0]))
+            checkpoint_path = str(Path(self.model_dir) / best_checkpoint)
+            
+            logger.info(f"선택된 체크포인트: {checkpoint_path}")
+            return checkpoint_path
+            
+        except Exception as e:
+            logger.error(f"Error finding best checkpoint: {str(e)}")
+            raise
 
     def _load_data(self):
         """테스트 데이터를 로드합니다."""
@@ -72,7 +137,7 @@ class ModelInference:
     def _load_model(self) -> torch.nn.Module:
         """모델 로드 및 초기화"""
         model_type = self.config['MODEL']['TYPE']
-        use_prob = self.config['MODEL']['USE_PROB']
+        use_prob = self.config['MODEL']['USEPROB']
         
         if model_type == "GRU":
             model_class = PortfolioGRUWithProb if use_prob else PortfolioGRU
@@ -87,7 +152,15 @@ class ModelInference:
                 n_select=self.config['PORTFOLIO']['CONSTRAINTS'].get('CARDINALITY')
             )
         elif model_type == "TCN":
-            model_class = PortfolioTCNWithProb if use_prob else PortfolioTCN
+            # 체크포인트 파일명에서 prob 설정 확인
+            is_prob_checkpoint = '_prob_' in self.model_path
+            
+            # 체크포인트와 현재 설정이 일치하는 모델 클래스 선택
+            if is_prob_checkpoint:
+                model_class = PortfolioTCNWithProb
+            else:
+                model_class = PortfolioTCN
+            
             model = model_class(
                 n_feature=self.config['DATA']['N_STOCKS'],
                 n_output=self.config['DATA']['N_STOCKS'],
@@ -144,7 +217,7 @@ class ModelInference:
             for i in range(len(self.test_x)):
                 x_returns = torch.tensor(self.test_x[i:i+1], dtype=torch.float32).to(self.device)
                 
-                if self.config['MODEL']['USE_PROB']:
+                if self.config['MODEL']['USEPROB']:
                     x_probs = torch.tensor(self.test_prob[i:i+1], dtype=torch.float32).to(self.device)
                     pred = self.model(x_returns, x_probs)
                 else:
@@ -177,7 +250,7 @@ class ModelInference:
             weights_filename = (
                 f"portfolio_weights_"
                 f"{self.config['MODEL']['TYPE']}_"
-                f"{'prob' if self.config['MODEL']['USE_PROB'] else 'no_prob'}_"
+                f"{'prob' if self.config['MODEL']['USEPROB'] else 'noprob'}_"
                 f"{self.config['PORTFOLIO']['OBJECTIVE']}.csv"
             )
             

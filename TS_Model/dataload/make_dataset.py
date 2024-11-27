@@ -29,12 +29,8 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
             index_col=0, parse_dates=True
         )
         
-        # NaN 값 처리 개선
-        returns_df = returns_df.fillna(method='ffill').fillna(method='bfill')
-        
-        # 로그 수익률 변환 (이미 로그 수익률이 아닌 경우)
-        if not is_log_returns(returns_df):  # 적절한 검증 함수 필요
-            returns_df = np.log(returns_df + 1)
+        # NaN 값 처리
+        returns_df = returns_df.fillna(0)  # 수익률의 NaN을 0으로 채움
         
         # NaN 처리 결과 로깅
         logging.info(f"데이터 로드 완료")

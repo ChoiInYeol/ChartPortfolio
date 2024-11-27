@@ -25,8 +25,8 @@ USE_CUDA: true
 
 MODEL:
   TYPE: 'TCN'  # ['GRU', 'TCN', 'TRANSFORMER']
-  USE_PROB: false  # 확률 기반 모델 사용 여부
-  N_STOCKS: 50  # 추가
+  USEPROB: false  # USE_PROB -> USEPROB
+  NSTOCKS: 50    # N_STOCKS -> NSTOCKS
   
   # GRU parameters
   N_LAYER: 1
@@ -68,9 +68,10 @@ TRAINING:
   USE_DATA_PARALLEL: false
 PORTFOLIO:
   # 목적함수 설정
-  OBJECTIVE: 'sharpe_ratio'  # ['mean_variance', 'minimum_variance', 'sharpe_ratio']
-  RISK_AVERSION: 1.0
-  RISK_FREE_RATE: 0.02
+  OBJECTIVE: 'maxsharpe'  # max_sharpe -> maxsharpe
+  # ['meanvar', 'minvar', 'maxsharpe']
+  RISKAVERSION: 1.0   # RISK_AVERSION -> RISKAVERSION
+  RISKFREERATE: 0.02  # RISK_FREE_RATE -> RISKFREERATE
   
   # 제약조건
   CONSTRAINTS:

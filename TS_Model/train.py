@@ -19,6 +19,7 @@ from pathlib import Path
 import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
+import torch.nn as nn
 
 import traceback
 
@@ -78,17 +79,17 @@ class Trainer:
     def _get_loss_function(self):
         """손실 함수를 반환합니다."""
         loss_type = self.config['PORTFOLIO']['OBJECTIVE']
-        if loss_type == "mean_variance":
+        if loss_type == "meanvar":
             return lambda returns, weights: mean_variance_loss(
                 returns, weights, 
-                risk_aversion=self.config['PORTFOLIO']['RISK_AVERSION']
+                risk_aversion=self.config['PORTFOLIO']['RISKAVERSION']
             )
-        elif loss_type == "minimum_variance":
+        elif loss_type == "minvar":
             return minimum_variance_loss
-        elif loss_type == "sharpe_ratio":
+        elif loss_type == "maxsharpe":
             return lambda returns, weights: sharpe_ratio_loss(
                 returns, weights,
-                risk_free_rate=self.config['PORTFOLIO']['RISK_FREE_RATE']
+                risk_free_rate=self.config['PORTFOLIO']['RISKFREERATE']
             )
         else:
             raise ValueError(f"Unknown loss function: {loss_type}")
@@ -201,7 +202,7 @@ class Trainer:
                 if val_loss < self.best_val_loss:
                     self.best_val_loss = val_loss
                     self.patience_counter = 0
-                    self._save_checkpoint(epoch, val_loss)
+                    self._save_checkpoint(epoch, self.model, self.optimizer, None, val_loss)
                 else:
                     self.patience_counter += 1
                     
@@ -255,41 +256,33 @@ class Trainer:
                     weights = self.model(returns)
                 loss = self.criterion(returns, weights)
             
-            # loss 값 스케일 조정 (로깅용)
-            display_loss = loss.item() * 100  # 예: 100을 곱하여 표시
-            total_loss += display_loss
+            total_loss += loss.item()
         
-        avg_loss = total_loss / len(dataloader)
-        
-        # 로그 포맷 지정
-        if is_training:
-            logger.info(f"Training Loss: {avg_loss:.2f}")  # 소수점 2자리까지만 표시
-        else:
-            logger.info(f"Validation Loss: {avg_loss:.2f}")
-        
-        return avg_loss
+        return total_loss / len(dataloader)
 
-    def _save_checkpoint(self, epoch: int, loss: float):
+    def _save_checkpoint(self, epoch: int, model: nn.Module, optimizer: torch.optim.Optimizer, 
+                        scheduler: torch.optim.lr_scheduler._LRScheduler, loss: float):
         """체크포인트를 저장합니다."""
-        if not self.distributed or self.local_rank == 0:
-            checkpoint = {
-                'epoch': epoch,
-                'model_state_dict': self.model.state_dict(),
-                'optimizer_state_dict': self.optimizer.state_dict(),
-                'loss': loss,
-                'train_losses': self.train_losses,
-                'val_losses': self.val_losses,
-                'epochs': self.epochs
-            }
-            
-            # 새로운 파일명 형식 적용
-            filename = f"{epoch}_{self.config['MODEL']['TYPE']}_{loss:.4f}_"\
-                    f"{'prob' if self.use_prob else 'no_prob'}_"\
-                    f"{self.config['PORTFOLIO']['OBJECTIVE']}.pth"
-            
-            checkpoint_path = os.path.join(self.model_dir, filename)
-            torch.save(checkpoint, checkpoint_path)
-            logger.info(f"Saved checkpoint to {checkpoint_path}")
+        prob_setting = 'prob' if self.config['MODEL']['USEPROB'] else 'noprob'
+        
+        checkpoint_name = (
+            f"{epoch}_{self.config['MODEL']['TYPE']}_"
+            f"{loss:.4f}_{prob_setting}_{self.config['PORTFOLIO']['OBJECTIVE']}.pth"
+        )
+        
+        checkpoint_path = self.model_dir / checkpoint_name
+        
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'scheduler_state_dict': scheduler.state_dict() if scheduler else None,
+            'loss': loss,
+            'config': self.config
+        }
+        
+        torch.save(checkpoint, checkpoint_path)
+        logger.info(f"체크포인트 저장됨: {checkpoint_path}")
 
     def _find_latest_checkpoint(self):
         """현재 설정과 일치하는 체크포인트 중 loss가 가장 낮은 것을 찾습니다."""
@@ -391,7 +384,7 @@ class Trainer:
             self.val_prob = val_data[2].astype("float32")
             self.val_dates = self.dates_dict['val']
             
-            # Test 데이터 처리
+            # Test 데터 처리
             test_data = data_dict['test']
             self.test_x = process_data(test_data[0])
             self.test_y = process_data(test_data[1], normalize=False)
@@ -562,7 +555,7 @@ class Trainer:
             dist.destroy_process_group()
 
     def predict(self, data_type: str = 'train') -> np.ndarray:
-        """지정된 데이터셋에 대한 포트폴리오 가중치를 예측합니다."""
+        """���정된 데이터셋에 대한 포트폴리오 가중치를 예측합니다."""
         self.model.eval()
         
         # 데이터셋 선택

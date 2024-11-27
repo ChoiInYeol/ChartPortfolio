@@ -425,8 +425,13 @@ class PortfolioTransformerWithProb(PortfolioTransformer):
         e_outputs = self.encoder(x_returns, mask)
         e_outputs = self.tempmaxpool(e_outputs.transpose(1, 2)).squeeze(-1)
         
-        # 상승확률 처리 (첫 번째 예측 시점의 확률 사용)
-        prob_features = self.prob_encoder(x_probs[:, 0, :])
+        # 상승확률 처리
+        # 확률 데이터가 단일 시점이면 차원 추가
+        if len(x_probs.shape) == 2:
+            x_probs = x_probs.unsqueeze(1)  # [batch_size, 1, n_stocks]
+            prob_features = self.prob_encoder(x_probs.squeeze(1))  # [batch_size, n_stocks]
+        else:
+            prob_features = self.prob_encoder(x_probs[:, -1, :])  # 마지막 시점의 확률 사용
         
         # 특성 결합
         combined = torch.cat([e_outputs, prob_features], dim=1)

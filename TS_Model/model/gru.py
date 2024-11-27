@@ -212,16 +212,25 @@ class PortfolioGRUWithProb(PortfolioGRU):
         """
         # 수익률과 확률 시퀀스 처리
         returns_out, _ = self.gru(x_returns)
+        
+        # 확률 데이터가 단일 시점이면 차원 추가
+        if len(x_probs.shape) == 2:
+            x_probs = x_probs.unsqueeze(1)  # [batch_size, 1, n_stocks]
         prob_out, _ = self.gru_prob(x_probs)
         
         # 마지막 타임스텝의 특성 추출
         h_returns = returns_out[:, -1, :]
-        h_prob = prob_out[:, -1, :]
+        
+        # prob_out이 3차원이면 마지막 타임스텝 사용, 2차원이면 그대로 사용
+        if len(prob_out.shape) == 3:
+            h_prob = prob_out[:, -1, :]
+        else:
+            h_prob = prob_out
         
         # 특성 결합
         combined = torch.cat([h_returns, h_prob], dim=1)
         
-        # 종목 선택
+        # 나머지 코드는 동일
         attention_scores = self.attention(combined)
         attention_weights = torch.sigmoid(attention_scores)
         
