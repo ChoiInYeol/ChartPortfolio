@@ -578,7 +578,8 @@ class GenerateStockData(object):
         self.stock_id_list = np.unique(self.df.index.get_level_values("StockID"))
         
         # CPU 코어 수에 맞춰 청크 크기 조정
-        num_processes = mp.cpu_count()
+        num_processes = mp.cpu_count() - 8 # 안정성을 위한 4개 코어 제외
+        print(f"Number of CPU cores: {num_processes}")
         # 2019년 이후 데이터는 더 작은 청크 사이즈 사용
         chunk_size = max(5, len(self.stock_id_list) // (num_processes * 8)) if self.year >= 2019 else max(10, len(self.stock_id_list) // (num_processes * 4))
         

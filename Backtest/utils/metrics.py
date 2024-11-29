@@ -19,15 +19,71 @@ class PerformanceMetrics:
         """
         self.logger = logging.getLogger(__name__)
 
+    def calculate_portfolio_returns(self, 
+                                  returns: pd.DataFrame,
+                                  weights: pd.DataFrame,
+                                  rebalancing_freq: int = 20) -> pd.Series:
+        """
+        포트폴리오 수익률을 계산합니다.
+        
+        Args:
+            returns (pd.DataFrame): 일별 수익률
+            weights (pd.DataFrame): 포트폴리오 가중치
+            rebalancing_freq (int): 리밸런싱 주기 (거래일 기준)
+            
+        Returns:
+            pd.Series: 일별 포트폴리오 수익률
+        """
+        portfolio_returns = pd.Series(index=returns.index, dtype=float)
+        
+        # 리밸런싱 날짜 찾기
+        rebalancing_dates = weights.index
+        
+        # 각 리밸런싱 기간별로 수익률 계산
+        for i in range(len(rebalancing_dates)-1):
+            start_date = rebalancing_dates[i]
+            end_date = rebalancing_dates[i+1]
+            
+            # 현재 가중치
+            current_weights = weights.loc[start_date]
+            
+            # 해당 기간의 수익률 계산
+            period_returns = returns.loc[start_date:end_date]
+            # start_date의 수익률은 포함하지 않음 (이미 가중치에 반영됨)
+            period_returns = period_returns.iloc[1:]
+            
+            # 일별 포트폴리오 수익률 계산
+            daily_returns = (period_returns * current_weights).sum(axis=1)
+            portfolio_returns.loc[period_returns.index] = daily_returns
+            
+            # 가중치 업데이트 (수익률에 따른 비중 변화 반영)
+            if not period_returns.empty:
+                current_weights = current_weights * (1 + period_returns).prod()
+                current_weights = current_weights / current_weights.sum()
+        
+        # 마지막 기간 처리
+        if len(rebalancing_dates) > 0:
+            last_date = rebalancing_dates[-1]
+            last_weights = weights.loc[last_date]
+            last_returns = returns.loc[last_date:]
+            # 첫날 수익률 제외
+            last_returns = last_returns.iloc[1:]
+            
+            if not last_returns.empty:
+                daily_returns = (last_returns * last_weights).sum(axis=1)
+                portfolio_returns.loc[last_returns.index] = daily_returns
+        
+        return portfolio_returns
+
     def calculate_portfolio_metrics(self, 
-                                  returns: pd.Series, 
+                                  returns: pd.Series,
                                   weights: Optional[pd.DataFrame] = None,
                                   benchmark_returns: Optional[pd.Series] = None) -> Dict[str, float]:
         """
         포트폴리오 성과 지표를 계산합니다.
         
         Args:
-            returns (pd.Series): 수익률 시계열
+            returns (pd.Series): 일별 수익률
             weights (pd.DataFrame, optional): 포트폴리오 가중치
             benchmark_returns (pd.Series, optional): 벤치마크 수익률
             

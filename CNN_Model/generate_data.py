@@ -67,19 +67,28 @@ if __name__ == "__main__":
     test_years = [2005]  # 테스트용 연도
     test_ws = [20]      # 테스트용 윈도우 사이즈
     
-    print("\nGenerating test data...")
-    generate_training_data(
-        year_list=test_years,
-        ws_list=test_ws,
-        freq='month',     # 일별 데이터 생성
-        chart_type='bar'
-    ) 
+    # print("\nGenerating test data...")
+    # generate_training_data(
+    #     year_list=test_years,
+    #     ws_list=test_ws,
+    #     freq='month',     # 일별 데이터 생성
+    #     chart_type='bar'
+    # ) 
+    
+    # # 테스트가 성공하면 전체 데이터 생성
+    # print("\nGenerating full dataset...")
+    # generate_training_data(
+    #     year_list=cf.IS_YEARS + cf.OOS_YEARS,
+    #     ws_list=[20],
+    #     freq='month',
+    #     chart_type='bar',
+    # )
     
     # 테스트가 성공하면 전체 데이터 생성
     print("\nGenerating full dataset...")
     generate_training_data(
-        year_list=cf.IS_YEARS + cf.OOS_YEARS,
+        year_list=cf.IS_YEARS,
         ws_list=[20],
-        freq='month',
+        freq='day',
         chart_type='bar',
     )

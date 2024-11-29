@@ -1,6 +1,26 @@
-TS_Model/Result/GRU/portfolio_weights_GRU_noprob_maxsharpe.csv
-TS_Model/Result/GRU/portfolio_weights_GRU_prob_maxsharpe.csv
-TS_Model/Result/TCN/portfolio_weights_TCN_noprob_maxsharpe.csv
-TS_Model/Result/TCN/portfolio_weights_TCN_prob_maxsharpe.csv
-TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_noprob_maxsharpe.csv
-TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_prob_maxsharpe.csv
+benchmarks:
+  # 기본 벤치마크
+  Naive: results/weights/naive.csv
+  CNN_Top: results/weights/cnn_top.csv
+  
+  # 최적화 벤치마크
+  MaxSharpe: results/weights/max_sharpe.csv
+  MinVar: results/weights/min_var.csv
+  MinCVaR: results/weights/min_cvar.csv
+  
+  # CNN + 최적화 벤치마크
+  CNN_MaxSharpe: results/weights/cnn_max_sharpe.csv
+  CNN_MinVar: results/weights/cnn_min_var.csv
+  CNN_MinCVaR: results/weights/cnn_min_cvar.csv
+
+# 시계열 모델 가중치
+ts_models:
+  GRU:
+    noprob: ../TS_Model/Result/GRU/portfolio_weights_GRU_noprob_maxsharpe.csv
+    prob: ../TS_Model/Result/GRU/portfolio_weights_GRU_prob_maxsharpe.csv
+  TCN:
+    noprob: ../TS_Model/Result/TCN/portfolio_weights_TCN_noprob_maxsharpe.csv
+    prob: ../TS_Model/Result/TCN/portfolio_weights_TCN_prob_maxsharpe.csv
+  TRANSFORMER:
+    noprob: ../TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_noprob_maxsharpe.csv
+    prob: ../TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_prob_maxsharpe.csv
