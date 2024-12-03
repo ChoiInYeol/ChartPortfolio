@@ -37,7 +37,6 @@ class PortfolioGRU(nn.Module):
         self.n_stocks = n_stocks
         
         # Score Block (h1)
-        # GRU를 통한 시계열 특성 추출
         self.gru = nn.GRU(
             n_stocks, hidden_dim,
             num_layers=n_layers,
@@ -47,8 +46,17 @@ class PortfolioGRU(nn.Module):
         
         self.scale = 2 if bidirectional else 1
         
-        # 종목별 score 생성을 위한 레이어
-        self.score_layer = nn.Sequential(
+        # 종목 선택을 위한 attention 레이어
+        self.attention = nn.Sequential(
+            nn.Linear(hidden_dim * self.scale, hidden_dim),
+            nn.LayerNorm(hidden_dim),
+            nn.SiLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(hidden_dim, n_stocks)
+        )
+        
+        # 선택된 종목의 비중 결정을 위한 레이어
+        self.score_layers = nn.Sequential(
             nn.Linear(hidden_dim * self.scale, hidden_dim),
             nn.LayerNorm(hidden_dim),
             nn.SiLU(),
@@ -67,31 +75,77 @@ class PortfolioGRU(nn.Module):
         Returns:
             포트폴리오 비중 [batch_size, n_stocks]
         """
-        # Score Block (h1): 시계열 특성 추출
+        # Score Block (h1)
         output, _ = self.gru(x)
         h_t = output[:, -1, :]  # 마지막 타임스텝의 특성
         
-        # 종목별 score 생성
-        scores = self.score_layer(h_t)
+        # 종목 선택
+        attention_scores = self.attention(h_t)
+        attention_weights = torch.sigmoid(attention_scores)
         
-        # Portfolio Block (h2): 제약조건을 만족하는 가중치 생성
+        # Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
         
-        # 1. Cardinality 제약 처리
-        if self.n_select < self.n_stocks:
-            topk_values, topk_indices = torch.topk(scores, self.n_select, dim=1)
-            mask = torch.zeros_like(scores).scatter_(1, topk_indices, 1.0)
-            scores = scores * mask
+        # 마스크 생성
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
         
-        # 2. Long-only 제약을 위한 softmax
+        # 선택된 종목에 대한 비중 계산
+        scores = self.score_layers(h_t)
         weights = F.softmax(scores, dim=-1)
         
-        # 3. Maximum Position 제약
-        weights = torch.clamp(weights, self.lb, self.ub)
+        # 선택되지 않은 종목은 0으로 마스킹
+        masked_weights = weights * mask
         
-        # 4. 정규화 (sum to 1)
-        weights = weights / (weights.sum(dim=1, keepdim=True) + 1e-8)
+        # 비중 재조정
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
         
-        return weights
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(w, self.lb, self.ub) 
+            for w in normalized_weights
+        ])
+        
+        return final_weights
+
+    def rebalance(self, weight: torch.Tensor, lb: float, ub: float) -> torch.Tensor:
+        """
+        포트폴리오 비중 재조정
+        
+        Args:
+            weight: 초기 비중
+            lb: 최소 비중
+            ub: 최대 비중
+            
+        Returns:
+            재조정된 비중
+        """
+        # 선택된 종목만 재조정
+        selected_mask = (weight > 0).float()
+        weight = weight * selected_mask
+        
+        weight_clamped = torch.clamp(weight, lb, ub)
+        total_excess = weight_clamped.sum() - 1.0
+
+        while abs(total_excess) > 1e-6:
+            if total_excess > 0:
+                # 초과분 처리
+                adjustable = (weight_clamped > lb) & (selected_mask == 1)
+                if not adjustable.any():
+                    break
+                adjustment = total_excess / adjustable.sum()
+                weight_clamped[adjustable] -= adjustment
+            else:
+                # 부족분 처리
+                adjustable = (weight_clamped < ub) & (selected_mask == 1)
+                if not adjustable.any():
+                    break
+                adjustment = -total_excess / adjustable.sum()
+                weight_clamped[adjustable] += adjustment
+            
+            weight_clamped = torch.clamp(weight_clamped, lb, ub)
+            total_excess = weight_clamped.sum() - 1.0
+
+        return weight_clamped
 
 class PortfolioGRUWithProb(PortfolioGRU):
     def __init__(
@@ -120,8 +174,7 @@ class PortfolioGRUWithProb(PortfolioGRU):
         """
         super().__init__(n_layers, hidden_dim, n_stocks, dropout_p, bidirectional, lb, ub, n_select)
         
-        # Score Block (h1)
-        # 1. 상승확률을 위한 GRU
+        # 상승확률 인코딩을 위한 GRU
         self.gru_prob = nn.GRU(
             n_stocks, hidden_dim,
             num_layers=n_layers,
@@ -129,8 +182,16 @@ class PortfolioGRUWithProb(PortfolioGRU):
             bidirectional=bidirectional
         )
         
-        # 2. 결합된 특성으로부터 score 생성을 위한 레이어
-        self.score_layer = nn.Sequential(
+        # 결합된 특성을 처리하기 위한 레이어 수정
+        self.attention = nn.Sequential(
+            nn.Linear(hidden_dim * self.scale * 2, hidden_dim),
+            nn.LayerNorm(hidden_dim),
+            nn.SiLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(hidden_dim, n_stocks)
+        )
+        
+        self.score_layers = nn.Sequential(
             nn.Linear(hidden_dim * self.scale * 2, hidden_dim),
             nn.LayerNorm(hidden_dim),
             nn.SiLU(),
@@ -149,43 +210,50 @@ class PortfolioGRUWithProb(PortfolioGRU):
         Returns:
             포트폴리오 비중 [batch_size, n_stocks]
         """
-        # Score Block (h1): 시계열 특성 추출
-        # 1. 수익률 시퀀스 처리
+        # 수익률과 확률 시퀀스 처리
         returns_out, _ = self.gru(x_returns)
-        h_returns = returns_out[:, -1, :]
         
-        # 2. 상승확률 처리
         # 확률 데이터가 단일 시점이면 차원 추가
         if len(x_probs.shape) == 2:
             x_probs = x_probs.unsqueeze(1)  # [batch_size, 1, n_stocks]
         prob_out, _ = self.gru_prob(x_probs)
-        h_prob = prob_out[:, -1, :]
         
-        # 3. 특성 결합
+        # 마지막 타임스텝의 특성 추출
+        h_returns = returns_out[:, -1, :]
+        
+        # prob_out이 3차원이면 마지막 타임스텝 사용, 2차원이면 그대로 사용
+        if len(prob_out.shape) == 3:
+            h_prob = prob_out[:, -1, :]
+        else:
+            h_prob = prob_out
+        
+        # 특성 결합
         combined = torch.cat([h_returns, h_prob], dim=1)
         
-        # 4. 종목별 score 생성
-        scores = self.score_layer(combined)
+        # 나머지 코드는 동일
+        attention_scores = self.attention(combined)
+        attention_weights = torch.sigmoid(attention_scores)
         
-        # Portfolio Block (h2): 제약조건을 만족하는 가중치 생성
+        # Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
         
-        # 1. Cardinality 제약 처리
-        if self.n_select < self.n_stocks:
-            topk_values, topk_indices = torch.topk(scores, self.n_select, dim=1)
-            mask = torch.zeros_like(scores).scatter_(1, topk_indices, 1.0)
-            scores = scores * mask
+        # 마스크 생성
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
         
-        # 2. Long-only 제약을 위한 softmax
+        # 선택된 종목에 대한 비중 계산
+        scores = self.score_layers(combined)
         weights = F.softmax(scores, dim=-1)
         
-        # 3. 희소성 처리: 임계값보다 작은 가중치는 0으로 설정
-        threshold = 0.02  # 2% 임계값
-        weights = torch.where(weights > threshold, weights, torch.zeros_like(weights))
+        # 선택되지 않은 종목은 0으로 마스킹
+        masked_weights = weights * mask
         
-        # 4. Maximum Position 제약
-        weights = torch.clamp(weights, self.lb, self.ub)
+        # 비중 재조정
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
         
-        # 5. 정규화 (sum to 1)
-        weights = weights / (weights.sum(dim=1, keepdim=True) + 1e-8)
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(w, self.lb, self.ub) 
+            for w in normalized_weights
+        ])
         
-        return weights
+        return final_weights

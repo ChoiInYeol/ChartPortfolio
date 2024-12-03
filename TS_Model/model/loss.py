@@ -23,25 +23,6 @@ def batch_covariance(returns: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
     cov = cov + torch.eye(N, device=returns.device) * eps
     return cov
 
-def constraint_penalty(weights: torch.Tensor, lb: float = 0.0, ub: float = 0.1) -> torch.Tensor:
-    """
-    포트폴리오 제약조건 위반에 대한 패널티
-    
-    Args:
-        weights: 포트폴리오 가중치 [batch_size, n_stocks]
-        lb: 최소 비중
-        ub: 최대 비중
-    """
-    # 제약조건 위반 정도 계산
-    min_violation = torch.relu(lb - weights)  # 최소 비중 위반
-    max_violation = torch.relu(weights - ub)  # 최대 비중 위반
-    sum_violation = torch.abs(weights.sum(dim=1) - 1.0)  # 합이 1 위반
-    
-    # 패널티 계수 (하이퍼파라미터로 조정 가능)
-    penalty_coef = 100.0
-    
-    return penalty_coef * (min_violation.sum() + max_violation.sum() + sum_violation.sum())
-
 def max_sharpe(returns: torch.Tensor, weights: torch.Tensor, risk_free_rate: float = 0.02) -> torch.Tensor:
     """
     Sharpe ratio를 최대화하는 손실 함수입니다.
@@ -77,43 +58,28 @@ def max_sharpe(returns: torch.Tensor, weights: torch.Tensor, risk_free_rate: flo
     # 스케일 조정 (예: 100을 곱하여 -100 ~ 100 범위로 조정)
     sharpe_loss = -sharpe.mean() * 100  # 최대화를 위해 음수 반환
     
-    # 제약조건 패널티 추가
-    constraint_loss = constraint_penalty(weights)
-    
-    return sharpe_loss + constraint_loss
+    return sharpe_loss
 
 def mean_variance(returns: torch.Tensor, weights: torch.Tensor, risk_aversion: float = 1.0) -> torch.Tensor:
-    """
-    평균-분산 최적화를 위한 손실 함수입니다.
-
-    Args:
-        returns (torch.Tensor): 수익률 텐서 [batch_size, time_steps, n_stocks]
-        weights (torch.Tensor): 포트폴리오 가중치 [batch_size, n_stocks]
-        risk_aversion (float): 위험 회피 계수
-
-    Returns:
-        torch.Tensor: negative utility (손실값)
-    """
-    weights = weights.unsqueeze(1)  # [B, 1, N]
+    """평균-분산 최적화를 위한 손실 함수"""
+    # 수익률 정규화
+    returns_normalized = (returns - returns.mean(dim=1, keepdim=True)) / (returns.std(dim=1, keepdim=True) + 1e-8)
     
-    # 기대수익률 계산
-    mean_return = returns.mean(dim=1, keepdim=True).transpose(1, 2)  # [B, N, 1]
-    port_return = torch.bmm(weights, mean_return).squeeze()  # [B, 1]
+    # 포트폴리오 수익률 계산
+    port_returns = torch.bmm(weights.unsqueeze(1), returns_normalized.transpose(1, 2)).squeeze()
     
-    # 포트폴리오 분산 계산
-    covmat = batch_covariance(returns)  # [B, N, N]
-    port_var = torch.bmm(weights, torch.bmm(covmat, weights.transpose(1, 2))).squeeze()  # [B, 1]
+    # 안정적인 공분산 계산
+    covmat = batch_covariance(returns_normalized)
+    port_var = torch.bmm(weights.unsqueeze(1), torch.bmm(covmat, weights.transpose(1, 2))).squeeze()
     
-    # 효용함수 = 기대수익률 - (위험회피계수/2) * 분산
-    utility = port_return - (risk_aversion / 2) * port_var
+    # 다양성 페널티
+    weights_var = weights.var(dim=1)  # 가중치 분포의 분산
+    diversity_penalty = 10.0 * weights_var  # 다양성 유지를 위한 페널티
     
-    # 스케일 조정
-    mv_loss = -utility.mean() * 100
+    # 최종 손실 함수
+    utility = port_returns - (risk_aversion * port_var) - diversity_penalty
     
-    # 제약조건 패널티 추가
-    constraint_loss = constraint_penalty(weights)
-    
-    return mv_loss + constraint_loss
+    return -utility.mean() * 100
 
 # 기존 인터페이스와의 호환성을 위한 별칭
 sharpe_ratio_loss = max_sharpe

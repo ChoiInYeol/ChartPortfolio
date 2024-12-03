@@ -31,7 +31,7 @@ MODEL:
   # GRU parameters
   N_LAYER: 1
   HIDDEN_DIM: 128
-  DROPOUT: 0.3
+  DROPOUT: 0.4
   BIDIRECTIONAL: false
   
   # TCN parameters
@@ -56,8 +56,8 @@ MODEL:
 TRAINING:
   # 학습 파라미터
   BATCH_SIZE: 64
-  EPOCHS: 50
-  EARLY_STOPPING: 25
+  EPOCHS: 500
+  EARLY_STOPPING: 50
   LEARNING_RATE: 0.005
   MOMENTUM: 0.9
   

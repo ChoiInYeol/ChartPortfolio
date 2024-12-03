@@ -593,7 +593,7 @@ class Trainer:
     def _cleanup_checkpoints(self):
         """학습 종료 후 최고 성능의 체크포인트만 남기고 나머지 삭제"""
         try:
-            # 체크��인트 파일 목록 가져오기
+            # 체크포인트 파일 목록 가져오기
             checkpoints = []
             for f in os.listdir(self.model_dir):
                 if f.endswith('.pth'):
@@ -618,8 +618,10 @@ class Trainer:
                     prob_setting = parts[3]
                     loss_type = parts[4].split('.')[0]
                     
+                    current_prob_setting = 'prob' if self.use_prob else 'noprob'  # noprob로 통일
+                    
                     if (model_type == self.config['MODEL']['TYPE'] and
-                        prob_setting == ('prob' if self.use_prob else 'no_prob') and
+                        prob_setting == current_prob_setting and  # 수정된 부분
                         loss_type == self.config['PORTFOLIO']['OBJECTIVE']):
                         matching_checkpoints.append(ckpt)
                 except:
