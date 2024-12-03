@@ -9,6 +9,7 @@ import inquirer
 from typing import Dict
 import pandas as pd
 import numpy as np
+import yaml
 
 from data_loader import DataLoader
 from utils.metrics import PerformanceMetrics
@@ -39,6 +40,7 @@ def setup_logging(base_folder: str) -> logging.Logger:
 class PortfolioBacktest:
     def __init__(self,
                  base_folder: str,
+                 data_size: int,
                  selections: Dict,
                  train_date: str = '2017-12-31',
                  end_date: str = '2024-07-05'):
@@ -47,28 +49,32 @@ class PortfolioBacktest:
         
         Args:
             base_folder (str): 기본 폴더 경로
+            data_size (int): 데이터 크기 (50, 370, 500, 2055)
             selections (Dict): 사용자 선택 옵션
             train_date (str): 학습 시작 날짜
             end_date (str): 투자 종료 날짜
         """
         self.base_folder = base_folder
+        self.data_size = data_size
         self.models = selections['models']
         self.train_date = train_date
         self.end_date = end_date
         
-        # 결과 저장 디렉토리 생성
-        self.result_dir = os.path.join(base_folder, 'results')
-        os.makedirs(self.result_dir, exist_ok=True)
-        
         # 로깅 설정
         self.logger = setup_logging(base_folder)
         
-        # 컴포넌트 초기화
+        # 데이터 로더 초기화
         self.data_loader = DataLoader(
-            base_folder=base_folder, 
+            base_folder=base_folder,
+            data_size=data_size,
             train_date=train_date,
             end_date=end_date
         )
+        
+        # 결과 디렉토리 설정
+        self.result_dir = self.data_loader.result_dir
+        
+        # 컴포넌트 초기화
         self.metrics = PerformanceMetrics()
         self.visualizer = PortfolioVisualizer()
         self.optimizer = OptimizationManager()
@@ -95,7 +101,14 @@ class PortfolioBacktest:
             
             # 2.2 CNN 기반 벤치마크 포트폴리오
             print("Creating CNN benchmark portfolios...")
-            benchmark_weights = self.optimizer.create_benchmark_portfolios(probs, returns)
+            N = 500  # 또는 다른 N 값
+            result_dir = os.path.join(self.base_folder, 'results')
+            benchmark_weights = self.optimizer.create_benchmark_portfolios(
+                probs, 
+                returns, 
+                N=N,
+                result_dir=result_dir
+            )
             portfolio_weights.update(benchmark_weights)
             print("Completed creating CNN benchmark portfolios.")
             
@@ -130,7 +143,6 @@ class PortfolioBacktest:
                 returns_series = self.metrics.calculate_portfolio_returns(
                     returns=returns,
                     weights=weights,
-                    rebalancing_freq=20  # 20일 리밸런싱
                 )
                 portfolio_returns[name] = returns_series
             
@@ -160,9 +172,19 @@ class PortfolioBacktest:
             selected_portfolios = [
                 'Naive',
                 'CNN Top',
+                
+                'Max Sharpe',
+                'Min Variance',
+                'Min CVaR',
+                
                 'CNN Top + Max Sharpe',
                 'CNN Top + Min Variance',
                 'CNN Top + Min CVaR',  # 'Cvar'를 'CVaR'로 수정
+                
+                'GRU',
+                'TCN',
+                'TRANSFORMER',
+                
                 'CNN + GRU',
                 'CNN + TCN',
                 'CNN + TRANSFORMER'
@@ -204,8 +226,15 @@ def main():
     """메인 실행 함수"""
     base_folder = os.path.dirname(os.path.abspath(__file__))
     
+    # 설정 파일 로드
+    with open(os.path.join(base_folder, 'weight.yaml'), 'r') as f:
+        config = yaml.safe_load(f)
+    
     # 사용자 선택 옵션
     questions = [
+        inquirer.List('data_size',
+                     message="Select data size",
+                     choices=config['base_settings']['data_sizes']),
         inquirer.Checkbox('models',
                          message="Select model type(s)",
                          choices=['GRU', 'TCN', 'TRANSFORMER'],
@@ -220,11 +249,13 @@ def main():
     
     # 선택 사항 출력
     logger = logging.getLogger(__name__)
+    logger.info(f"Selected data size: {selections['data_size']}")
     logger.info(f"Selected models: {selections['models']}")
     
     # 백테스트 실행
     backtest = PortfolioBacktest(
         base_folder=base_folder,
+        data_size=selections['data_size'],
         selections=selections,
         train_date='2017-12-31',
         end_date='2024-07-05'

@@ -23,6 +23,25 @@ def batch_covariance(returns: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
     cov = cov + torch.eye(N, device=returns.device) * eps
     return cov
 
+def constraint_penalty(weights: torch.Tensor, lb: float = 0.0, ub: float = 0.1) -> torch.Tensor:
+    """
+    포트폴리오 제약조건 위반에 대한 패널티
+    
+    Args:
+        weights: 포트폴리오 가중치 [batch_size, n_stocks]
+        lb: 최소 비중
+        ub: 최대 비중
+    """
+    # 제약조건 위반 정도 계산
+    min_violation = torch.relu(lb - weights)  # 최소 비중 위반
+    max_violation = torch.relu(weights - ub)  # 최대 비중 위반
+    sum_violation = torch.abs(weights.sum(dim=1) - 1.0)  # 합이 1 위반
+    
+    # 패널티 계수 (하이퍼파라미터로 조정 가능)
+    penalty_coef = 100.0
+    
+    return penalty_coef * (min_violation.sum() + max_violation.sum() + sum_violation.sum())
+
 def max_sharpe(returns: torch.Tensor, weights: torch.Tensor, risk_free_rate: float = 0.02) -> torch.Tensor:
     """
     Sharpe ratio를 최대화하는 손실 함수입니다.
@@ -56,7 +75,12 @@ def max_sharpe(returns: torch.Tensor, weights: torch.Tensor, risk_free_rate: flo
     sharpe = (annual_return - risk_free_rate) / port_vol
     
     # 스케일 조정 (예: 100을 곱하여 -100 ~ 100 범위로 조정)
-    return -sharpe.mean() * 100  # 최대화를 위해 음수 반환
+    sharpe_loss = -sharpe.mean() * 100  # 최대화를 위해 음수 반환
+    
+    # 제약조건 패널티 추가
+    constraint_loss = constraint_penalty(weights)
+    
+    return sharpe_loss + constraint_loss
 
 def mean_variance(returns: torch.Tensor, weights: torch.Tensor, risk_aversion: float = 1.0) -> torch.Tensor:
     """
@@ -84,7 +108,12 @@ def mean_variance(returns: torch.Tensor, weights: torch.Tensor, risk_aversion: f
     utility = port_return - (risk_aversion / 2) * port_var
     
     # 스케일 조정
-    return -utility.mean() * 100
+    mv_loss = -utility.mean() * 100
+    
+    # 제약조건 패널티 추가
+    constraint_loss = constraint_penalty(weights)
+    
+    return mv_loss + constraint_loss
 
 # 기존 인터페이스와의 호환성을 위한 별칭
 sharpe_ratio_loss = max_sharpe

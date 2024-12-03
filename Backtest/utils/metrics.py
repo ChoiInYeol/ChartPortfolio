@@ -22,7 +22,7 @@ class PerformanceMetrics:
     def calculate_portfolio_returns(self, 
                                   returns: pd.DataFrame,
                                   weights: pd.DataFrame,
-                                  rebalancing_freq: int = 20) -> pd.Series:
+                                  ) -> pd.Series:
         """
         포트폴리오 수익률을 계산합니다.
         

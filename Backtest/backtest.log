@@ -104,3 +104,333 @@ KeyError: "['CNN Top + Min CVaR'] not in index"
 2024-11-29 13:23:38,294 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
 2024-11-29 13:23:43,672 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TRANSFORMER', 'CNN + TRANSFORMER', 'TCN', 'CNN + TCN']
 2024-11-29 13:24:12,528 - INFO - Backtest completed successfully
+2024-12-03 14:42:02,174 - INFO - Data loaded - Returns: (1637, 50), Up prob: (79, 50)
+2024-12-03 14:42:41,913 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-12-03 14:42:41,916 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTop_weights.csv
+2024-12-03 14:42:41,919 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpe_weights.csv
+2024-12-03 14:42:41,921 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVariance_weights.csv
+2024-12-03 14:42:41,924 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaR_weights.csv
+2024-12-03 14:42:41,926 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 14:42:41,928 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVariance_weights.csv
+2024-12-03 14:42:41,931 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 14:42:42,246 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-12-03 14:42:42,560 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-12-03 14:42:42,880 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-12-03 14:42:43,204 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-12-03 14:42:43,515 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-12-03 14:42:43,828 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 14:43:39,675 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 14:43:39,675 - WARNING - Missing portfolios: ['GRU Top', 'TCN Top', 'TRANSFORMER Top']
+2024-12-03 14:45:31,341 - INFO - Backtest completed successfully
+2024-12-03 14:49:36,697 - INFO - Data loaded - Returns: (1637, 50), Up prob: (79, 50)
+2024-12-03 14:50:15,698 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-12-03 14:50:15,700 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTop_weights.csv
+2024-12-03 14:50:15,702 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpe_weights.csv
+2024-12-03 14:50:15,704 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVariance_weights.csv
+2024-12-03 14:50:15,706 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaR_weights.csv
+2024-12-03 14:50:15,708 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 14:50:15,710 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVariance_weights.csv
+2024-12-03 14:50:15,713 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 14:50:16,014 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-12-03 14:50:16,307 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-12-03 14:50:16,614 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-12-03 14:50:16,914 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-12-03 14:50:17,203 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-12-03 14:50:17,500 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 14:51:10,617 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 14:53:01,662 - INFO - Backtest completed successfully
+2024-12-03 15:06:23,371 - INFO - Data loaded - Returns: (1637, 2055), Up prob: (79, 2055)
+2024-12-03 15:24:29,802 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:27:17,024 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:30:42,064 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:31:38,976 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:37:17,793 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:38:23,277 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:40:45,270 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-12-03 15:40:45,445 - INFO - Saved Naive Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/NaiveTop500_weights.csv
+2024-12-03 15:40:45,464 - INFO - Saved CNN Top Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopTop500_weights.csv
+2024-12-03 15:40:45,482 - INFO - Saved Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpeTop500_weights.csv
+2024-12-03 15:40:45,490 - INFO - Saved Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVarianceTop500_weights.csv
+2024-12-03 15:40:45,497 - INFO - Saved Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaRTop500_weights.csv
+2024-12-03 15:40:45,514 - INFO - Saved CNN Top + Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpeTop500_weights.csv
+2024-12-03 15:40:45,522 - INFO - Saved CNN Top + Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVarianceTop500_weights.csv
+2024-12-03 15:40:45,530 - INFO - Saved CNN Top + Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaRTop500_weights.csv
+2024-12-03 15:40:45,864 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-12-03 15:40:46,197 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-12-03 15:40:46,555 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-12-03 15:40:46,928 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-12-03 15:40:47,272 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-12-03 15:40:47,609 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 15:40:54,718 - INFO - Available portfolios: ['Naive', 'Naive Top500', 'CNN Top Top500', 'Max Sharpe Top500', 'Min Variance Top500', 'Min CVaR Top500', 'CNN Top + Max Sharpe Top500', 'CNN Top + Min Variance Top500', 'CNN Top + Min CVaR Top500', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 15:40:54,719 - WARNING - Missing portfolios: ['CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR']
+2024-12-03 15:44:59,323 - INFO - Backtest completed successfully
+2024-12-03 15:50:52,876 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:53:02,149 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:53:49,194 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-12-03 15:53:49,369 - INFO - Saved Naive Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/NaiveTop500_weights.csv
+2024-12-03 15:53:49,389 - INFO - Saved CNN Top Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopTop500_weights.csv
+2024-12-03 15:53:49,397 - INFO - Saved Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpeTop500_weights.csv
+2024-12-03 15:53:49,406 - INFO - Saved Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVarianceTop500_weights.csv
+2024-12-03 15:53:49,413 - INFO - Saved Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaRTop500_weights.csv
+2024-12-03 15:53:49,421 - INFO - Saved CNN Top + Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpeTop500_weights.csv
+2024-12-03 15:53:49,431 - INFO - Saved CNN Top + Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVarianceTop500_weights.csv
+2024-12-03 15:53:49,439 - INFO - Saved CNN Top + Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaRTop500_weights.csv
+2024-12-03 15:53:49,792 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-12-03 15:53:50,145 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-12-03 15:53:53,889 - INFO - Available portfolios: ['Naive', 'Naive Top500', 'CNN Top Top500', 'Max Sharpe Top500', 'Min Variance Top500', 'Min CVaR Top500', 'CNN Top + Max Sharpe Top500', 'CNN Top + Min Variance Top500', 'CNN Top + Min CVaR Top500', 'GRU', 'CNN + GRU']
+2024-12-03 15:53:53,889 - WARNING - Missing portfolios: ['CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'TCN', 'TRANSFORMER', 'CNN + TCN', 'CNN + TRANSFORMER']
+2024-12-03 15:56:47,423 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 15:57:50,802 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-12-03 15:57:50,973 - INFO - Saved Naive Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/NaiveTop500_weights.csv
+2024-12-03 15:57:50,994 - INFO - Saved CNN Top Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopTop500_weights.csv
+2024-12-03 15:57:51,001 - INFO - Saved Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpeTop500_weights.csv
+2024-12-03 15:57:51,008 - INFO - Saved Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVarianceTop500_weights.csv
+2024-12-03 15:57:51,016 - INFO - Saved Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaRTop500_weights.csv
+2024-12-03 15:57:51,023 - INFO - Saved CNN Top + Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpeTop500_weights.csv
+2024-12-03 15:57:51,030 - INFO - Saved CNN Top + Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVarianceTop500_weights.csv
+2024-12-03 15:57:51,038 - INFO - Saved CNN Top + Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaRTop500_weights.csv
+2024-12-03 15:57:51,397 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-12-03 15:57:51,753 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-12-03 15:57:52,150 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-12-03 15:57:52,569 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-12-03 15:57:52,917 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-12-03 15:57:53,239 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 15:58:00,307 - INFO - Available portfolios: ['Naive', 'Naive Top500', 'CNN Top Top500', 'Max Sharpe Top500', 'Min Variance Top500', 'Min CVaR Top500', 'CNN Top + Max Sharpe Top500', 'CNN Top + Min Variance Top500', 'CNN Top + Min CVaR Top500', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 15:58:00,308 - WARNING - Missing portfolios: ['CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR']
+2024-12-03 16:02:59,055 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:03:46,178 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-12-03 16:03:46,355 - INFO - Saved Naive Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/NaiveTop500_weights.csv
+2024-12-03 16:03:46,375 - INFO - Saved CNN Top Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopTop500_weights.csv
+2024-12-03 16:03:46,382 - INFO - Saved Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpeTop500_weights.csv
+2024-12-03 16:03:46,390 - INFO - Saved Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVarianceTop500_weights.csv
+2024-12-03 16:03:46,397 - INFO - Saved Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaRTop500_weights.csv
+2024-12-03 16:03:46,405 - INFO - Saved CNN Top + Max Sharpe Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpeTop500_weights.csv
+2024-12-03 16:03:46,413 - INFO - Saved CNN Top + Min Variance Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVarianceTop500_weights.csv
+2024-12-03 16:03:46,420 - INFO - Saved CNN Top + Min CVaR Top500 weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaRTop500_weights.csv
+2024-12-03 16:03:46,773 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-12-03 16:03:47,115 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-12-03 16:03:47,481 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-12-03 16:03:47,816 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-12-03 16:03:48,154 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-12-03 16:03:48,496 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 16:03:55,640 - INFO - Available portfolios: ['Naive', 'Naive Top500', 'CNN Top Top500', 'Max Sharpe Top500', 'Min Variance Top500', 'Min CVaR Top500', 'CNN Top + Max Sharpe Top500', 'CNN Top + Min Variance Top500', 'CNN Top + Min CVaR Top500', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 16:03:55,641 - WARNING - Missing portfolios: ['CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR']
+2024-12-03 16:07:56,138 - INFO - Backtest completed successfully
+2024-12-03 16:12:25,088 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:13:13,055 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-12-03 16:13:13,075 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTop_weights.csv
+2024-12-03 16:13:13,082 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpe_weights.csv
+2024-12-03 16:13:13,090 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVariance_weights.csv
+2024-12-03 16:13:13,097 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaR_weights.csv
+2024-12-03 16:13:13,105 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 16:13:13,112 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVariance_weights.csv
+2024-12-03 16:13:13,120 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 16:13:13,437 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-12-03 16:13:13,754 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-12-03 16:13:14,088 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-12-03 16:13:14,431 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-12-03 16:13:14,770 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-12-03 16:13:15,099 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 16:13:21,530 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 16:17:06,813 - INFO - Backtest completed successfully
+2024-12-03 16:20:16,352 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:21:04,223 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 16:21:04,241 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 16:21:04,248 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 16:21:04,255 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 16:21:04,262 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 16:21:04,269 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 16:21:04,275 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 16:21:04,282 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 16:21:04,588 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 16:21:04,894 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 16:21:05,228 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 16:21:05,559 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 16:21:05,856 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 16:21:06,153 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 16:21:12,561 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 16:24:59,056 - INFO - Backtest completed successfully
+2024-12-03 16:29:16,633 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:29:16,635 - ERROR - Error during backtest: name 'top_N_columns' is not defined
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 106, in run
+    benchmark_weights = self.optimizer.create_benchmark_portfolios(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/ImagePortOpt/Backtest/optimization/optimizer.py", line 155, in create_benchmark_portfolios
+    period_returns = period_returns[top_N_columns]
+                                    ^^^^^^^^^^^^^
+NameError: name 'top_N_columns' is not defined
+2024-12-03 16:30:14,150 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:30:14,155 - ERROR - Error during backtest: name 'pbar' is not defined
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 106, in run
+    benchmark_weights = self.optimizer.create_benchmark_portfolios(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/ImagePortOpt/Backtest/optimization/optimizer.py", line 247, in create_benchmark_portfolios
+    pbar.set_description(f"Processing date: {date}")
+    ^^^^
+NameError: name 'pbar' is not defined
+2024-12-03 16:30:55,199 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:31:44,264 - ERROR - Error during backtest: name 'filename_mapping' is not defined
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 106, in run
+    benchmark_weights = self.optimizer.create_benchmark_portfolios(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/ImagePortOpt/Backtest/optimization/optimizer.py", line 248, in create_benchmark_portfolios
+NameError: name 'filename_mapping' is not defined
+2024-12-03 16:32:04,682 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:32:54,130 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 16:32:54,138 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 16:32:54,146 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 16:32:54,154 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 16:32:54,161 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 16:32:54,169 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 16:32:54,176 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 16:32:54,184 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 16:32:54,514 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 16:32:54,844 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 16:32:55,205 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 16:32:55,608 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 16:32:55,942 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 16:32:56,259 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 16:33:02,763 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 16:36:48,644 - INFO - Backtest completed successfully
+2024-12-03 16:41:37,703 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:42:24,288 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 16:42:24,297 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 16:42:24,304 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 16:42:24,311 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 16:42:24,318 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 16:42:24,325 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 16:42:24,333 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 16:42:24,340 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 16:42:24,647 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 16:42:24,950 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 16:42:25,254 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 16:42:25,562 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 16:42:25,843 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 16:42:26,127 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 16:42:32,492 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'CNN Top + Max Sharpe', 'Min Variance', 'CNN Top + Min Variance', 'Min CVaR', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 16:46:15,933 - INFO - Backtest completed successfully
+2024-12-03 16:48:12,098 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:48:58,826 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 16:48:58,834 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 16:48:58,841 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 16:48:58,848 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 16:48:58,855 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 16:48:58,861 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 16:48:58,868 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 16:48:58,875 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 16:48:59,176 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 16:48:59,466 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 16:48:59,777 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 16:49:00,083 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 16:49:00,365 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 16:49:00,655 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 16:49:00,655 - ERROR - Error during backtest: PerformanceMetrics.calculate_portfolio_returns() got an unexpected keyword argument 'rebalancing_freq'
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 143, in run
+    returns_series = self.metrics.calculate_portfolio_returns(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: PerformanceMetrics.calculate_portfolio_returns() got an unexpected keyword argument 'rebalancing_freq'
+2024-12-03 16:53:59,368 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 16:54:48,140 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 16:54:48,148 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 16:54:48,155 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 16:54:48,162 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 16:54:48,169 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 16:54:48,175 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 16:54:48,183 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 16:54:48,190 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 16:54:48,498 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 16:54:48,816 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 16:54:49,136 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 16:54:49,444 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 16:54:49,738 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 16:54:50,026 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 16:54:50,132 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'CNN Top + Max Sharpe', 'Min Variance', 'CNN Top + Min Variance', 'Min CVaR', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 16:58:27,096 - INFO - Backtest completed successfully
+2024-12-03 16:59:47,628 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 17:00:33,638 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 17:00:33,645 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 17:00:33,653 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 17:00:33,660 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 17:00:33,666 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 17:00:33,673 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 17:00:33,680 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 17:00:33,687 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 17:00:33,988 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 17:00:34,284 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 17:00:34,590 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 17:00:34,887 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 17:00:35,180 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 17:00:35,465 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 17:00:35,684 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'CNN Top + Max Sharpe', 'Min Variance', 'CNN Top + Min Variance', 'Min CVaR', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 17:04:07,174 - INFO - Backtest completed successfully
+2024-12-03 17:10:44,498 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 17:13:10,856 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 17:13:10,864 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 17:13:10,871 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 17:13:10,878 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 17:13:10,885 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 17:13:10,892 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 17:13:10,899 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 17:13:10,906 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 17:13:11,227 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 17:13:11,558 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 17:13:11,899 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 17:13:12,229 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 17:13:12,528 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 17:13:12,826 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 17:13:18,959 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'CNN Top + Max Sharpe', 'Min Variance', 'CNN Top + Min Variance', 'Min CVaR', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 17:16:36,702 - INFO - Backtest completed successfully
+2024-12-03 17:20:17,612 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2024-12-03 17:22:40,970 - INFO - Saved Naive weights to results/Result_500/weights/Naive_weights.csv
+2024-12-03 17:22:40,978 - INFO - Saved CNN Top weights to results/Result_500/weights/CNNTop_weights.csv
+2024-12-03 17:22:40,985 - INFO - Saved Max Sharpe weights to results/Result_500/weights/MaxSharpe_weights.csv
+2024-12-03 17:22:40,992 - INFO - Saved CNN Top + Max Sharpe weights to results/Result_500/weights/CNNTopMaxSharpe_weights.csv
+2024-12-03 17:22:40,999 - INFO - Saved Min Variance weights to results/Result_500/weights/MinVariance_weights.csv
+2024-12-03 17:22:41,006 - INFO - Saved CNN Top + Min Variance weights to results/Result_500/weights/CNNTopMinVariance_weights.csv
+2024-12-03 17:22:41,014 - INFO - Saved Min CVaR weights to results/Result_500/weights/MinCVaR_weights.csv
+2024-12-03 17:22:41,021 - INFO - Saved CNN Top + Min CVaR weights to results/Result_500/weights/CNNTopMinCVaR_weights.csv
+2024-12-03 17:22:41,357 - INFO - Saved GRU weights to results/Result_500/weights/GRU_weights.csv
+2024-12-03 17:22:41,684 - INFO - Saved CNN + GRU weights to results/Result_500/weights/CNNGRU_weights.csv
+2024-12-03 17:22:42,023 - INFO - Saved TCN weights to results/Result_500/weights/TCN_weights.csv
+2024-12-03 17:22:42,345 - INFO - Saved CNN + TCN weights to results/Result_500/weights/CNNTCN_weights.csv
+2024-12-03 17:22:42,643 - INFO - Saved TRANSFORMER weights to results/Result_500/weights/TRANSFORMER_weights.csv
+2024-12-03 17:22:42,957 - INFO - Saved CNN + TRANSFORMER weights to results/Result_500/weights/CNNTRANSFORMER_weights.csv
+2024-12-03 17:22:49,118 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'CNN Top + Max Sharpe', 'Min Variance', 'CNN Top + Min Variance', 'Min CVaR', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
+2024-12-03 17:22:49,175 - ERROR - Error during backtest: "[Timestamp('2018-03-31 00:00:00'), Timestamp('2018-06-30 00:00:00'), Timestamp('2018-09-30 00:00:00'), Timestamp('2019-03-31 00:00:00'), Timestamp('2019-06-30 00:00:00'), Timestamp('2019-08-31 00:00:00'), Timestamp('2019-11-30 00:00:00'), Timestamp('2020-02-29 00:00:00'), Timestamp('2020-05-31 00:00:00'), Timestamp('2020-10-31 00:00:00'), Timestamp('2021-01-31 00:00:00'), Timestamp('2021-02-28 00:00:00'), Timestamp('2021-05-31 00:00:00'), Timestamp('2021-07-31 00:00:00'), Timestamp('2021-10-31 00:00:00'), Timestamp('2022-04-30 00:00:00'), Timestamp('2022-07-31 00:00:00'), Timestamp('2022-12-31 00:00:00'), Timestamp('2023-04-30 00:00:00'), Timestamp('2023-09-30 00:00:00'), Timestamp('2023-12-31 00:00:00'), Timestamp('2024-03-31 00:00:00'), Timestamp('2024-06-30 00:00:00')] not in index"
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 204, in run
+    self.visualizer.plot_portfolio_comparison(
+  File "/home/indi/codespace/ImagePortOpt/Backtest/utils/visualization.py", line 76, in plot_portfolio_comparison
+    cumulative_returns.loc[rebalance_dates, col],
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexing.py", line 1184, in __getitem__
+    return self._getitem_tuple(key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexing.py", line 1368, in _getitem_tuple
+    return self._getitem_lowerdim(tup)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexing.py", line 1089, in _getitem_lowerdim
+    return getattr(section, self.name)[new_key]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexing.py", line 1191, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexing.py", line 1420, in _getitem_axis
+    return self._getitem_iterable(key, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexing.py", line 1360, in _getitem_iterable
+    keyarr, indexer = self._get_listlike_indexer(key, axis)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexing.py", line 1558, in _get_listlike_indexer
+    keyarr, indexer = ax._get_indexer_strict(key, axis_name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6200, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6252, in _raise_if_missing
+    raise KeyError(f"{not_found} not in index")
+KeyError: "[Timestamp('2018-03-31 00:00:00'), Timestamp('2018-06-30 00:00:00'), Timestamp('2018-09-30 00:00:00'), Timestamp('2019-03-31 00:00:00'), Timestamp('2019-06-30 00:00:00'), Timestamp('2019-08-31 00:00:00'), Timestamp('2019-11-30 00:00:00'), Timestamp('2020-02-29 00:00:00'), Timestamp('2020-05-31 00:00:00'), Timestamp('2020-10-31 00:00:00'), Timestamp('2021-01-31 00:00:00'), Timestamp('2021-02-28 00:00:00'), Timestamp('2021-05-31 00:00:00'), Timestamp('2021-07-31 00:00:00'), Timestamp('2021-10-31 00:00:00'), Timestamp('2022-04-30 00:00:00'), Timestamp('2022-07-31 00:00:00'), Timestamp('2022-12-31 00:00:00'), Timestamp('2023-04-30 00:00:00'), Timestamp('2023-09-30 00:00:00'), Timestamp('2023-12-31 00:00:00'), Timestamp('2024-03-31 00:00:00'), Timestamp('2024-06-30 00:00:00')] not in index"
+2024-12-03 17:24:00,460 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)

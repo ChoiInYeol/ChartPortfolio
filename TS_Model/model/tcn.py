@@ -24,7 +24,7 @@ class PortfolioTCN(nn.Module):
         Args:
             n_feature: 입력 특성 수 (n_stocks와 동일)
             n_output: 출력 차원 (n_stocks와 동일)
-            num_channels: TCN 채널 수 리스트 (예: [64, 64, 64])
+            num_channels: TCN 채널 수 리스트
             kernel_size: 컨볼루션 커널 크기
             n_dropout: 드롭아웃 비율
             n_timestep: 시계열 길이
@@ -39,7 +39,8 @@ class PortfolioTCN(nn.Module):
         self.ub = ub
         self.n_select = n_select if n_select is not None else n_output
         
-        # Score Block (h1) - TCN 인코더
+        # Score Block (h1)
+        # 1. TCN을 통한 시계열 특성 추출
         self.tcn = TemporalConvNet(
             num_inputs=n_feature,
             num_channels=num_channels,
@@ -47,7 +48,7 @@ class PortfolioTCN(nn.Module):
             dropout=n_dropout
         )
         
-        # 종목 선택을 위한 score 생성 레이어
+        # 2. 종목별 score 생성을 위한 레이어
         self.score_layer = nn.Sequential(
             nn.Linear(num_channels[-1], num_channels[-1]),
             nn.LayerNorm(num_channels[-1]),
@@ -69,24 +70,29 @@ class PortfolioTCN(nn.Module):
         Returns:
             포트폴리오 비중 [batch_size, n_stocks]
         """
-        # Score Block (h1)
-        output = self.tcn(x.transpose(1, 2))
-        features = self.tempmaxpool(output).squeeze(-1)
+        # Score Block (h1): 시계열 특성 추출
+        # 1. TCN을 통한 특성 추출
+        output = self.tcn(x.transpose(1, 2))  # [batch_size, channels, seq_len]
+        features = self.tempmaxpool(output).squeeze(-1)  # [batch_size, channels]
         
-        # 종목 선택 scores 생성
+        # 2. 종목별 score 생성
         scores = self.score_layer(features)
         
-        # Portfolio Block (h2) - 제약조건을 만족하는 가중치 생성
-        if self.n_select < self.n_stocks:  # Cardinality 제약
+        # Portfolio Block (h2): 제약조건을 만족하는 가중치 생성
+        
+        # 1. Cardinality 제약 처리
+        if self.n_select < self.n_stocks:
             topk_values, topk_indices = torch.topk(scores, self.n_select, dim=1)
             mask = torch.zeros_like(scores).scatter_(1, topk_indices, 1.0)
             scores = scores * mask
         
-        # Long-only + Maximum Position 제약
+        # 2. Long-only 제약을 위한 softmax
         weights = F.softmax(scores, dim=-1)
+        
+        # 3. Maximum Position 제약
         weights = torch.clamp(weights, self.lb, self.ub)
         
-        # 정규화
+        # 4. 정규화 (sum to 1)
         weights = weights / (weights.sum(dim=1, keepdim=True) + 1e-8)
         
         return weights
@@ -147,17 +153,6 @@ class PortfolioTCNWithProb(PortfolioTCN):
     ):
         """
         상승확률을 활용하는 TCN 기반 포트폴리오 최적화 모델
-        
-        Args:
-            n_feature: 입력 특성 수 (n_stocks와 동일)
-            n_output: 출력 차원 (n_stocks와 동일)
-            num_channels: TCN 채널 수 리스트
-            kernel_size: 컨볼루션 커널 크기
-            n_dropout: 드롭아웃 비율
-            n_timestep: 시계열 길이
-            lb: 최소 포트폴리오 비중
-            ub: 최대 포트폴리오 비중
-            n_select: 선택할 종목 수 (None인 경우 n_stocks 사용)
         """
         super().__init__(
             n_feature, n_output, num_channels,
@@ -165,24 +160,17 @@ class PortfolioTCNWithProb(PortfolioTCN):
             lb, ub, n_select
         )
         
-        # 상승확률 인코딩을 위한 레이어
-        self.prob_encoder = nn.Sequential(
-            nn.Linear(n_output, num_channels[-1]),
-            nn.LayerNorm(num_channels[-1]),
-            nn.SiLU(),
-            nn.Dropout(n_dropout)
+        # Score Block (h1)
+        # 1. 상승확률을 위한 TCN
+        self.tcn_prob = TemporalConvNet(
+            num_inputs=n_feature,
+            num_channels=num_channels,
+            kernel_size=kernel_size,
+            dropout=n_dropout
         )
         
-        # 결합된 특성을 처리하기 위한 레이어 수정
-        self.attention = nn.Sequential(
-            nn.Linear(num_channels[-1] * 2, num_channels[-1]),
-            nn.LayerNorm(num_channels[-1]),
-            nn.SiLU(),
-            nn.Dropout(n_dropout),
-            nn.Linear(num_channels[-1], n_output)
-        )
-        
-        self.score_layers = nn.Sequential(
+        # 2. 결합된 특성으로부터 score 생성을 위한 레이어
+        self.score_layer = nn.Sequential(
             nn.Linear(num_channels[-1] * 2, num_channels[-1]),
             nn.LayerNorm(num_channels[-1]),
             nn.SiLU(),
@@ -201,48 +189,57 @@ class PortfolioTCNWithProb(PortfolioTCN):
         Returns:
             포트폴리오 비중 [batch_size, n_stocks]
         """
-        # TCN으로 수익률 시퀀스 처리
-        output = self.tcn(x_returns.transpose(1, 2))
-        output = self.tempmaxpool(output).squeeze(-1)
+        # Score Block (h1): 시계열 특성 추출
+        # 1. 수익률 시퀀스 처리
+        returns_out = self.tcn(x_returns.transpose(1, 2))  # [batch_size, channels, seq_len]
         
-        # 상승확률 처리
-        # 확률 데이터가 2차원이면 그대로 사용
+        # 2. 상승확률 처리
         if len(x_probs.shape) == 2:
-            prob_features = self.prob_encoder(x_probs)  # [batch_size, n_stocks]
-        # 3차원이면 마지막 시점의 확률 사용
+            x_probs = x_probs.unsqueeze(1)  # [batch_size, 1, n_stocks]
+            
+        # 상승확률 데이터의 시퀀스 길이가 1인 경우 처리
+        if x_probs.shape[1] == 1:
+            # TCN 출력을 직접 사용
+            prob_out = self.tcn_prob(x_probs.transpose(1, 2))  # [batch_size, channels, 1]
+            h_prob = prob_out.squeeze(-1)  # [batch_size, channels]
         else:
-            prob_features = self.prob_encoder(x_probs[:, -1, :])  # [batch_size, n_stocks]
+            prob_out = self.tcn_prob(x_probs.transpose(1, 2))
+            h_prob = self.tempmaxpool(prob_out).squeeze(-1)
         
-        # 특성 결합
-        combined = torch.cat([output, prob_features], dim=1)
+        # 수익률 특성도 동일한 방식으로 처리
+        if returns_out.shape[-1] == 1:
+            h_returns = returns_out.squeeze(-1)
+        else:
+            h_returns = self.tempmaxpool(returns_out).squeeze(-1)
         
-        # 종목 선택
-        attention_scores = self.attention(combined)
-        attention_weights = torch.sigmoid(attention_scores)
+        # 3. 특성 결합
+        combined = torch.cat([h_returns, h_prob], dim=1)
         
-        # Top-k 종목 선택
-        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
+        # 4. 종목별 score 생성
+        scores = self.score_layer(combined)
         
-        # 마스크 생성
-        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
+        # Portfolio Block (h2): 제약조건을 만족하는 가중치 생성
         
-        # 선택된 종목에 대한 비중 계산
-        scores = self.score_layers(combined)
+        # 1. Cardinality 제약 처리
+        if self.n_select < self.n_stocks:
+            topk_values, topk_indices = torch.topk(scores, self.n_select, dim=1)
+            mask = torch.zeros_like(scores).scatter_(1, topk_indices, 1.0)
+            scores = scores * mask
+        
+        # 2. Long-only 제약을 위한 softmax
         weights = F.softmax(scores, dim=-1)
         
-        # 선택되지 않은 종목은 0으로 마스킹
-        masked_weights = weights * mask
+        # 3. 희소성 처리: 임계값보다 작은 가중치는 0으로 설정
+        threshold = 0.02  # 2% 임계값
+        weights = torch.where(weights > threshold, weights, torch.zeros_like(weights))
         
-        # 비중 재조정
-        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
+        # 4. Maximum Position 제약
+        weights = torch.clamp(weights, self.lb, self.ub)
         
-        # 최소/최대 비중 제약 적용
-        final_weights = torch.stack([
-            self.rebalance(w, self.lb, self.ub) 
-            for w in normalized_weights
-        ])
+        # 5. 정규화 (sum to 1)
+        weights = weights / (weights.sum(dim=1, keepdim=True) + 1e-8)
         
-        return final_weights
+        return weights
 
 
 class Chomp1d(nn.Module):

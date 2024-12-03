@@ -1,26 +1,31 @@
-benchmarks:
-  # 기본 벤치마크
-  Naive: results/weights/naive.csv
-  CNN_Top: results/weights/cnn_top.csv
-  
-  # 최적화 벤치마크
-  MaxSharpe: results/weights/max_sharpe.csv
-  MinVar: results/weights/min_var.csv
-  MinCVaR: results/weights/min_cvar.csv
-  
-  # CNN + 최적화 벤치마크
-  CNN_MaxSharpe: results/weights/cnn_max_sharpe.csv
-  CNN_MinVar: results/weights/cnn_min_var.csv
-  CNN_MinCVaR: results/weights/cnn_min_cvar.csv
+# 기본 설정
+base_settings:
+  result_dir: results
+  data_sizes: [50, 370, 500, 2055]
+  subdirs:
+    - weights
+    - figures
+    - metrics
 
-# 시계열 모델 가중치
-ts_models:
-  GRU:
-    noprob: ../TS_Model/Result/GRU/portfolio_weights_GRU_noprob_maxsharpe.csv
-    prob: ../TS_Model/Result/GRU/portfolio_weights_GRU_prob_maxsharpe.csv
-  TCN:
-    noprob: ../TS_Model/Result/TCN/portfolio_weights_TCN_noprob_maxsharpe.csv
-    prob: ../TS_Model/Result/TCN/portfolio_weights_TCN_prob_maxsharpe.csv
-  TRANSFORMER:
-    noprob: ../TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_noprob_maxsharpe.csv
-    prob: ../TS_Model/Result/TRANSFORMER/portfolio_weights_TRANSFORMER_prob_maxsharpe.csv
+# 파일명 템플릿
+file_templates:
+  benchmarks:
+    naive: "weights/naive.csv"
+    cnn_top: "weights/cnn_top.csv"
+    max_sharpe: "weights/max_sharpe.csv"
+    min_variance: "weights/min_variance.csv"
+    min_cvar: "weights/min_cvar.csv"
+    cnn_max_sharpe: "weights/cnn_max_sharpe.csv"
+    cnn_min_variance: "weights/cnn_min_variance.csv"
+    cnn_min_cvar: "weights/cnn_min_cvar.csv"
+
+  ts_models:
+    GRU:
+      noprob: "../TS_Model/Result/GRU_top{size}/portfolio_weights_GRU_top{size}_noprob_maxsharpe.csv"
+      prob: "../TS_Model/Result/GRU_top{size}/portfolio_weights_GRU_top{size}_prob_maxsharpe.csv"
+    TCN:
+      noprob: "../TS_Model/Result/TCN_top{size}/portfolio_weights_TCN_top{size}_noprob_maxsharpe.csv"
+      prob: "../TS_Model/Result/TCN_top{size}/portfolio_weights_TCN_top{size}_prob_maxsharpe.csv"
+    TRANSFORMER:
+      noprob: "../TS_Model/Result/TRANSFORMER_top{size}/portfolio_weights_TRANSFORMER_top{size}_noprob_maxsharpe.csv"
+      prob: "../TS_Model/Result/TRANSFORMER_top{size}/portfolio_weights_TRANSFORMER_top{size}_prob_maxsharpe.csv"

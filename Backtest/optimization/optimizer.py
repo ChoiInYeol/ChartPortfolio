@@ -4,7 +4,10 @@ import numpy as np
 import pandas as pd
 from typing import Dict, Tuple
 import logging
-from scipy.optimize import minimize
+import torch
+from tqdm import tqdm
+import os
+
 
 class OptimizationManager:
     """포트폴리오 최적화를 위한 클래스입니다."""
@@ -13,20 +16,25 @@ class OptimizationManager:
         """OptimizationManager 초기화"""
         self.logger = logging.getLogger(__name__)
 
-    def optimize_portfolio(self, 
-                         returns: pd.DataFrame,
-                         method: str = 'max_sharpe',
-                         constraints: Dict = None) -> np.ndarray:
-        """포트폴리오를 최적화합니다."""
+    def optimize_portfolio_with_torch(self, 
+                                      returns: pd.DataFrame,
+                                      method: str = 'max_sharpe',
+                                      constraints: Dict = None,
+                                      show_progress: bool = True) -> np.ndarray:
+        """PyTorch를 사용하여 포트폴리오를 최적화합니다."""
         try:
             n_assets = returns.shape[1]
+            
+            # 시드 고정
+            torch.manual_seed(42)
+            np.random.seed(42)
             
             # 데이터 검증
             if n_assets < 2:
                 self.logger.warning("Not enough assets for optimization")
                 return np.ones(n_assets) / n_assets
             
-            if len(returns) < 20:  # 최소 20일의 데이터 필요
+            if len(returns) < 20:
                 self.logger.warning("Not enough historical data for optimization")
                 return np.ones(n_assets) / n_assets
             
@@ -37,190 +45,245 @@ class OptimizationManager:
                     'max_weight': 0.2
                 }
             
-            # 초기 가중치 설정 (동일가중)
-            initial_weights = np.ones(n_assets) / n_assets
+            # 여러 번의 시도를 통한 최적화
+            best_weights = None
+            best_objective = float('inf')
+            n_attempts = 5  # 시도 횟수
             
-            # 공분산 행렬 계산
-            returns_np = returns.values  # numpy array로 변환
-            cov_matrix = np.cov(returns_np.T) * 252
+            for attempt in range(n_attempts):
+                try:
+                    # 초기 가중치 설정 (각 시도마다 다른 초기값)
+                    initial_weights = torch.from_numpy(
+                        np.random.dirichlet(np.ones(n_assets) * (attempt + 1))
+                    ).float().cuda()
+                    
+                    # 공분산 행렬 계산 및 안정화
+                    returns_tensor = torch.tensor(returns.values, dtype=torch.float32, device='cuda')
+                    cov_matrix = torch.cov(returns_tensor.T) * 252
+                    
+                    # 공분산 행렬 안정화 강화
+                    stability_factor = 1e-6 * (attempt + 1)  # 각 시도마다 다른 안정화 계수
+                    cov_matrix += torch.eye(n_assets, device='cuda') * stability_factor
+                    
+                    # 목적함수 설정
+                    if method == 'max_sharpe':
+                        def objective(weights):
+                            return -self._sharpe_ratio_torch(weights, returns_tensor)
+                    elif method == 'min_variance':
+                        def objective(weights):
+                            variance = self._portfolio_variance_torch(weights, cov_matrix)
+                            # 분산이 너무 작은 경우 페널티 추가
+                            if variance < 1e-10:
+                                return torch.tensor(float('inf'), device='cuda')
+                            return variance
+                    elif method == 'min_cvar':
+                        def objective(weights):
+                            return -self._portfolio_cvar_torch(weights, returns_tensor)
+                    
+                    # 최적화 실행
+                    weights = initial_weights.clone().requires_grad_(True)
+                    optimizer = torch.optim.Adam([weights], lr=0.01 / (attempt + 1))  # 학습률 조정
+                    
+                    for epoch in range(300):
+                        optimizer.zero_grad()
+                        loss = objective(weights)
+                        
+                        if not torch.isnan(loss) and not torch.isinf(loss):
+                            loss.backward()
+                            optimizer.step()
+                            
+                            with torch.no_grad():
+                                weights.clamp_(constraints['min_weight'], constraints['max_weight'])
+                                weights /= weights.sum()
+                    
+                    # 최적의 가중치 업데이트
+                    final_loss = objective(weights).item()
+                    if final_loss < best_objective and not np.isnan(final_loss):
+                        best_objective = final_loss
+                        best_weights = weights.detach().cpu().numpy()
+                
+                except Exception as e:
+                    self.logger.warning(f"Optimization attempt {attempt + 1} failed: {str(e)}")
+                    continue
             
-            # 공분산 행렬 유효성 검사
-            if np.isnan(cov_matrix).any() or np.isinf(cov_matrix).any():
-                self.logger.warning("Invalid covariance matrix")
-                return initial_weights
+            # 모든 시도가 실패한 경우 동일가중치 반환
+            if best_weights is None:
+                self.logger.warning("All optimization attempts failed, using equal weights")
+                return np.ones(n_assets) / n_assets
             
-            # 목적함수 설정
-            if method == 'max_sharpe':
-                objective = lambda w: -self._sharpe_ratio(w, returns_np)
-            elif method == 'min_variance':
-                objective = lambda w: self._portfolio_variance(w, cov_matrix)
-            elif method == 'min_cvar':
-                objective = lambda w: -self._portfolio_cvar(w, returns_np)
-            else:
-                raise ValueError(f"Unknown optimization method: {method}")
+            # 최종 가중치 정규화
+            best_weights = best_weights / np.sum(best_weights)
             
-            # 제약조건 정의
-            constraints_list = [
-                {'type': 'eq', 'fun': lambda x: np.sum(x) - 1},
-                {'type': 'ineq', 'fun': lambda x: x - constraints['min_weight']},
-                {'type': 'ineq', 'fun': lambda x: constraints['max_weight'] - x}
-            ]
+            # 가중치 검증
+            if np.all(best_weights == 0) or np.any(np.isnan(best_weights)):
+                self.logger.warning("Invalid weights detected, using equal weights")
+                return np.ones(n_assets) / n_assets
             
-            bounds = [(constraints['min_weight'], constraints['max_weight'])] * n_assets
-            
-            # 최적화 실행
-            result = minimize(
-                fun=objective,
-                x0=initial_weights,
-                method='SLSQP',
-                constraints=constraints_list,
-                bounds=bounds,
-                options={'maxiter': 1000, 'ftol': 1e-8}
-            )
-            
-            if not result.success:
-                self.logger.warning(f"Optimization failed: {result.message}")
-                return initial_weights
-            
-            # 결과 검증
-            weights = result.x
-            if np.isnan(weights).any() or np.isinf(weights).any():
-                self.logger.warning("Invalid optimization result")
-                return initial_weights
-            
-            # 가중치 합이 1이 되도록 정규화
-            weights = weights / np.sum(weights)
-            
-            return weights
+            return best_weights
             
         except Exception as e:
             self.logger.error(f"Error during optimization: {str(e)}")
             return np.ones(n_assets) / n_assets
 
-    def _sharpe_ratio(self, weights: np.ndarray, returns: np.ndarray) -> float:
-        """Sharpe ratio를 계산합니다."""
-        try:
-            portfolio_ret = np.mean(returns @ weights) * 252
-            portfolio_vol = np.sqrt(weights @ np.cov(returns.T) * 252 @ weights)
-            
-            if portfolio_vol == 0 or np.isnan(portfolio_vol) or np.isinf(portfolio_vol):
-                return 0
-            
-            return portfolio_ret / portfolio_vol
-            
-        except Exception as e:
-            self.logger.error(f"Error calculating Sharpe ratio: {str(e)}")
-            return 0
+    def _sharpe_ratio_torch(self, weights: torch.Tensor, returns: torch.Tensor) -> torch.Tensor:
+        """PyTorch를 사용하여 Sharpe ratio를 계산합니다."""
+        portfolio_ret = torch.mean(returns @ weights) * 252
+        portfolio_vol = torch.sqrt(weights @ torch.cov(returns.T) * 252 @ weights)
+        
+        if portfolio_vol == 0 or torch.isnan(portfolio_vol) or torch.isinf(portfolio_vol):
+            return torch.tensor(0.0, device='cuda')
+        
+        return portfolio_ret / portfolio_vol
 
-    def _portfolio_variance(self, weights: np.ndarray, cov_matrix: np.ndarray) -> float:
-        """포트폴리오 분산을 계산합니다."""
-        try:
-            return weights @ cov_matrix @ weights
-        except Exception as e:
-            self.logger.error(f"Error calculating portfolio variance: {str(e)}")
-            return np.inf
+    def _portfolio_variance_torch(self, weights: torch.Tensor, cov_matrix: torch.Tensor) -> torch.Tensor:
+        """PyTorch를 사용하여 포트폴리오 분산을 계산합니다."""
+        return weights @ cov_matrix @ weights
 
-    def _portfolio_cvar(self, weights: np.ndarray, returns: np.ndarray, alpha: float = 0.05) -> float:
-        """포트폴리오 CVaR을 계산합니다."""
-        try:
-            portfolio_returns = returns @ weights
-            var = np.percentile(portfolio_returns, alpha * 100)
-            below_var = portfolio_returns[portfolio_returns <= var]
-            
-            if len(below_var) == 0:
-                return np.inf
-            
-            cvar = np.mean(below_var)
-            
-            if np.isnan(cvar) or np.isinf(cvar):
-                return np.inf
-            
-            return cvar
-            
-        except Exception as e:
-            self.logger.error(f"Error calculating CVaR: {str(e)}")
-            return np.inf
+    def _portfolio_cvar_torch(self, weights: torch.Tensor, returns: torch.Tensor, alpha: float = 0.05) -> torch.Tensor:
+        """PyTorch를 사용하여 포트폴리오 CVaR을 계산합니다."""
+        portfolio_returns = returns @ weights
+        var = torch.quantile(portfolio_returns, alpha)
+        below_var = portfolio_returns[portfolio_returns <= var]
+        
+        if len(below_var) == 0:
+            return torch.tensor(float('inf'), device='cuda')
+        
+        cvar = torch.mean(below_var)
+        
+        if torch.isnan(cvar) or torch.isinf(cvar):
+            return torch.tensor(float('inf'), device='cuda')
+        
+        return cvar
 
     def create_benchmark_portfolios(self, 
                                   up_prob: pd.DataFrame,
-                                  returns: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+                                  returns: pd.DataFrame,
+                                  N: int = None,
+                                  result_dir: str = 'results') -> Dict[str, pd.DataFrame]:
         """벤치마크 포트폴리오들을 생성합니다."""
         benchmark_weights = {}
+        lookback_period = 60  # 최적화에 사용할 lookback period
         
-        # 1. Naive (Universe) - 시가총액 상위 50종목 동일가중
-        top_50_columns = returns.columns[:50]
-        naive_weights = pd.DataFrame(0.0, 
-                                   index=returns.index,
-                                   columns=returns.columns,
-                                   dtype=np.float64)  # dtype 명시
-        naive_weights.loc[:, top_50_columns] = 1.0/50
-        benchmark_weights['Naive'] = naive_weights
+        # N개 종목 선택
+        top_N_columns = returns.columns[:N] if N else returns.columns
         
-        # 각 시점별로 처리
-        for date in up_prob.index:
-            period_returns = returns.loc[:date].tail(60)
+        # 첫 번째 가능한 날짜 계산 (충분한 lookback period 확보)
+        first_valid_date = returns.index[lookback_period]
+        
+        # 각 월별로 처리
+        for date in tqdm(up_prob[up_prob.index >= first_valid_date].index, 
+                        desc="Creating benchmark portfolios"):
+            # 해당 월의 마지막 거래일 확인
+            current_month = pd.Timestamp(date).to_period('M')
+            month_data = up_prob[up_prob.index.to_period('M') == current_month]
             
-            # 2. CNN 기반 포트폴리오
-            probs = up_prob.loc[date]
-            up_stocks = probs[probs >= 0.5].index
-            down_stocks = probs[probs < 0.5].index
+            if len(month_data) == 0:
+                continue
             
-            # CNN Top (상승예측 종목 동일가중)
-            if 'CNN Top' not in benchmark_weights:
-                benchmark_weights['CNN Top'] = pd.DataFrame(0.0,  # 0.0으로 초기화
-                                                          index=up_prob.index,
-                                                          columns=returns.columns,
-                                                          dtype=np.float64)  # dtype 명시
-            if len(up_stocks) > 0:
-                equal_weight = np.float64(1.0/len(up_stocks))  # dtype 명시
-                benchmark_weights['CNN Top'].loc[date, up_stocks] = equal_weight
+            last_day = month_data.index[-1]
             
-            # # CNN Bottom (하락예측 종목 동일가중)
-            # if 'CNN Bottom' not in benchmark_weights:
-            #     benchmark_weights['CNN Bottom'] = pd.DataFrame(0.0,
-            #                                                  index=up_prob.index,
-            #                                                  columns=returns.columns,
-            #                                                  dtype=np.float64)
-            # if len(down_stocks) > 0:
-            #     equal_weight = np.float64(1.0/len(down_stocks))
-            #     benchmark_weights['CNN Bottom'].loc[date, down_stocks] = equal_weight
-            
-            # 3. 최적화 포트폴리오
-            # Universe 전체에 대한 최적화
-            for method in ['max_sharpe', 'min_variance', 'min_cvar']:
-                # 포트폴리오 이름 생성 시 'cvar'를 'CVaR'로 변경
-                portfolio_name = method.replace('_', ' ').title()
-                if method == 'min_cvar':
-                    portfolio_name = 'Min CVaR'
-                    
-                if portfolio_name not in benchmark_weights:
-                    benchmark_weights[portfolio_name] = pd.DataFrame(0.0,
-                                                                  index=up_prob.index,
-                                                                  columns=returns.columns,
-                                                                  dtype=np.float64)
+            # 해당 월의 마지막 거래일에만 처리
+            if date == last_day:
+                # 최근 60일 수익률 데이터 사용
+                period_returns = returns.loc[:date].tail(lookback_period)
+                if N is not None:
+                    period_returns = period_returns[top_N_columns]
                 
-                weights = self.optimize_portfolio(period_returns, method=method)
-                weights = np.array(weights, dtype=np.float64)
-                benchmark_weights[portfolio_name].loc[date] = weights
-            
-            # CNN Top 종목들에 대한 최적화
-            if len(up_stocks) > 0:
-                up_returns = period_returns[up_stocks]
+                # 해당 월의 상승확률 정규화
+                month_probs = up_prob.loc[month_data.index[-1]]
+                if N is not None:
+                    month_probs = month_probs[top_N_columns]
+                
+                # 상위 50% 종목 선택
+                threshold = month_probs.median()
+                up_stocks = month_probs[month_probs >= threshold].index
+                
+                # CNN Top 포트폴리오 초기화
+                if 'CNN Top' not in benchmark_weights:
+                    benchmark_weights['CNN Top'] = pd.DataFrame(
+                        0.0,
+                        index=up_prob[up_prob.index >= first_valid_date].index,
+                        columns=returns.columns,
+                        dtype=np.float64
+                    )
+                
+                # 상승예측 종목이 없는 경우 처리
+                if len(up_stocks) == 0:
+                    # 이전 달의 가중치를 유지
+                    prev_date = benchmark_weights['CNN Top'].index[
+                        benchmark_weights['CNN Top'].index < date
+                    ][-1]
+                    for portfolio_name in benchmark_weights:
+                        benchmark_weights[portfolio_name].loc[date] = \
+                            benchmark_weights[portfolio_name].loc[prev_date]
+                    continue
+                
+                # CNN Top (상승예측 종목 동일가중)
+                equal_weight = np.float64(1.0/len(up_stocks))
+                benchmark_weights['CNN Top'].loc[date, up_stocks] = equal_weight
+                
+                # 최적화 포트폴리오 생성
                 for method in ['max_sharpe', 'min_variance', 'min_cvar']:
-                    # CNN Top 포트폴리오 이름 생성 시 'cvar'를 'CVaR'로 변경
                     method_name = method.replace('_', ' ').title()
                     if method == 'min_cvar':
                         method_name = 'Min CVaR'
+                    
+                    # 기본 포트폴리오 초기화
+                    if method_name not in benchmark_weights:
+                        benchmark_weights[method_name] = pd.DataFrame(
+                            0.0,
+                            index=up_prob[up_prob.index >= first_valid_date].index,
+                            columns=returns.columns,
+                            dtype=np.float64
+                        )
+                    
+                    try:
+                        # 전체 종목에 대한 최적화
+                        weights = self.optimize_portfolio_with_torch(
+                            period_returns, 
+                            method=method,
+                            show_progress=False
+                        )
+                        weights = np.array(weights, dtype=np.float64)
+                        
+                        if N is not None:
+                            benchmark_weights[method_name].loc[date, top_N_columns] = weights
+                        else:
+                            benchmark_weights[method_name].loc[date] = weights
+                        
+                    except Exception as e:
+                        self.logger.error(f"Error optimizing {method_name} for date {date}: {str(e)}")
+                        # 최적화 실패 시 이전 가중치 유지
+                        prev_date = benchmark_weights[method_name].index[
+                            benchmark_weights[method_name].index < date
+                        ][-1]
+                        benchmark_weights[method_name].loc[date] = \
+                            benchmark_weights[method_name].loc[prev_date]
+                    
+                    # CNN Top + 최적화 포트폴리오
                     portfolio_name = f'CNN Top + {method_name}'
-                    
                     if portfolio_name not in benchmark_weights:
-                        benchmark_weights[portfolio_name] = pd.DataFrame(0.0,
-                                                                      index=up_prob.index,
-                                                                      columns=returns.columns,
-                                                                      dtype=np.float64)
+                        benchmark_weights[portfolio_name] = pd.DataFrame(
+                            0.0,
+                            index=up_prob[up_prob.index >= first_valid_date].index,
+                            columns=returns.columns,
+                            dtype=np.float64
+                        )
                     
-                    weights = self.optimize_portfolio(up_returns, method=method)
-                    weights = np.array(weights, dtype=np.float64)
-                    benchmark_weights[portfolio_name].loc[date, up_stocks] = weights
+                    try:
+                        # CNN이 선택한 종목들에 대해서만 최적화
+                        up_returns = period_returns[up_stocks]
+                        weights = self.optimize_portfolio_with_torch(
+                            up_returns,
+                            method=method,
+                            show_progress=False
+                        )
+                        weights = np.array(weights, dtype=np.float64)
+                        benchmark_weights[portfolio_name].loc[date, up_stocks] = weights
+                        
+                    except Exception as e:
+                        self.logger.error(f"Error optimizing {portfolio_name} for date {date}: {str(e)}")
+                        # 최적화 실패 시 동일가중
+                        benchmark_weights[portfolio_name].loc[date, up_stocks] = equal_weight
         
         return benchmark_weights

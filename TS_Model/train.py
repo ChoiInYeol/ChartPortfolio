@@ -17,8 +17,6 @@ from typing import Dict, Any
 from pathlib import Path
 
 import torch
-import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.nn as nn
 
 import traceback
@@ -28,34 +26,25 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 class Trainer:
-    def __init__(self, config: Dict[str, Any], use_prob: bool = False, local_rank: int = -1):
+    def __init__(self, config: Dict[str, Any]):
         """학습을 위한 Trainer 클래스 초기화"""
         self.config = config
-        self.use_prob = config['MODEL']['USE_PROB']  # config에서 직접 가져오기
-        self.local_rank = local_rank
-        self.distributed = local_rank != -1
+        self.use_prob = config['MODEL']['USEPROB']
+        
+        # 모델 저장 경로 설정 (topN 반영)
+        n_stocks = str(self.config['DATA']['N_STOCKS'])
+        model_name = f"{self.config['MODEL']['TYPE']}_top{n_stocks}"
+        self.model_dir = Path(self.config['PATHS']['RESULTS']) / model_name
+        self.model_dir.mkdir(parents=True, exist_ok=True)
         
         # 디바이스 설정
-        if self.distributed:
-            if not dist.is_initialized():
-                torch.cuda.set_device(local_rank)
-                dist.init_process_group(backend='nccl')
-            self.device = torch.device(f'cuda:{local_rank}')
-        else:
-            self.device = torch.device("cuda" if config["USE_CUDA"] else "cpu")
+        self.device = torch.device("cuda" if config["USE_CUDA"] else "cpu")
             
         # 손실 함수 설정
         self.criterion = self._get_loss_function()
         
-        # 결과 저장 경로 설정
-        self.model_dir = Path(self.config['PATHS']['RESULTS']) / self.config['MODEL']['TYPE']
-        self.model_dir.mkdir(parents=True, exist_ok=True)
-        self.best_loss = float('inf')
-        
         # 모델 초기화
         self.model = self._create_model()
-        if self.distributed:
-            self.model = DDP(self.model, device_ids=[local_rank], output_device=local_rank)
         
         # 옵티마이저 초기화
         base_optimizer = torch.optim.SGD
@@ -75,6 +64,18 @@ class Trainer:
         self.train_losses = []
         self.val_losses = []
         self.epochs = []
+        
+        # Learning rate scheduler 추가
+        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer.base_optimizer,  # SAM의 base_optimizer 사용
+            mode='min',
+            factor=0.5,
+            patience=5,
+            verbose=True
+        )
+        
+        # Weight decay 추가
+        self.weight_decay = config.get('TRAINING', {}).get('WEIGHT_DECAY', 1e-4)
 
     def _get_loss_function(self):
         """손실 함수를 반환합니다."""
@@ -97,7 +98,7 @@ class Trainer:
     def _create_model(self) -> torch.nn.Module:
         """모델을 생성하고 이전 체크포인트를 로드합니다."""
         model_type = self.config['MODEL']['TYPE']  # 수정: MODEL 딕셔너리에서 TYPE만 가져오기
-        use_prob = self.config['MODEL']['USE_PROB']
+        use_prob = self.config['MODEL']['USEPROB']
         
         if model_type == "GRU":
             model_class = PortfolioGRUWithProb if use_prob else PortfolioGRU
@@ -175,9 +176,6 @@ class Trainer:
         
         try:
             for epoch in epochs:
-                if self.distributed:
-                    train_loader.sampler.set_epoch(epoch)
-                
                 # Training
                 self.model.train()
                 train_loss = self._run_epoch(train_loader, is_training=True)
@@ -237,7 +235,12 @@ class Trainer:
                 else:
                     weights = self.model(returns)
                     
-                loss = self.criterion(returns, weights)
+                # L2 regularization 추가
+                l2_reg = torch.tensor(0., device=self.device)
+                for param in self.model.parameters():
+                    l2_reg += torch.norm(param)
+                
+                loss = self.criterion(returns, weights) + self.weight_decay * l2_reg
                 loss.backward()
                 self.optimizer.first_step(zero_grad=True)
                 
@@ -250,15 +253,22 @@ class Trainer:
                 self.criterion(returns, weights).backward()
                 self.optimizer.second_step(zero_grad=True)
             else:
-                if self.use_prob:
-                    weights = self.model(returns, probs)
-                else:
-                    weights = self.model(returns)
-                loss = self.criterion(returns, weights)
+                with torch.no_grad():
+                    if self.use_prob:
+                        weights = self.model(returns, probs)
+                    else:
+                        weights = self.model(returns)
+                    loss = self.criterion(returns, weights)
             
             total_loss += loss.item()
         
-        return total_loss / len(dataloader)
+        avg_loss = total_loss / len(dataloader)
+        
+        # Validation 시 learning rate 조정
+        if not is_training:
+            self.scheduler.step(avg_loss)
+        
+        return avg_loss
 
     def _save_checkpoint(self, epoch: int, model: nn.Module, optimizer: torch.optim.Optimizer, 
                         scheduler: torch.optim.lr_scheduler._LRScheduler, loss: float):
@@ -338,9 +348,13 @@ class Trainer:
         logging.info("Loading datasets...")
         
         try:
-            # 설정된 경로에서 데이터 로드
-            dataset_path = Path(self.config['PATHS']['DATA']['DEEP']) / 'dataset.pkl'
-            dates_path = Path(self.config['PATHS']['DATA']['DEEP']) / 'dates.pkl'
+            # N_STOCKS에 따른 파일명 설정
+            n_stocks = str(self.config['DATA']['N_STOCKS'])
+            dataset_path = Path(self.config['PATHS']['DATA']['DEEP']) / f'dataset_top{n_stocks}.pkl'
+            dates_path = Path(self.config['PATHS']['DATA']['DEEP']) / f'dates_top{n_stocks}.pkl'
+            
+            logging.info(f"Loading dataset from {dataset_path}")
+            logging.info(f"Loading dates from {dates_path}")
             
             with open(dataset_path, "rb") as f:
                 data_dict = pickle.load(f)
@@ -384,7 +398,7 @@ class Trainer:
             self.val_prob = val_data[2].astype("float32")
             self.val_dates = self.dates_dict['val']
             
-            # Test 데터 처리
+            # Test 데 처리
             test_data = data_dict['test']
             self.test_x = process_data(test_data[0])
             self.test_y = process_data(test_data[1], normalize=False)
@@ -409,36 +423,17 @@ class Trainer:
             raise
 
     def dataloader(self, x, y, probs, is_train=True):
-        """
-        데이터로더 생성
-        
-        Args:
-            x: 입력 데이터
-            y: 타겟 데이터
-            probs: 확률 데이터
-            is_train: 학습용 데이터로더인지 여부
-        """
+        """데이터로더 생성"""
         dataset = torch.utils.data.TensorDataset(
             torch.tensor(x, dtype=torch.float32),
             torch.tensor(y, dtype=torch.float32),
             torch.tensor(probs, dtype=torch.float32)
         )
-        
-        if self.distributed:
-            sampler = torch.utils.data.DistributedSampler(
-                dataset,
-                num_replicas=dist.get_world_size(),
-                rank=self.local_rank,
-                shuffle=is_train  # 학습 시에만 shuffle
-            )
-        else:
-            sampler = None
             
         return torch.utils.data.DataLoader(
             dataset=dataset,
             batch_size=self.config["TRAINING"]["BATCH_SIZE"],
-            shuffle=(sampler is None and is_train),  # 학습 시에만 shuffle
-            sampler=sampler,
+            shuffle=is_train,  # 학습 시에만 shuffle
             num_workers=4,
             pin_memory=True,
             drop_last=is_train,  # 학습 시에만 마지막 배치 drop
@@ -472,90 +467,98 @@ class Trainer:
 
     def save_weights(self, weights_array: np.ndarray, data_type: str):
         """가중치 저장"""
-        if not self.distributed or self.local_rank == 0:
-            # 주식 이름 로드
-            try:
-                tickers = pd.read_csv("/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv", index_col=0).columns[:self.config['DATA']['N_STOCKS']]
-            except Exception as e:
-                logger.error(f"Error loading tickers: {e}")
-                tickers = [f"Stock_{i}" for i in range(self.config['DATA']['N_STOCKS'])]
-
-            # 날짜 인덱스 가져오기
-            if data_type == "train":
-                dates = self.train_dates
-            elif data_type == "val":
-                dates = self.val_dates
-            else:  # test
-                dates = self.test_dates
-                
-            # 날짜 리스트를 평탄화 (중첩된 리스트 처리)
-            flat_dates = [date for sublist in dates for date in sublist]
+        if weights_array.size == 0:
+            logger.error("Empty weights array received")
+            return
+        
+        try:
+            # N_STOCKS에 따른 파일명 설정
+            n_stocks = str(self.config['DATA']['N_STOCKS'])
+            returns_path = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data") / f"filtered_returns_top{n_stocks}.csv"
             
-            weights_path = os.path.join(
-                self.config['RESULT_DIR'],
-                self.config["MODEL"],
-                f"weights_{data_type}.csv"
+            # 티커 가져오기
+            tickers = pd.read_csv(returns_path, index_col=0).columns
+            
+            # 날짜 인덱스 사용
+            dates = self.train_dates if data_type == 'train' else self.val_dates
+            date_index = pd.DatetimeIndex([date[0] for date in dates])
+            
+            # 가중치 파일명 생성
+            weights_filename = (
+                f"portfolio_weights_"
+                f"{self.config['MODEL']['TYPE']}_top{n_stocks}_"
+                f"{'prob' if self.use_prob else 'no_prob'}_"
+                f"{self.config['PORTFOLIO']['OBJECTIVE']}_{data_type}.csv"
             )
             
-            # CSV 파일에 헤더와 인덱스 추가
-            df_weights = pd.DataFrame(weights_array, columns=tickers, index=pd.to_datetime(flat_dates))
+            weights_path = self.model_dir / weights_filename
+            
+            # DataFrame 생성 및 저장
+            df_weights = pd.DataFrame(
+                weights_array,
+                columns=tickers,
+                index=date_index
+            )
             df_weights.to_csv(weights_path)
-            logger.info(f"Weights for {data_type} data saved to {weights_path}")
+            
+            logger.info(f"{data_type.capitalize()} weights saved to {weights_path}")
+            
+        except Exception as e:
+            logger.error(f"Error saving {data_type} weights: {str(e)}")
+            raise
 
     def _save_training_history(self):
         """학습 이력을 CSV 파일로 저장합니다."""
-        if not self.distributed or self.local_rank == 0:  # 분산 학습 시 마스터 노드에서만 저장
-            history_df = pd.DataFrame({
-                'epoch': self.epochs,
-                'train_loss': self.train_losses,
-                'val_loss': self.val_losses
-            })
+        history_df = pd.DataFrame({
+            'epoch': self.epochs,
+            'train_loss': self.train_losses,
+            'val_loss': self.val_losses
+        })
+        
+        # 모델 설정에 따른 파일명 생성
+        model_type = self.config["MODEL"]["TYPE"]
+        if model_type == "GRU":
+            model_config = f"{model_type}_L{self.config['MODEL']['N_LAYER']}_H{self.config['MODEL']['HIDDEN_DIM']}"
+            if self.config['MODEL']['BIDIRECTIONAL']:
+                model_config += "_bi"
+        elif model_type == "TCN":
+            model_config = f"{model_type}_L{self.config['MODEL']['TCN']['level']}_H{self.config['MODEL']['TCN']['hidden_size']}"
+        elif model_type == "TRANSFORMER":
+            model_config = f"{model_type}_L{self.config['MODEL']['TRANSFORMER']['n_layer']}_H{self.config['MODEL']['TRANSFORMER']['n_head']}"
+        
+        # 목적함수 추가
+        objective = self.config['PORTFOLIO']['OBJECTIVE']
+        model_config += f"_{objective}"
+        
+        # 확률 사용 여부 추가 
+        if self.config['MODEL']['USEPROB']:
+            model_config += "_prob"
             
-            # 모델 설정에 따른 파일명 생성
-            model_type = self.config["MODEL"]["TYPE"]
-            if model_type == "GRU":
-                model_config = f"{model_type}_L{self.config['MODEL']['N_LAYER']}_H{self.config['MODEL']['HIDDEN_DIM']}"
-                if self.config['MODEL']['BIDIRECTIONAL']:
-                    model_config += "_bi"
-            elif model_type == "TCN":
-                model_config = f"{model_type}_L{self.config['MODEL']['TCN']['level']}_H{self.config['MODEL']['TCN']['hidden_size']}"
-            elif model_type == "TRANSFORMER":
-                model_config = f"{model_type}_L{self.config['MODEL']['TRANSFORMER']['n_layer']}_H{self.config['MODEL']['TRANSFORMER']['n_head']}"
-            
-            # 목적함수 추가
-            objective = self.config['PORTFOLIO']['OBJECTIVE']
-            model_config += f"_{objective}"
-            
-            # 확률 사용 여부 추가 
-            if self.config['MODEL']['USE_PROB']:
-                model_config += "_prob"
-                
-            # Loss와 Epoch 추가
-            model_config += f"_e{len(self.epochs)}_loss{self.best_val_loss:.4f}"
-            
-            # 저장 경로 설정
-            history_path = os.path.join(
-                self.model_dir,
-                f'training_history_{model_config}.csv'
-            )
-            
-            history_df.to_csv(history_path, index=False)
-            logger.info(f"Training history saved to {history_path}")
-            
-            # 학습 결과 요약 로깅
-            logger.info(f"Training Summary:")
-            logger.info(f"Best validation loss: {self.best_val_loss:.4f}")
-            logger.info(f"Total epochs: {len(self.epochs)}")
-            logger.info(f"Final train loss: {self.train_losses[-1]:.4f}")
-            logger.info(f"Final validation loss: {self.val_losses[-1]:.4f}")
+        # Loss와 Epoch 추가
+        model_config += f"_e{len(self.epochs)}_loss{self.best_val_loss:.4f}"
+        
+        # 저장 경로 설정
+        history_path = os.path.join(
+            self.model_dir,
+            f'training_history_{model_config}.csv'
+        )
+        
+        history_df.to_csv(history_path, index=False)
+        logger.info(f"Training history saved to {history_path}")
+        
+        # 학습 결과 요약 로깅
+        logger.info(f"Training Summary:")
+        logger.info(f"Best validation loss: {self.best_val_loss:.4f}")
+        logger.info(f"Total epochs: {len(self.epochs)}")
+        logger.info(f"Final train loss: {self.train_losses[-1]:.4f}")
+        logger.info(f"Final validation loss: {self.val_losses[-1]:.4f}")
 
     def __del__(self):
-        """소멸자에서 process group 정리"""
-        if self.distributed and dist.is_initialized():
-            dist.destroy_process_group()
+        """소멸자"""
+        pass  # 분산 학습 관련 코드 제거
 
     def predict(self, data_type: str = 'train') -> np.ndarray:
-        """���정된 데이터셋에 대한 포트폴리오 가중치를 예측합니다."""
+        """정된 데이터셋에 대한 포트폴리오 가중치를 예측합니다."""
         self.model.eval()
         
         # 데이터셋 선택
@@ -587,118 +590,68 @@ class Trainer:
         
         return np.concatenate(predictions, axis=0)
 
-    def save_weights(self, weights_array: np.ndarray, data_type: str = 'train'):
-        """
-        가중치를 저장합니다.
-        
-        Args:
-            weights_array (np.ndarray): 저장할 가중치 배열
-            data_type (str): 데이터 타입 ('train' 또는 'val')
-        """
-        if weights_array.size == 0:
-            logger.error("Empty weights array received")
-            return
-        
-        try:
-            # 티커 가져오기
-            tickers = pd.read_csv(
-                "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv",
-                index_col=0
-            ).columns[:self.config['DATA']['N_STOCKS']]
-            
-            # 날짜 인덱스 사용
-            dates = self.train_dates if data_type == 'train' else self.val_dates
-            date_index = pd.DatetimeIndex([date[0] for date in dates])
-            
-            # 가중치 파일명 생성
-            weights_filename = (
-                f"portfolio_weights_"
-                f"{self.config['MODEL']['TYPE']}_"
-                f"{'prob' if self.use_prob else 'no_prob'}_"
-                f"{self.config['PORTFOLIO']['OBJECTIVE']}_{data_type}.csv"
-            )
-            
-            weights_path = self.model_dir / weights_filename
-            
-            # DataFrame 생성 및 저장
-            df_weights = pd.DataFrame(
-                weights_array,
-                columns=tickers,
-                index=date_index
-            )
-            df_weights.to_csv(weights_path)
-            
-            logger.info(f"{data_type.capitalize()} weights saved to {weights_path}")
-            
-        except Exception as e:
-            logger.error(f"Error saving {data_type} weights: {str(e)}")
-            raise
-
     def _cleanup_checkpoints(self):
-        """
-        학습 종료 후 최고 성능의 체크포인트만 남기고 나머지 삭제
-        """
-        if not self.distributed or self.local_rank == 0:  # 마스터 노드에서만 실행
-            try:
-                # 체크포인트 파일 목록 가져오기
-                checkpoints = []
-                for f in os.listdir(self.model_dir):
-                    if f.endswith('.pth'):
-                        try:
-                            # 체크포인트 파일명 파싱 시도
-                            parts = f.split('_')
-                            if len(parts) >= 5:  # 최소 필요한 부분이 있는지 확인
-                                checkpoints.append(f)
-                        except:
-                            continue
-                            
-                if not checkpoints:
-                    logger.info("No checkpoints found to cleanup")
-                    return
-                
-                # 현재 설정과 일치하는 체크포인트 필터링
-                matching_checkpoints = []
-                for ckpt in checkpoints:
+        """학습 종료 후 최고 성능의 체크포인트만 남기고 나머지 삭제"""
+        try:
+            # 체크��인트 파일 목록 가져오기
+            checkpoints = []
+            for f in os.listdir(self.model_dir):
+                if f.endswith('.pth'):
                     try:
-                        parts = ckpt.split('_')
-                        model_type = parts[1]
-                        prob_setting = parts[3]
-                        loss_type = parts[4].split('.')[0]
-                        
-                        if (model_type == self.config['MODEL']['TYPE'] and
-                            prob_setting == ('prob' if self.use_prob else 'no_prob') and
-                            loss_type == self.config['PORTFOLIO']['OBJECTIVE']):
-                            matching_checkpoints.append(ckpt)
+                        # 체크포인트 파일명 파싱 시도
+                        parts = f.split('_')
+                        if len(parts) >= 5:  # 최소 필요한 부분이 있는지 확인
+                            checkpoints.append(f)
                     except:
                         continue
-                
-                if not matching_checkpoints:
-                    logger.info("No matching checkpoints found")
-                    return
-                
-                # loss 값을 기준으로 정렬하여 가장 좋은 것 선택
+                            
+            if not checkpoints:
+                logger.info("No checkpoints found to cleanup")
+                return
+            
+            # 현재 설정과 일치하는 체크포인트 필터링
+            matching_checkpoints = []
+            for ckpt in checkpoints:
                 try:
-                    best_checkpoint = min(matching_checkpoints,
-                                        key=lambda x: float(x.split('_')[2]))
-                except ValueError as e:
-                    logger.error(f"Error parsing loss values: {str(e)}")
-                    return
-                
-                # 나머지 체크포인트 삭제
-                deleted_count = 0
-                for ckpt in matching_checkpoints:
-                    if ckpt != best_checkpoint:
-                        try:
-                            checkpoint_path = os.path.join(self.model_dir, ckpt)
-                            os.remove(checkpoint_path)
-                            deleted_count += 1
-                            logger.info(f"Removed checkpoint: {checkpoint_path}")
-                        except OSError as e:
-                            logger.error(f"Error removing {ckpt}: {str(e)}")
-                            continue
-                
-                logger.info(f"Cleanup complete - Kept: {best_checkpoint}, Removed: {deleted_count} files")
-                
-            except Exception as e:
-                logger.error(f"Error during checkpoint cleanup: {str(e)}")
-                logger.error(f"Traceback: {traceback.format_exc()}")
+                    parts = ckpt.split('_')
+                    model_type = parts[1]
+                    prob_setting = parts[3]
+                    loss_type = parts[4].split('.')[0]
+                    
+                    if (model_type == self.config['MODEL']['TYPE'] and
+                        prob_setting == ('prob' if self.use_prob else 'no_prob') and
+                        loss_type == self.config['PORTFOLIO']['OBJECTIVE']):
+                        matching_checkpoints.append(ckpt)
+                except:
+                    continue
+            
+            if not matching_checkpoints:
+                logger.info("No matching checkpoints found")
+                return
+            
+            # loss 값을 기준으로 정렬하여 가장 좋은 것 선택
+            try:
+                best_checkpoint = min(matching_checkpoints,
+                                    key=lambda x: float(x.split('_')[2]))
+            except ValueError as e:
+                logger.error(f"Error parsing loss values: {str(e)}")
+                return
+            
+            # 나머지 체크포인트 삭제
+            deleted_count = 0
+            for ckpt in matching_checkpoints:
+                if ckpt != best_checkpoint:
+                    try:
+                        checkpoint_path = os.path.join(self.model_dir, ckpt)
+                        os.remove(checkpoint_path)
+                        deleted_count += 1
+                        logger.info(f"Removed checkpoint: {checkpoint_path}")
+                    except OSError as e:
+                        logger.error(f"Error removing {ckpt}: {str(e)}")
+                        continue
+            
+            logger.info(f"Cleanup complete - Kept: {best_checkpoint}, Removed: {deleted_count} files")
+            
+        except Exception as e:
+            logger.error(f"Error during checkpoint cleanup: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")

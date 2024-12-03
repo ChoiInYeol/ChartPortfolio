@@ -8,7 +8,6 @@ from model.gru import PortfolioGRU, PortfolioGRUWithProb
 from model.transformer import PortfolioTransformer, PortfolioTransformerWithProb
 from model.tcn import PortfolioTCN, PortfolioTCNWithProb
 from typing import Dict, Any, Optional
-import torch.distributed as dist
 from pathlib import Path
 import pickle
 
@@ -25,8 +24,10 @@ class ModelInference:
         self.config = config
         self.device = torch.device("cuda" if config["USE_CUDA"] else "cpu")
         
-        # 모델 저장 디렉토리 설정
-        self.model_dir = f"/home/indi/codespace/ImagePortOpt/TS_Model/Result/{config['MODEL']['TYPE']}"
+        # N_STOCKS에 따른 모델 경로 설정
+        n_stocks = str(config['DATA']['N_STOCKS'])
+        model_name = f"{config['MODEL']['TYPE']}_top{n_stocks}"
+        self.model_dir = Path("/home/indi/codespace/ImagePortOpt/TS_Model/Result") / model_name
         
         # 가장 최신의 체크포인트 찾기
         self.model_path = self._find_best_checkpoint()
@@ -35,7 +36,7 @@ class ModelInference:
         self.model = self._load_model()
         
         # 결과 저장 디렉토리 생성
-        self.result_dir = Path(config['PATHS']['RESULTS']) / config['MODEL']['TYPE']
+        self.result_dir = Path(config['PATHS']['RESULTS']) / model_name
         self.result_dir.mkdir(parents=True, exist_ok=True)
         
         # 데이터 로드
@@ -105,12 +106,12 @@ class ModelInference:
     def _load_data(self):
         """테스트 데이터를 로드합니다."""
         try:
-            # DEEP 경로 사용
+            # N_STOCKS에 따른 파일명 설정
+            n_stocks = str(self.config['DATA']['N_STOCKS'])
             data_dir = str(self.config['PATHS']['DATA']['DEEP'])
             
-            # 데이터셋 경로 설정
-            dataset_path = Path(data_dir) / "dataset.pkl"
-            dates_path = Path(data_dir) / "dates.pkl"
+            dataset_path = Path(data_dir) / f"dataset_top{n_stocks}.pkl"
+            dates_path = Path(data_dir) / f"dates_top{n_stocks}.pkl"
             
             logger.info(f"Data directory: {data_dir}")
             logger.info(f"Loading dataset from {dataset_path}")
@@ -237,11 +238,12 @@ class ModelInference:
             return
         
         try:
-            # filtered_returns.csv 파일에서 칼럼명(티커) 가져오기
-            tickers = pd.read_csv(
-                "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv",
-                index_col=0
-            ).columns[:self.config['DATA']['N_STOCKS']]
+            # N_STOCKS에 따른 파일명 설정
+            n_stocks = str(self.config['DATA']['N_STOCKS'])
+            returns_path = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data") / f"filtered_returns_top{n_stocks}.csv"
+            
+            # 티커 가져오기
+            tickers = pd.read_csv(returns_path, index_col=0).columns
             
             # 날짜 인덱스 사용
             date_index = pd.DatetimeIndex([dates[0] for dates in self.test_dates])
@@ -249,7 +251,7 @@ class ModelInference:
             # 가중치 파일명 생성
             weights_filename = (
                 f"portfolio_weights_"
-                f"{self.config['MODEL']['TYPE']}_"
+                f"{self.config['MODEL']['TYPE']}_top{n_stocks}_"
                 f"{'prob' if self.config['MODEL']['USEPROB'] else 'noprob'}_"
                 f"{self.config['PORTFOLIO']['OBJECTIVE']}.csv"
             )
@@ -270,8 +272,3 @@ class ModelInference:
             logger.error(f"Error saving weights: {str(e)}")
             logger.error(f"Config PATHS: {self.config['PATHS']}")
             raise
-
-def cleanup():
-    """분산 처리 정리"""
-    if dist.is_initialized():
-        dist.destroy_process_group()

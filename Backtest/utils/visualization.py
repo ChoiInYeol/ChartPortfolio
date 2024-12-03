@@ -6,7 +6,8 @@ import numpy as np
 import logging
 import os
 import scienceplots
-plt.style.use(['science'])
+import matplotlib.pyplot as plt
+plt.style.use('science')
 
 class PortfolioVisualizer:
     """포트폴리오 시각화를 위한 클래스입니다."""
@@ -14,22 +15,31 @@ class PortfolioVisualizer:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         
-        # 기본 색상 스키마
+        # 기본 색상 스키마 
         self.color_scheme = {
-            'Naive': '#1f77b4',
-            'CNN Top': '#ff7f0e',
-            'Max Sharpe': '#d62728',
-            'Min Variance': '#9467bd',
-            'Min CVaR': '#8c564b',
-            'CNN Top + Max Sharpe': '#e377c2',
-            'CNN Top + Min Variance': '#7f7f7f',
-            'CNN Top + Min CVaR': '#bcbd22',
-            'GRU': '#17becf',
-            'TCN': '#1a55FF',
-            'TRANSFORMER': '#FF55AA',
-            'CNN + GRU': '#AA55FF',
-            'CNN + TCN': '#55FFAA',
-            'CNN + TRANSFORMER': '#FFAA55'
+            # 벤치마크
+            'Naive': '#FF1F5B',  # qualitative 1
+            'CNN Top': '#00CD6C',  # qualitative 2
+            
+            # 최적화
+            'Max Sharpe': '#009ADE',  # qualitative 3 
+            'Min Variance': '#AF58BA',  # qualitative 4
+            'Min CVaR': '#FFC61E',  # qualitative 5
+            
+            # 최적화 + CNN Top
+            'CNN Top + Max Sharpe': '#F28522',  # qualitative 6
+            'CNN Top + Min Variance': '#A0B1BA',  # qualitative 7
+            'CNN Top + Min CVaR': '#A6761D',  # qualitative 8
+            
+            # 시계열 모델
+            'GRU': '#E9002D',  # qualitative 9
+            'TCN': '#FFAA00',  # qualitative 10
+            'TRANSFORMER': '#00B000',  # qualitative 11
+            
+            # 시계열 모델 + CNN Top
+            'CNN + GRU': '#C40F5B',  # qualitative 12
+            'CNN + TCN': '#FD8D3C',  # qualitative 13
+            'CNN + TRANSFORMER': '#089099'  # qualitative 14
         }
 
     def plot_portfolio_comparison(self,
@@ -37,16 +47,8 @@ class PortfolioVisualizer:
                                 title: str,
                                 result_dir: str,
                                 selected_portfolios: list = None):
-        """
-        포트폴리오 성과를 비교 시각화합니다.
-        
-        Args:
-            returns_dict (pd.DataFrame): 포트폴리오별 수익률
-            title (str): 그래프 제목
-            result_dir (str): 결과 저장 경로
-            selected_portfolios (list, optional): 표시할 포트폴리오 목록
-        """
-        plt.figure(figsize=(15, 8), dpi=300)
+        """포트폴리오 성과를 비교 시각화합니다."""
+        plt.figure(figsize=(15, 8), dpi=100)
         
         # 선택된 포트폴리오만 필터링
         if selected_portfolios is not None:
@@ -64,7 +66,21 @@ class PortfolioVisualizer:
                     cumulative_returns[col], 
                     label=col,
                     color=color,
-                    linewidth=1.5)
+                    linewidth=1)
+            
+            # 리밸런싱 날짜에 점 표시 (실제 데이터의 인덱스와 일치하는 날짜만)
+            rebalance_dates = pd.date_range(start=cumulative_returns.index[0],
+                                          end=cumulative_returns.index[-1],
+                                          freq='ME')
+            # 실제 데이터의 인덱스와 교집합만 사용
+            valid_dates = rebalance_dates[rebalance_dates.isin(cumulative_returns.index)]
+            
+            if len(valid_dates) > 0:
+                plt.plot(valid_dates,
+                        cumulative_returns.loc[valid_dates, col],
+                        'o',
+                        color=color,
+                        markersize=4)
         
         plt.title(title, fontsize=14, pad=20)
         plt.xlabel('Date', fontsize=12)
@@ -77,7 +93,7 @@ class PortfolioVisualizer:
                   fontsize=10)
         
         plt.tight_layout()
-        save_path = os.path.join(result_dir, 'portfolio_comparison.png')
+        save_path = os.path.join(result_dir, 'figures', 'portfolio_comparison.png')
         plt.savefig(save_path, bbox_inches='tight')
         plt.close()
         
@@ -95,7 +111,7 @@ class PortfolioVisualizer:
             save_path (str): 저장 경로
             title (str): 그래프 제목
         """
-        plt.figure(figsize=(15, 8), dpi=300)
+        plt.figure(figsize=(15, 8), dpi=100)
         
         # 0이 아닌 가중치만 선택
         weights = weights.loc[:, (weights != 0).any()]
@@ -139,6 +155,7 @@ class PortfolioVisualizer:
         plt.xticks(rotation=45)
         
         plt.tight_layout()
+        save_path = os.path.join(os.path.dirname(save_path), 'figures', os.path.basename(save_path))
         plt.savefig(save_path, bbox_inches='tight')
         plt.close()
         

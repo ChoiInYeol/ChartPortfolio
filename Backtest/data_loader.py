@@ -10,16 +10,18 @@ from typing import Dict
 class DataLoader:
     """데이터 로딩을 위한 클래스입니다."""
     
-    def __init__(self, base_folder: str, train_date: str = '2017-12-31', end_date: str = '2024-07-05'):
+    def __init__(self, base_folder: str, data_size: int, train_date: str = '2017-12-31', end_date: str = '2024-07-05'):
         """
         DataLoader 초기화
         
         Args:
             base_folder (str): 기본 폴더 경로
+            data_size (int): 데이터 크기 (50, 370, 500, 2055)
             train_date (str): 학습 시작 날짜
             end_date (str): 투자 종료 날짜
         """
         self.base_folder = base_folder
+        self.data_size = data_size
         self.train_date = train_date
         self.end_date = end_date
         self.logger = logging.getLogger(__name__)
@@ -27,24 +29,35 @@ class DataLoader:
         # 설정 파일 로드
         with open(os.path.join(base_folder, 'weight.yaml'), 'r') as f:
             self.config = yaml.safe_load(f)
+        
+        # 결과 디렉토리 설정
+        self.result_dir = os.path.join(
+            self.config['base_settings']['result_dir'],
+            f'Result_{data_size}'
+        )
+        
+        # 하위 디렉토리 생성
+        for subdir in self.config['base_settings']['subdirs']:
+            os.makedirs(os.path.join(self.result_dir, subdir), exist_ok=True)
 
     def load_data(self) -> Dict[str, pd.DataFrame]:
         """필요한 데이터를 모두 로드합니다."""
         try:
             # 수익률 데이터 로드
-            returns = pd.read_csv('../TS_Model/data/filtered_returns.csv', 
+            returns = pd.read_csv(f'../TS_Model/data/filtered_returns_top{self.data_size}.csv', 
                                 index_col=0, parse_dates=True)
             
             # 상승확률 데이터 로드
-            probs = pd.read_csv('../TS_Model/data/filtered_probs.csv', 
+            probs = pd.read_csv(f'../TS_Model/data/filtered_probs_top{self.data_size}.csv', 
                               index_col=0, parse_dates=True)
             
-            # 날짜 필터링
-            returns = returns[(returns.index >= self.train_date) & (returns.index <= self.end_date)]
-            probs = probs[(probs.index >= self.train_date) & (probs.index <= self.end_date)]
+            # 날짜 필터링 및 결측치 처리
+            returns = returns[(returns.index >= self.train_date) & 
+                            (returns.index <= self.end_date)]
+            returns = returns.ffill().bfill()
             
-            # 결측치 처리
-            returns = returns.fillna(method='ffill').fillna(method='bfill')
+            probs = probs[(probs.index >= self.train_date) & 
+                         (probs.index <= self.end_date)]
             probs = probs.fillna(0.5)
             
             return {
@@ -61,34 +74,32 @@ class DataLoader:
         weights_dict = {}
         
         try:
-            # 파일 경로 설정
-            model_paths = self.config['ts_models'].get(model_name, {})
-            if not model_paths:
-                self.logger.warning(f"No paths configured for model {model_name}")
+            model_templates = self.config['file_templates']['ts_models'].get(model_name, {})
+            if not model_templates:
+                self.logger.warning(f"No templates configured for model {model_name}")
                 return weights_dict
             
-            # CNN 미사용 가중치
-            noprob_path = model_paths.get('noprob')
-            if noprob_path and os.path.exists(noprob_path):
-                weights = pd.read_csv(noprob_path, index_col=0, parse_dates=True)
-                # 날짜 필터링
-                weights = weights[(weights.index >= self.train_date) & (weights.index <= self.end_date)]
-                weights = weights.fillna(0)
-                weights_dict[model_name] = weights
-            
-            # CNN 사용 가중치
-            prob_path = model_paths.get('prob')
-            if prob_path and os.path.exists(prob_path):
-                weights = pd.read_csv(prob_path, index_col=0, parse_dates=True)
-                # 날짜 필터링
-                weights = weights[(weights.index >= self.train_date) & (weights.index <= self.end_date)]
-                weights = weights.fillna(0)
-                weights_dict[f'CNN + {model_name}'] = weights
-                
+            # 파일 경로 생성
+            for weight_type, template in model_templates.items():
+                path = template.format(size=self.data_size)
+                if os.path.exists(path):
+                    weights = pd.read_csv(path, index_col=0, parse_dates=True)
+                    weights = weights[(weights.index >= self.train_date) & 
+                                    (weights.index <= self.end_date)].fillna(0)
+                    
+                    if weight_type == 'noprob':
+                        weights_dict[model_name] = weights
+                    else:  # prob
+                        weights_dict[f'CNN + {model_name}'] = weights
+                        
         except Exception as e:
             self.logger.error(f"Error loading weights for {model_name}: {str(e)}")
         
         return weights_dict
+
+    def get_result_path(self, subdir: str, filename: str) -> str:
+        """결과 파일의 전체 경로를 반환합니다."""
+        return os.path.join(self.result_dir, subdir, filename)
 
     def load_benchmark(self) -> pd.Series:
         """S&P 500 지수 데이터를 로드합니다."""
