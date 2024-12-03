@@ -45,46 +45,59 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
         logging.error(f"데이터 로드 중 오류 발생: {str(e)}")
         raise
 
-def filter_sp500_stocks(returns_df: pd.DataFrame, probs_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def filter_top_n_stocks(
+    returns_df: pd.DataFrame, 
+    probs_df: pd.DataFrame, 
+    n: str = None
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    시가총액 상위 50개 종목만 필터링합니다.
+    시가총액 상위 N개 종목만 필터링합니다.
     
     Args:
         returns_df: 전체 수익률 데이터
         probs_df: 전체 상승확률 데이터
+        n: 필터링할 종목 수 (기본값은 market_caps_df의 전체 심볼 수)
         
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: 시가총액 상위 50개 종목으로 필터링된 (수익률, 상승확률) 데이터
+        Tuple[pd.DataFrame, pd.DataFrame]: 시가총액 상위 N개 종목으로 필터링된 (수익률, 상승확률) 데이터
     """
     try:
-        # 시가총액 상위 50개 종목 리스트 로드
+        # 시가총액 데이터 로드
         market_caps_df = pd.read_csv(
             "/home/indi/codespace/ImagePortOpt/TS_Model/data/market_caps_20180101.csv"
         )
-        top_50_symbols = market_caps_df['Symbol'].tolist()[:50]
         
-        # 시가총액 상위 50개 종목 중 데이터가 있는 종목만 필터링
-        available_symbols = [sym for sym in top_50_symbols if sym in returns_df and sym in probs_df]
+        # N이 숫자가 아닌 경우 전체 심볼 수로 설정
+        if not n.isdigit():
+            n = len(market_caps_df)
+        else:
+            n = int(n)
+        
+        # 시가총액 상위 N개 종목 리스트 로드
+        top_n_symbols = market_caps_df['Symbol'].tolist()[:n]
+        
+        # 시가총액 상위 N개 종목 중 데이터가 있는 종목만 필터링
+        available_symbols = [sym for sym in top_n_symbols if sym in returns_df and sym in probs_df]
         filtered_returns = returns_df[available_symbols]
         filtered_probs = probs_df[available_symbols]
         
-        logging.info(f"시가총액 상위 50개 종목 필터링 완료")
+        logging.info(f"시가총액 상위 {n}개 종목 필터링 완료")
         logging.info(f"필터링된 종목 수: {len(available_symbols)}")
         logging.info(f"필터링된 수익률 데이터 shape: {filtered_returns.shape}")
         logging.info(f"필터링된 상승확률 데이터 shape: {filtered_probs.shape}")
         
-        # csv로 저장
+        # N에 따라 다른 파일명으로 저장
         filtered_returns.to_csv(
-            "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns.csv"
+            f"/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns_top{n}.csv"
         )
         filtered_probs.to_csv(
-            "/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_probs.csv"
+            f"/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_probs_top{n}.csv"
         )
         
         return filtered_returns, filtered_probs
         
     except Exception as e:
-        logging.error(f"시가총액 상위 50개 종목 필터링 중 오류 발생: {str(e)}")
+        logging.error(f"시가총액 상위 {n}개 종목 필터링 중 오류 발생: {str(e)}")
         raise
 
 def normalize_probabilities(probs: np.ndarray, method: str = 'standardize') -> np.ndarray:
@@ -274,9 +287,15 @@ def prepare_dataset(config: Dict[str, Any]) -> None:
         logging.info("1. 원본 데이터 로드 시작")
         returns_df, probs_df = load_raw_data()
         
+        # N 값 가져오기 (config에서 설정 필요)
+        n = config['DATA'].get('N_STOCKS', None)
+        n_suffix = str(n) if n is not None else "all"
+
         # 2. SP500 종목 필터링
         logging.info("2. SP500 종목 필터링 시작")
-        filtered_returns, filtered_probs = filter_sp500_stocks(returns_df, probs_df)
+        filtered_returns, filtered_probs = filter_top_n_stocks(returns_df,
+                                                               probs_df,
+                                                               n)
         
         # 3. 데이터셋 분할 및 생성
         logging.info("3. 데이터셋 분할 및 생성 시작")
@@ -302,9 +321,9 @@ def prepare_dataset(config: Dict[str, Any]) -> None:
         save_dir = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data")
         save_dir.mkdir(parents=True, exist_ok=True)
         
-        with open(save_dir / "dataset.pkl", "wb") as f:
+        with open(save_dir / f"dataset_top{n_suffix}.pkl", "wb") as f:
             pickle.dump(dataset, f)
-        with open(save_dir / "dates.pkl", "wb") as f:
+        with open(save_dir / f"dates_top{n_suffix}.pkl", "wb") as f:
             pickle.dump(dates, f)
             
         logging.info("데이터셋 준비 완료")

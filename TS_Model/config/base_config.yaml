@@ -18,7 +18,7 @@ DATA:
   PRED_WINDOW: 20  # 예측 기간 (이전 PRED_LEN)
   
   # 데이터 처리
-  N_STOCKS: 50  # 처리할 종목 수
+  N_STOCKS: 500  # 처리할 종목 수
   PROB_NORMALIZE: 'standardize'  # 확률값 정규화 방법 ['standardize', 'minmax']
   SCALING_FACTOR: 20  # 스케일링 팩터
 USE_CUDA: true

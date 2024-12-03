@@ -188,7 +188,11 @@ class OptimizationManager:
             # 3. 최적화 포트폴리오
             # Universe 전체에 대한 최적화
             for method in ['max_sharpe', 'min_variance', 'min_cvar']:
+                # 포트폴리오 이름 생성 시 'cvar'를 'CVaR'로 변경
                 portfolio_name = method.replace('_', ' ').title()
+                if method == 'min_cvar':
+                    portfolio_name = 'Min CVaR'
+                    
                 if portfolio_name not in benchmark_weights:
                     benchmark_weights[portfolio_name] = pd.DataFrame(0.0,
                                                                   index=up_prob.index,
@@ -196,14 +200,19 @@ class OptimizationManager:
                                                                   dtype=np.float64)
                 
                 weights = self.optimize_portfolio(period_returns, method=method)
-                weights = np.array(weights, dtype=np.float64)  # dtype 명시
+                weights = np.array(weights, dtype=np.float64)
                 benchmark_weights[portfolio_name].loc[date] = weights
             
             # CNN Top 종목들에 대한 최적화
             if len(up_stocks) > 0:
                 up_returns = period_returns[up_stocks]
                 for method in ['max_sharpe', 'min_variance', 'min_cvar']:
-                    portfolio_name = f'CNN Top + {method.replace("_", " ").title()}'
+                    # CNN Top 포트폴리오 이름 생성 시 'cvar'를 'CVaR'로 변경
+                    method_name = method.replace('_', ' ').title()
+                    if method == 'min_cvar':
+                        method_name = 'Min CVaR'
+                    portfolio_name = f'CNN Top + {method_name}'
+                    
                     if portfolio_name not in benchmark_weights:
                         benchmark_weights[portfolio_name] = pd.DataFrame(0.0,
                                                                       index=up_prob.index,

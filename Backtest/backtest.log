@@ -32,3 +32,75 @@
 2024-11-27 14:05:24,730 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
 2024-11-27 14:05:56,923 - INFO - Backtest completed successfully
 2024-11-29 13:16:32,549 - INFO - Data loaded - Returns: (1637, 50), Up prob: (79, 50)
+2024-11-29 13:17:13,365 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-11-29 13:17:13,367 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTop_weights.csv
+2024-11-29 13:17:13,369 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpe_weights.csv
+2024-11-29 13:17:13,372 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVariance_weights.csv
+2024-11-29 13:17:13,374 - INFO - Saved Min Cvar weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCvar_weights.csv
+2024-11-29 13:17:13,376 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpe_weights.csv
+2024-11-29 13:17:13,378 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVariance_weights.csv
+2024-11-29 13:17:13,381 - INFO - Saved CNN Top + Min Cvar weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCvar_weights.csv
+2024-11-29 13:17:13,416 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-11-29 13:17:13,448 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-11-29 13:17:13,480 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-11-29 13:17:13,511 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-11-29 13:17:13,542 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-11-29 13:17:13,573 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-11-29 13:17:19,184 - ERROR - Error during backtest: "['CNN Top + Min CVaR'] not in index"
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 168, in run
+    selected_returns = returns_df[selected_portfolios]
+                       ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/frame.py", line 4108, in __getitem__
+    indexer = self.columns._get_indexer_strict(key, "columns")[1]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6200, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6252, in _raise_if_missing
+    raise KeyError(f"{not_found} not in index")
+KeyError: "['CNN Top + Min CVaR'] not in index"
+2024-11-29 13:20:24,415 - INFO - Data loaded - Returns: (1637, 50), Up prob: (79, 50)
+2024-11-29 13:21:02,237 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-11-29 13:21:02,239 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTop_weights.csv
+2024-11-29 13:21:02,241 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpe_weights.csv
+2024-11-29 13:21:02,243 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVariance_weights.csv
+2024-11-29 13:21:02,246 - INFO - Saved Min Cvar weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCvar_weights.csv
+2024-11-29 13:21:02,248 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpe_weights.csv
+2024-11-29 13:21:02,250 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVariance_weights.csv
+2024-11-29 13:21:02,253 - INFO - Saved CNN Top + Min Cvar weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCvar_weights.csv
+2024-11-29 13:21:02,293 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-11-29 13:21:02,325 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-11-29 13:21:02,357 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-11-29 13:21:02,388 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-11-29 13:21:02,419 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-11-29 13:21:02,450 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-11-29 13:21:08,014 - ERROR - Error during backtest: "['CNN Top + Min CVaR'] not in index"
+Traceback (most recent call last):
+  File "/home/indi/codespace/ImagePortOpt/Backtest/main.py", line 168, in run
+    selected_returns = returns_df[selected_portfolios]
+                       ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/frame.py", line 4108, in __getitem__
+    indexer = self.columns._get_indexer_strict(key, "columns")[1]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6200, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6252, in _raise_if_missing
+    raise KeyError(f"{not_found} not in index")
+KeyError: "['CNN Top + Min CVaR'] not in index"
+2024-11-29 13:22:58,358 - INFO - Data loaded - Returns: (1637, 50), Up prob: (79, 50)
+2024-11-29 13:23:38,055 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/Naive_weights.csv
+2024-11-29 13:23:38,057 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTop_weights.csv
+2024-11-29 13:23:38,059 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MaxSharpe_weights.csv
+2024-11-29 13:23:38,061 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinVariance_weights.csv
+2024-11-29 13:23:38,064 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/MinCVaR_weights.csv
+2024-11-29 13:23:38,066 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMaxSharpe_weights.csv
+2024-11-29 13:23:38,068 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinVariance_weights.csv
+2024-11-29 13:23:38,071 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTopMinCVaR_weights.csv
+2024-11-29 13:23:38,112 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/GRU_weights.csv
+2024-11-29 13:23:38,149 - INFO - Saved CNN + GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNGRU_weights.csv
+2024-11-29 13:23:38,186 - INFO - Saved TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TRANSFORMER_weights.csv
+2024-11-29 13:23:38,222 - INFO - Saved CNN + TRANSFORMER weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTRANSFORMER_weights.csv
+2024-11-29 13:23:38,258 - INFO - Saved TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/TCN_weights.csv
+2024-11-29 13:23:38,294 - INFO - Saved CNN + TCN weights to /home/indi/codespace/ImagePortOpt/Backtest/results/weights/CNNTCN_weights.csv
+2024-11-29 13:23:43,672 - INFO - Available portfolios: ['Naive', 'CNN Top', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'GRU', 'CNN + GRU', 'TRANSFORMER', 'CNN + TRANSFORMER', 'TCN', 'CNN + TCN']
+2024-11-29 13:24:12,528 - INFO - Backtest completed successfully

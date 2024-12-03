@@ -153,16 +153,27 @@ class PortfolioBacktest:
             
             # 5.2 수익률 그래프 저장
             returns_df = pd.DataFrame(portfolio_returns)
+
+            # 실제 컬럼명 확인을 위한 로깅 추가
+            self.logger.info(f"Available portfolios: {returns_df.columns.tolist()}")
+
             selected_portfolios = [
-                'Naive',  # Naive (1/N)
-                'CNN Top',  # CNN Top (Baseline)
+                'Naive',
+                'CNN Top',
                 'CNN Top + Max Sharpe',
                 'CNN Top + Min Variance',
-                'CNN Top + Min CVaR',
+                'CNN Top + Min CVaR',  # 'Cvar'를 'CVaR'로 수정
                 'CNN + GRU',
                 'CNN + TCN',
                 'CNN + TRANSFORMER'
             ]
+
+            # 선택된 포트폴리오 존재 여부 확인
+            missing_portfolios = [p for p in selected_portfolios if p not in returns_df.columns]
+            if missing_portfolios:
+                self.logger.warning(f"Missing portfolios: {missing_portfolios}")
+                # 존재하는 포트폴리오만 선택
+                selected_portfolios = [p for p in selected_portfolios if p in returns_df.columns]
 
             # 선택된 포트폴리오만 필터링
             selected_returns = returns_df[selected_portfolios]

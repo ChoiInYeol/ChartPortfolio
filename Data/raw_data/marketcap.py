@@ -39,24 +39,21 @@ def get_market_cap(ticker: str, start_date: str, end_date: str) -> tuple:
         logging.warning(f"Failed to get market cap for {ticker}: {str(e)}")
         return ticker, None, None
 
-def get_top_50_tickers(target_date: str = '2018-01-01') -> list:
+def get_all_market_caps(target_date: str = '2018-01-01') -> pd.DataFrame:
     """
-    특정 시점 기준 시가총액 상위 50개 종목을 추출합니다.
+    특정 시점 기준 전체 종목의 시가총액을 추출합니다.
     
     Args:
         target_date: 목표 기준일 (YYYY-MM-DD)
     
     Returns:
-        list: 시가총액 상위 50개 종목의 ticker 리스트
+        pd.DataFrame: 전체 종목의 시가총액 정보가 담긴 DataFrame
     """
     try:
-        # 데이터 경로 설정
-        data_dir = Path("/home/indi/codespace/ImagePortOpt")
-        
-        # filtered_returns.csv 파일 로드
+        # returns_df.csv 파일 로드하여 전체 종목 리스트 추출
         returns_df = pd.read_csv(
-            data_dir / "TS_Model/data/filtered_returns.csv",
-            index_col=0, parse_dates=True
+            "/home/indi/codespace/ImagePortOpt/Data/processed/return_df.csv",
+            index_col=0
         )
         
         available_tickers = returns_df.columns.tolist()
@@ -85,38 +82,30 @@ def get_top_50_tickers(target_date: str = '2018-01-01') -> list:
         # 시가총액 순으로 정렬
         market_caps.sort(key=lambda x: x[1], reverse=True)
         
-        # 상위 50개 종목 선택
-        top_50_tickers = [ticker for ticker, _, _ in market_caps[:50]]
-        
-        # 결과 저장
-        market_cap_df = pd.DataFrame(market_caps, 
-                                   columns=['Symbol', 'MarketCap', 'Date'])
+        # DataFrame 생성 및 저장
+        market_cap_df = pd.DataFrame(market_caps, columns=['Symbol', 'MarketCap', 'Date'])
         market_cap_df = market_cap_df.sort_values('MarketCap', ascending=False)
         
-        # 저장 경로 생성
-        save_dir = data_dir / "TS_Model/data"
+        # 저장 경로 설정 및 생성
+        save_dir = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data")
         save_dir.mkdir(parents=True, exist_ok=True)
         
-        # 전체 시가총액 정보 저장
+        # 시가총액 정보 저장
         filename = f"market_caps_{target_date.strftime('%Y%m%d')}.csv"
         market_cap_df.to_csv(save_dir / filename, index=False)
         
-        # 상위 50개 종목만 저장
-        top_50_df = pd.DataFrame(top_50_tickers, columns=['Symbol'])
-        top_50_df.to_csv(save_dir / "filtered_tickers.csv", index=False)
-        
-        logging.info(f"시가총액 상위 50개 종목 필터링 완료")
-        logging.info(f"필터링된 종목 수: {len(top_50_tickers)}")
-        logging.info(f"결과 저장 경로: {save_dir}")
+        logging.info(f"시가총액 정보 추출 완료")
+        logging.info(f"전체 종목 수: {len(market_cap_df)}")
+        logging.info(f"결과 저장 경로: {save_dir / filename}")
         
         # 시가총액 정보 출력
         print("\n상위 10개 종목 시가총액 정보:")
         print(market_cap_df.head(10).to_string())
         
-        return top_50_tickers
+        return market_cap_df
         
     except Exception as e:
-        logging.error(f"시가총액 상위 종목 필터링 중 오류 발생: {str(e)}")
+        logging.error(f"시가총액 정보 추출 중 오류 발생: {str(e)}")
         raise
 
 if __name__ == "__main__":
@@ -127,13 +116,9 @@ if __name__ == "__main__":
     )
     
     try:
-        # 2018년 1월 1일 주변 거래일 기준 시가총액 상위 50개 종목 추출
+        # 2018년 1월 1일 주변 거래일 기준 시가총액 정보 추출
         target_date = '2018-01-01'
-        top_50_tickers = get_top_50_tickers(target_date)
-        
-        print(f"\n{target_date} 기준 시가총액 상위 50개 종목:")
-        for i, ticker in enumerate(top_50_tickers, 1):
-            print(f"{i}. {ticker}")
+        market_cap_df = get_all_market_caps(target_date)
         
     except Exception as e:
         logging.error(f"프로그램 실행 중 오류 발생: {str(e)}")
