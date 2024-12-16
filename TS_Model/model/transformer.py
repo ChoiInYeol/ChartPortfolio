@@ -224,28 +224,22 @@ class PortfolioTransformer(nn.Module):
         ub: float = 0.1,
         n_select: Optional[int] = None
     ):
-        """
-        Transformer 기반 포트폴리오 최적화 모델
-        
-        Args:
-            n_feature: 입력 특성 수 (n_stocks와 동일)
-            n_timestep: 시계열 길이
-            n_layer: Transformer 레이어 수
-            n_head: 어텐션 헤드 수
-            n_dropout: 드롭아웃 비율
-            n_output: 출력 차원 (n_stocks와 동일)
-            lb: 최소 포트폴리오 비중
-            ub: 최대 포트폴리오 비중
-            n_select: 선택할 종목 수 (None인 경우 n_stocks 사용)
-        """
         super().__init__()
         self.n_stocks = n_output
         self.lb = lb
         self.ub = ub
         self.n_select = n_select if n_select is not None else n_output
         
-        # Score Block (h1)
-        # 1. Transformer를 통한 시계열 특성 추출
+        # 1. 입력 임베딩 레이어
+        self.input_embedding = nn.Sequential(
+            nn.Linear(n_feature, n_feature * 2),
+            nn.LayerNorm(n_feature * 2),
+            nn.SiLU(),
+            nn.Dropout(n_dropout),
+            nn.Linear(n_feature * 2, n_feature)
+        )
+        
+        # 2. 시계열 인코더
         self.encoder = Encoder(
             input_size=n_feature,
             seq_len=n_timestep,
@@ -254,8 +248,32 @@ class PortfolioTransformer(nn.Module):
             dropout=n_dropout
         )
         
-        # 2. 종목별 score 생성을 위한 레이어
-        self.score_layer = nn.Sequential(
+        # 3. 시간적 특성을 위한 Self-attention
+        self.temporal_attention = nn.MultiheadAttention(
+            embed_dim=n_feature,
+            num_heads=n_head,
+            dropout=n_dropout,
+            batch_first=True
+        )
+        
+        # 4. 종목 간 상관관계를 위한 Cross-attention
+        self.cross_attention = nn.MultiheadAttention(
+            embed_dim=n_feature,
+            num_heads=n_head,
+            dropout=n_dropout,
+            batch_first=True
+        )
+        
+        # 5. 특성 결합을 위한 레이어
+        self.feature_fusion = nn.Sequential(
+            nn.Linear(n_feature * 2, n_feature),
+            nn.LayerNorm(n_feature),
+            nn.SiLU(),
+            nn.Dropout(n_dropout)
+        )
+        
+        # 6. 종목 선택을 위한 레이어
+        self.attention = nn.Sequential(
             nn.Linear(n_feature, n_feature),
             nn.LayerNorm(n_feature),
             nn.SiLU(),
@@ -263,50 +281,89 @@ class PortfolioTransformer(nn.Module):
             nn.Linear(n_feature, n_output)
         )
         
-        self.tempmaxpool = nn.MaxPool1d(n_timestep)
+        # 7. 비중 결정을 위한 레이어
+        self.score_layers = nn.Sequential(
+            nn.Linear(n_feature, n_feature * 2),
+            nn.LayerNorm(n_feature * 2),
+            nn.SiLU(),
+            nn.Dropout(n_dropout),
+            nn.Linear(n_feature * 2, n_output)
+        )
 
     def forward(self, x: torch.Tensor, x_probs: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """
-        순전파
+        # 1. 입력 임베딩
+        x = self.input_embedding(x)  # [batch_size, seq_len, n_feature]
         
-        Args:
-            x: 입력 시퀀스 [batch_size, seq_len, n_stocks]
-            x_probs: 상승확률 (사용하지 않음)
-            
-        Returns:
-            포트폴리오 비중 [batch_size, n_stocks]
-        """
-        # Score Block (h1): 시계열 특성 추출
-        # 1. Transformer를 통한 특성 추출
+        # 2. 시계열 인코딩
         mask = torch.ones(x.shape[0], x.shape[1], x.shape[1]).to(x.device)
         encoded = self.encoder(x, mask)  # [batch_size, seq_len, n_feature]
-        features = self.tempmaxpool(encoded.transpose(1, 2)).squeeze(-1)  # [batch_size, n_feature]
         
-        # 2. 종목별 score 생성
-        scores = self.score_layer(features)
+        # 3. 시간적 특성 추출
+        temporal_out, _ = self.temporal_attention(
+            encoded, encoded, encoded
+        )
         
-        # Portfolio Block (h2): 제약조건을 만족하는 가중치 생성
+        # 4. 종목 간 상관관계 모델링
+        cross_out, _ = self.cross_attention(
+            temporal_out, temporal_out, temporal_out
+        )
         
-        # 1. Cardinality 제약 처리
-        if self.n_select < self.n_stocks:
-            topk_values, topk_indices = torch.topk(scores, self.n_select, dim=1)
-            mask = torch.zeros_like(scores).scatter_(1, topk_indices, 1.0)
-            scores = scores * mask
+        # 5. 특성 결합
+        temporal_context = temporal_out[:, -1, :]  # 마지막 시점
+        cross_context = cross_out[:, -1, :]  # 마지막 시점
+        combined = torch.cat([temporal_context, cross_context], dim=1)
+        fused_features = self.feature_fusion(combined)
         
-        # 2. Long-only 제약을 위한 softmax
+        # 6. 종목 선택
+        attention_scores = self.attention(fused_features)
+        attention_weights = torch.sigmoid(attention_scores)
+        
+        # 7. Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
+        
+        # 8. 비중 계산
+        scores = self.score_layers(fused_features)
         weights = F.softmax(scores, dim=-1)
         
-        # 3. 희소성 처리: 임계값보다 작은 가중치는 0으로 설정
-        threshold = 0.02  # 2% 임계값
-        weights = torch.where(weights > threshold, weights, torch.zeros_like(weights))
+        # 9. 마스킹 및 정규화
+        masked_weights = weights * mask
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
         
-        # 4. Maximum Position 제약
-        weights = torch.clamp(weights, self.lb, self.ub)
+        # 10. 최종 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(w, self.lb, self.ub) 
+            for w in normalized_weights
+        ])
         
-        # 5. 정규화 (sum to 1)
-        weights = weights / (weights.sum(dim=1, keepdim=True) + 1e-8)
+        return final_weights
+
+    def rebalance(self, weight: torch.Tensor, lb: float, ub: float) -> torch.Tensor:
+        """포트폴리오 비중 재조정"""
+        selected_mask = (weight > 0).float()
+        weight = weight * selected_mask
         
-        return weights
+        weight_clamped = torch.clamp(weight, lb, ub)
+        total_excess = weight_clamped.sum() - 1.0
+
+        while abs(total_excess) > 1e-6:
+            if total_excess > 0:
+                adjustable = (weight_clamped > lb) & (selected_mask == 1)
+                if not adjustable.any():
+                    break
+                adjustment = total_excess / adjustable.sum()
+                weight_clamped[adjustable] -= adjustment
+            else:
+                adjustable = (weight_clamped < ub) & (selected_mask == 1)
+                if not adjustable.any():
+                    break
+                adjustment = -total_excess / adjustable.sum()
+                weight_clamped[adjustable] += adjustment
+            
+            weight_clamped = torch.clamp(weight_clamped, lb, ub)
+            total_excess = weight_clamped.sum() - 1.0
+
+        return weight_clamped
 
 
 class PortfolioTransformerWithProb(PortfolioTransformer):
@@ -324,14 +381,24 @@ class PortfolioTransformerWithProb(PortfolioTransformer):
     ):
         """
         상승확률을 활용하는 Transformer 기반 포트폴리오 최적화 모델
+        
+        Args:
+            n_feature: 입력 특성 수 (n_stocks와 동일)
+            n_timestep: 시계열 길이
+            n_layer: Transformer 레이어 수
+            n_head: 어텐션 헤드 수
+            n_dropout: 드롭아웃 비율
+            n_output: 출력 차원 (n_stocks와 동일)
+            lb: 최소 포트폴리오 비중
+            ub: 최대 포트폴리오 비중
+            n_select: 선택할 종목 수 (None인 경우 n_stocks 사용)
         """
         super().__init__(
             n_feature, n_timestep, n_layer, n_head,
             n_dropout, n_output, lb, ub, n_select
         )
         
-        # Score Block (h1)
-        # 1. 상승확률을 위한 Transformer
+        # 상승확률을 위한 Transformer
         self.encoder_prob = Encoder(
             input_size=n_feature,
             seq_len=n_timestep,
@@ -340,8 +407,16 @@ class PortfolioTransformerWithProb(PortfolioTransformer):
             dropout=n_dropout
         )
         
-        # 2. 결합된 특성으로부터 score 생성을 위한 레이어
-        self.score_layer = nn.Sequential(
+        # 결합된 특성으로부터 score 생성을 위한 레이어
+        self.attention = nn.Sequential(
+            nn.Linear(n_feature * 2, n_feature),
+            nn.LayerNorm(n_feature),
+            nn.SiLU(),
+            nn.Dropout(n_dropout),
+            nn.Linear(n_feature, n_output)
+        )
+        
+        self.score_layers = nn.Sequential(
             nn.Linear(n_feature * 2, n_feature),
             nn.LayerNorm(n_feature),
             nn.SiLU(),
@@ -360,53 +435,51 @@ class PortfolioTransformerWithProb(PortfolioTransformer):
         Returns:
             포트폴리오 비중 [batch_size, n_stocks]
         """
-        # Score Block (h1): 시계열 특성 추출
-        # 1. 수익률 시퀀스 처리
+        # 수익률 시퀀스 처리
         returns_mask = torch.ones(x_returns.shape[0], x_returns.shape[1], x_returns.shape[1]).to(x_returns.device)
         returns_encoded = self.encoder(x_returns, returns_mask)  # [batch_size, seq_len, n_feature]
         
-        # 2. 상승확률 처리
+        # 상승확률 처리
         if len(x_probs.shape) == 2:
             x_probs = x_probs.unsqueeze(1)  # [batch_size, 1, n_stocks]
-            
-        # 상승확률 데이터의 시퀀스 길이가 1인 경우 처리
-        if x_probs.shape[1] == 1:
-            # Transformer 출력을 직접 사용
-            prob_mask = torch.ones(x_probs.shape[0], 1, 1).to(x_probs.device)
-            prob_encoded = self.encoder_prob(x_probs, prob_mask)  # [batch_size, 1, n_feature]
-            h_prob = prob_encoded.squeeze(1)  # [batch_size, n_feature]
-        else:
-            prob_mask = torch.ones(x_probs.shape[0], x_probs.shape[1], x_probs.shape[1]).to(x_probs.device)
-            prob_encoded = self.encoder_prob(x_probs, prob_mask)
-            h_prob = self.tempmaxpool(prob_encoded.transpose(1, 2)).squeeze(-1)
         
-        # 수익률 특성도 동일한 방식으로 처리
-        if returns_encoded.shape[1] == 1:
-            h_returns = returns_encoded.squeeze(1)
-        else:
-            h_returns = self.tempmaxpool(returns_encoded.transpose(1, 2)).squeeze(-1)
+        prob_mask = torch.ones(x_probs.shape[0], x_probs.shape[1], x_probs.shape[1]).to(x_probs.device)
+        prob_encoded = self.encoder_prob(x_probs, prob_mask)
         
-        # 3. 특성 결합
+        # 마지막 타임스텝의 특성 추출
+        h_returns = returns_encoded[:, -1, :]  # [batch_size, n_feature]
+        h_prob = prob_encoded[:, -1, :]  # [batch_size, n_feature]
+        
+        # 특성 결합
         combined = torch.cat([h_returns, h_prob], dim=1)
         
-        # 4. 종목별 score 생성
-        scores = self.score_layer(combined)
+        # 종목 선택
+        attention_scores = self.attention(combined)
+        attention_weights = torch.sigmoid(attention_scores)
         
-        # Portfolio Block (h2): 제약조건을 만족하는 가중치 생성
+        # Top-k 종목 선택
+        topk_values, topk_indices = torch.topk(attention_weights, self.n_select, dim=1)
         
-        # 1. Cardinality 제약 처리
-        if self.n_select < self.n_stocks:
-            topk_values, topk_indices = torch.topk(scores, self.n_select, dim=1)
-            mask = torch.zeros_like(scores).scatter_(1, topk_indices, 1.0)
-            scores = scores * mask
+        # 마스크 생성
+        mask = torch.zeros_like(attention_weights).scatter_(1, topk_indices, 1.0)
         
-        # 2. Long-only 제약을 위한 softmax
+        # 선택된 종목에 대한 비중 계산
+        scores = self.score_layers(combined)
         weights = F.softmax(scores, dim=-1)
         
-        # 3. Maximum Position 제약
-        weights = torch.clamp(weights, self.lb, self.ub)
+        # 선택되지 않은 종목은 0으로 마스킹
+        masked_weights = weights * mask
         
-        # 4. 정규화 (sum to 1)
-        weights = weights / (weights.sum(dim=1, keepdim=True) + 1e-8)
+        # 비중 재조정
+        normalized_weights = masked_weights / (masked_weights.sum(dim=1, keepdim=True) + 1e-8)
         
-        return weights
+        # 최소/최대 비중 제약 적용
+        final_weights = torch.stack([
+            self.rebalance(w, self.lb, self.ub) 
+            for w in normalized_weights
+        ])
+        
+        # 소수점 3째자리까지 반올림
+        final_weights = torch.round(final_weights * 1000) / 1000
+        
+        return final_weights

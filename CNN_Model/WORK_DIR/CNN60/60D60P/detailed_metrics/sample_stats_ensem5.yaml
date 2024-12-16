@@ -1,0 +1,45 @@
+model_0:
+  train:
+    negative: 0
+    positive: 0
+    total: 0
+  validate:
+    negative: 0
+    positive: 0
+    total: 0
+model_1:
+  train:
+    negative: 0
+    positive: 0
+    total: 0
+  validate:
+    negative: 0
+    positive: 0
+    total: 0
+model_2:
+  train:
+    negative: 0
+    positive: 0
+    total: 0
+  validate:
+    negative: 0
+    positive: 0
+    total: 0
+model_3:
+  train:
+    negative: 0
+    positive: 0
+    total: 0
+  validate:
+    negative: 0
+    positive: 0
+    total: 0
+model_4:
+  train:
+    negative: 0
+    positive: 0
+    total: 0
+  validate:
+    negative: 0
+    positive: 0
+    total: 0

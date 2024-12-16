@@ -262,25 +262,28 @@ class Experiment:
             sample_stats=all_sample_stats,
             learning_curves=all_learning_curves
         )
-
+        
     def calculate_portfolio(
         self,
         load_saved_data: bool = True,
         delay_list: List[int] = [0],
         is_ensem_res: bool = True,
         cut: int = 10,
-        freq: str = 'month' # 'day', 'week', 'month', 'quarter', 'year'
+        freq: Optional[str] = None  # freq를 선택적 파라미터로 변경
     ) -> None:
         """
         포트폴리오를 계산하고 결과를 저장합니다.
-
+        
         Args:
             load_saved_data: 저장된 데이터 사용 여부
             delay_list: 지연 기간 리스트
             is_ensem_res: 앙상블 결과 사용 여부
             cut: 포트폴리오 분할 수
-            freq: 예측 주기 ('day', 'week', 'month', 'quarter', 'year')
+            freq: 예측 주기. None인 경우 self.train_freq 사용
         """
+        # freq가 None이면 train_freq 사용
+        freq = freq or self.train_freq
+        
         # 앙상블 결과 생성
         year_list = list(self.is_years) + list(self.oos_years) if is_ensem_res else list(self.oos_years)
         
@@ -341,7 +344,7 @@ class Experiment:
             del model_list
             torch.cuda.empty_cache()
 
-        # 앙상블 결과 로드
+        # 앙상블 결과 로드 시에는 train_freq 사용
         whole_ensemble_res = load_ensemble_res(
             year=self.oos_years,
             ensem_res_dir=self.ensem_res_dir,
@@ -349,7 +352,7 @@ class Experiment:
             ws=self.ws,
             pw=self.pw,
             ohlc_len=self.ohlc_len,
-            freq=self.pf_freq,
+            freq=self.train_freq,  # self.pf_freq 대신 self.train_freq 사용
             country=self.country,
             multiindex=True
         )

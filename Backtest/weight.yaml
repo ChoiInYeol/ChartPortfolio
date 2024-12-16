@@ -1,31 +1,52 @@
 # 기본 설정
 base_settings:
-  result_dir: results
   data_sizes: [50, 370, 500, 2055]
-  subdirs:
-    - weights
-    - figures
-    - metrics
+  train_date: '2017-12-31'
+  end_date: '2024-07-05'
+  window_size: 20
+  prediction_window: 20
 
-# 파일명 템플릿
-file_templates:
-  benchmarks:
-    naive: "weights/naive.csv"
-    cnn_top: "weights/cnn_top.csv"
-    max_sharpe: "weights/max_sharpe.csv"
-    min_variance: "weights/min_variance.csv"
-    min_cvar: "weights/min_cvar.csv"
-    cnn_max_sharpe: "weights/cnn_max_sharpe.csv"
-    cnn_min_variance: "weights/cnn_min_variance.csv"
-    cnn_min_cvar: "weights/cnn_min_cvar.csv"
+paths:
+  ts_model_data: '../TS_Model/data'
+  results: 'results'
+  weights: 'weights'
+  figures: 'figures'
 
-  ts_models:
-    GRU:
-      noprob: "../TS_Model/Result/GRU_top{size}/portfolio_weights_GRU_top{size}_noprob_maxsharpe.csv"
-      prob: "../TS_Model/Result/GRU_top{size}/portfolio_weights_GRU_top{size}_prob_maxsharpe.csv"
-    TCN:
-      noprob: "../TS_Model/Result/TCN_top{size}/portfolio_weights_TCN_top{size}_noprob_maxsharpe.csv"
-      prob: "../TS_Model/Result/TCN_top{size}/portfolio_weights_TCN_top{size}_prob_maxsharpe.csv"
-    TRANSFORMER:
-      noprob: "../TS_Model/Result/TRANSFORMER_top{size}/portfolio_weights_TRANSFORMER_top{size}_noprob_maxsharpe.csv"
-      prob: "../TS_Model/Result/TRANSFORMER_top{size}/portfolio_weights_TRANSFORMER_top{size}_prob_maxsharpe.csv"
+portfolios:
+  # 파일명과 표시명 매핑
+  names:
+    Naive: 'Naive'
+    CNNTop: 'CNN Top'
+
+    MaxSharpe: 'Max Sharpe'
+    MinVariance: 'Min Variance'
+    MinCVaR: 'Min CVaR'
+
+    CNNTopMaxSharpe: 'CNN Top + Max Sharpe'
+    CNNTopMinVariance: 'CNN Top + Min Variance'
+    CNNTopMinCVaR: 'CNN Top + Min CVaR'
+
+    GRU: 'GRU'
+    TCN: 'TCN'
+    TRANSFORMER: 'TRANSFORMER'
+    
+    CNNGRU: 'CNN + GRU'
+    CNNTCN: 'CNN + TCN'
+    CNNTRANSFORMER: 'CNN + TRANSFORMER'
+  
+  # 시각화 시 기본적으로 표시할 포트폴리오 목록
+  default_selection:
+    - 'Naive'
+    - 'CNN Top'
+    - 'Max Sharpe'
+    - 'Min Variance'
+    - 'Min CVaR'
+    - 'CNN Top + Max Sharpe'
+    - 'CNN Top + Min Variance'
+    - 'CNN Top + Min CVaR'
+    - 'GRU'
+    - 'TCN'
+    - 'TRANSFORMER'
+    - 'CNN + GRU'
+    - 'CNN + TCN'
+    - 'CNN + TRANSFORMER'

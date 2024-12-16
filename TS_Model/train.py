@@ -31,9 +31,11 @@ class Trainer:
         self.config = config
         self.use_prob = config['MODEL']['USEPROB']
         
-        # 모델 저장 경로 설정 (topN 반영)
+        # 모델 저장 경로 설정 (topN, ws, pw 반영)
         n_stocks = str(self.config['DATA']['N_STOCKS'])
-        model_name = f"{self.config['MODEL']['TYPE']}_top{n_stocks}"
+        ws = str(self.config['DATA']['WINDOW_SIZE'])
+        pw = str(self.config['DATA']['PRED_WINDOW'])
+        model_name = f"{self.config['MODEL']['TYPE']}_{n_stocks}_{ws}D{pw}P"
         self.model_dir = Path(self.config['PATHS']['RESULTS']) / model_name
         self.model_dir.mkdir(parents=True, exist_ok=True)
         
@@ -350,8 +352,10 @@ class Trainer:
         try:
             # N_STOCKS에 따른 파일명 설정
             n_stocks = str(self.config['DATA']['N_STOCKS'])
-            dataset_path = Path(self.config['PATHS']['DATA']['DEEP']) / f'dataset_top{n_stocks}.pkl'
-            dates_path = Path(self.config['PATHS']['DATA']['DEEP']) / f'dates_top{n_stocks}.pkl'
+            ws = str(self.config['DATA']['WINDOW_SIZE'])
+            pw = str(self.config['DATA']['PRED_WINDOW'])
+            dataset_path = Path(self.config['PATHS']['DATA']['DEEP']) / f'dataset_{n_stocks}_{ws}D{pw}P.pkl'
+            dates_path = Path(self.config['PATHS']['DATA']['DEEP']) / f'dates_{n_stocks}_{ws}D{pw}P.pkl'
             
             logging.info(f"Loading dataset from {dataset_path}")
             logging.info(f"Loading dates from {dates_path}")
@@ -474,7 +478,9 @@ class Trainer:
         try:
             # N_STOCKS에 따른 파일명 설정
             n_stocks = str(self.config['DATA']['N_STOCKS'])
-            returns_path = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data") / f"filtered_returns_top{n_stocks}.csv"
+            ws = str(self.config['DATA']['WINDOW_SIZE'])
+            pw = str(self.config['DATA']['PRED_WINDOW'])
+            returns_path = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data") / f"filtered_returns_{n_stocks}_{ws}D{pw}P.csv"
             
             # 티커 가져오기
             tickers = pd.read_csv(returns_path, index_col=0).columns

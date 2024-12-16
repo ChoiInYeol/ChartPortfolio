@@ -608,7 +608,7 @@ class PortfolioBacktest:
 
 
 # 데이터 로드
-prob_df = pd.read_csv("./processed/ensem_res.csv")
+prob_df = pd.read_csv("./processed/ensem_res_60D60P.csv")
 ret_df = pd.read_csv("./processed/return_df.csv")
 
 # 날짜를 datetime으로 변환하고 인덱스로 설정

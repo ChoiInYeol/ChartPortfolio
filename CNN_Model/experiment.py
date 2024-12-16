@@ -206,8 +206,8 @@ if __name__ == "__main__":
 
     # CNN2D 모델 학습
     print("\nTraining CNN2D model...")
-    ws = 20
-    pw = 20
+    ws = 60
+    pw = 60
     
     # 모델 객체 생성
     model_obj = create_model_object(
@@ -240,14 +240,13 @@ if __name__ == "__main__":
         delayed_ret=0
     )
 
-    # # 모델 학습
-    # exp.train_empirical_ensem_model()
+    # 모델 학습
+    exp.train_empirical_ensem_model()
 
     # 포트폴리오 계산
     exp.calculate_portfolio(
         load_saved_data=True,
-        delay_list=[0, 1],
-        freq='month',
+        delay_list=[0],
         is_ensem_res=True,
         cut=10
     )

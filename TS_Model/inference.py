@@ -24,9 +24,11 @@ class ModelInference:
         self.config = config
         self.device = torch.device("cuda" if config["USE_CUDA"] else "cpu")
         
-        # N_STOCKS에 따른 모델 경로 설정
+        # N_STOCKS, ws, pw에 따른 모델 경로 설정
         n_stocks = str(config['DATA']['N_STOCKS'])
-        model_name = f"{config['MODEL']['TYPE']}_top{n_stocks}"
+        ws = str(config['DATA']['WINDOW_SIZE'])
+        pw = str(config['DATA']['PRED_WINDOW'])
+        model_name = f"{config['MODEL']['TYPE']}_{n_stocks}_{ws}D{pw}P"
         self.model_dir = Path("/home/indi/codespace/ImagePortOpt/TS_Model/Result") / model_name
         
         # 가장 최신의 체크포인트 찾기
@@ -108,10 +110,12 @@ class ModelInference:
         try:
             # N_STOCKS에 따른 파일명 설정
             n_stocks = str(self.config['DATA']['N_STOCKS'])
+            ws = str(self.config['DATA']['WINDOW_SIZE'])
+            pw = str(self.config['DATA']['PRED_WINDOW'])
             data_dir = str(self.config['PATHS']['DATA']['DEEP'])
             
-            dataset_path = Path(data_dir) / f"dataset_top{n_stocks}.pkl"
-            dates_path = Path(data_dir) / f"dates_top{n_stocks}.pkl"
+            dataset_path = Path(data_dir) / f"dataset_{n_stocks}_{ws}D{pw}P.pkl"
+            dates_path = Path(data_dir) / f"dates_{n_stocks}_{ws}D{pw}P.pkl"
             
             logger.info(f"Data directory: {data_dir}")
             logger.info(f"Loading dataset from {dataset_path}")
@@ -240,7 +244,9 @@ class ModelInference:
         try:
             # N_STOCKS에 따른 파일명 설정
             n_stocks = str(self.config['DATA']['N_STOCKS'])
-            returns_path = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data") / f"filtered_returns_top{n_stocks}.csv"
+            ws = str(self.config['DATA']['WINDOW_SIZE'])
+            pw = str(self.config['DATA']['PRED_WINDOW'])
+            returns_path = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data") / f"filtered_returns_{n_stocks}_{ws}D{pw}P.csv"
             
             # 티커 가져오기
             tickers = pd.read_csv(returns_path, index_col=0).columns

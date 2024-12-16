@@ -15,18 +15,18 @@ DATA:
   
   # 시퀀스 설정
   WINDOW_SIZE: 60  # 입력 시퀀스 길이 (이전 TRAIN_LEN)
-  PRED_WINDOW: 20  # 예측 기간 (이전 PRED_LEN)
+  PRED_WINDOW: 60  # 예측 기간 (이전 PRED_LEN)
   
   # 데이터 처리
   N_STOCKS: 500  # 처리할 종목 수
   PROB_NORMALIZE: 'standardize'  # 확률값 정규화 방법 ['standardize', 'minmax']
-  SCALING_FACTOR: 20  # 스케일링 팩터
+  SCALING_FACTOR: 60  # 스케일링 팩터
 USE_CUDA: true
 
 MODEL:
   TYPE: 'TCN'  # ['GRU', 'TCN', 'TRANSFORMER']
-  USEPROB: false  # USE_PROB -> USEPROB
-  NSTOCKS: 50    # N_STOCKS -> NSTOCKS
+  USEPROB: false
+  NSTOCKS: 50
   
   # GRU parameters
   N_LAYER: 1
@@ -36,27 +36,27 @@ MODEL:
   
   # TCN parameters
   TCN:
-    n_timestep: 60
-    n_feature: 50  # n_stocks와 동일
-    n_output: 50   # n_stocks와 동일
-    kernel_size: 4
-    n_dropout: 0.1
-    hidden_size: 64
-    level: 3
-    num_channels: [64, 64, 64]    # channels 대신 num_channels 사용
+    n_timestep: 60 # WINDOW_SIZE
+    n_feature: 500  # N_STOCKS
+    n_output: 500 # N_STOCKS
+    kernel_size: 8  # 4 -> 8
+    n_dropout: 0.2  # 0.1 -> 0.2
+    hidden_size: 128  # 64 -> 128
+    level: 5  # 3 -> 5
+    num_channels: [64, 128, 256, 128, 64]  # 더 복잡한 채널 구조
   
   # TRANSFORMER parameters
   TRANSFORMER:
-    n_timestep: 60
-    n_output: 50 # n_stocks와 동일
-    n_layer: 6
+    n_timestep: 60 # WINDOW_SIZE
+    n_output: 500  # N_STOCKS
+    n_layer: 4
     n_head: 5
     n_dropout: 0.1
 
 TRAINING:
   # 학습 파라미터
   BATCH_SIZE: 64
-  EPOCHS: 500
+  EPOCHS: 1
   EARLY_STOPPING: 50
   LEARNING_RATE: 0.005
   MOMENTUM: 0.9
@@ -87,7 +87,7 @@ PORTFOLIO:
     MARKET_IMPACT: 0.001
 
 BACKTEST:
-  REBALANCING_FREQUENCY: 'monthly'  # ['daily', 'weekly', 'monthly', 'quarterly']
+  REBALANCING_FREQUENCY: 'quarterly'  # ['daily', 'weekly', 'monthly', 'quarterly']
   WINDOW_SIZE: 60
   INCLUDE_TRANSACTION_COSTS: true
   RISK_METRICS: ['volatility', 'sharpe', 'sortino', 'max_drawdown']

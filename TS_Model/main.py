@@ -2,7 +2,6 @@ import argparse
 import yaml
 import logging
 import torch
-import inquirer
 from pathlib import Path
 from dataload.make_dataset import prepare_dataset
 from train import Trainer
@@ -15,44 +14,44 @@ def setup_logging():
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
-def get_cli_inputs():
-    """대화형 CLI로 사용자 입력 받기"""
-    questions = [
-        inquirer.List('mode',
-                     message='실행 모드를 선택하세요',
-                     choices=['train', 'inference']),
-        
-        inquirer.List('model_type',
-                     message='모델 타입을 선택하세요',
-                     choices=['GRU', 'TCN', 'TRANSFORMER']),
-        
-        inquirer.List('use_prob',
-                     message='확률 기반 모델을 사용하시겠습니까?',
-                     choices=['true', 'false']),
-        
-        inquirer.Path('config',
-                     message='설정 파일 경로를 입력하세요',
-                     default='config/base_config.yaml',
-                     exists=True),
-    ]
+def parse_arguments():
+    """커맨드 라인 인자 파싱"""
+    parser = argparse.ArgumentParser(description='시계열 모델 학습/추론')
     
-    answers = inquirer.prompt(questions)
-    return answers
+    parser.add_argument('--mode', 
+                       choices=['train', 'inference'],
+                       required=True,
+                       help='실행 모드 (train 또는 inference)')
+    
+    parser.add_argument('--model_type',
+                       choices=['GRU', 'TCN', 'TRANSFORMER'],
+                       required=True,
+                       help='모델 타입')
+    
+    parser.add_argument('--use_prob',
+                       type=lambda x: x.lower() == 'true',
+                       required=True,
+                       help='확률 기반 모델 사용 여부 (true/false)')
+    
+    parser.add_argument('--config',
+                       type=str,
+                       default='config/base_config.yaml',
+                       help='설정 파일 경로')
+    
+    return parser.parse_args()
 
 def main():
     """메인 실행 함수"""
-    # CLI 입력 받기
-    args = get_cli_inputs()
-    if args is None:  # 사용자가 Ctrl+C로 종료한 경우
-        return
+    # CLI 인자 파싱
+    args = parse_arguments()
         
     # 설정 파일 로드
-    with open(args['config'], 'r', encoding='utf-8') as f:
+    with open(args.config, 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
         
     # CLI 입력으로 config 값 업데이트
-    config['MODEL']['TYPE'] = args['model_type']
-    config['MODEL']['USEPROB'] = args['use_prob'].lower() == 'true'
+    config['MODEL']['TYPE'] = args.model_type
+    config['MODEL']['USEPROB'] = args.use_prob
     
     setup_logging()
     logging.info(f"Running with model {config['MODEL']['TYPE']} (useprob={config['MODEL']['USEPROB']})")
@@ -65,7 +64,7 @@ def main():
         config['TRAINING']['USE_DATA_PARALLEL'] = False
     
     try:
-        if args['mode'] == 'train':
+        if args.mode == 'train':
             # 1. 모델 학습
             logging.info("Starting training...")
             trainer = Trainer(config)
@@ -99,3 +98,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # python main.py --mode train --model_type GRU --use_prob true --config config/base_config.yaml

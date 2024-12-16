@@ -8,6 +8,9 @@ from typing import Tuple, List, Dict, Any
 
 logger = logging.getLogger(__name__)
 
+ws = 20
+pw = 20
+
 def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     원본 수익률과 확률 데이터를 로드합니다.
@@ -25,7 +28,7 @@ def load_raw_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
             index_col=0, parse_dates=True
         )
         probs_df = pd.read_csv(
-            data_dir / "processed/ensem_res.csv",
+            data_dir / f"processed/ensem_res_{ws}D{pw}P.csv",
             index_col=0, parse_dates=True
         )
         
@@ -88,10 +91,10 @@ def filter_top_n_stocks(
         
         # N에 따라 다른 파일명으로 저장
         filtered_returns.to_csv(
-            f"/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns_top{n}.csv"
+            f"/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_returns_{n}_{ws}D{pw}P.csv"
         )
         filtered_probs.to_csv(
-            f"/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_probs_top{n}.csv"
+            f"/home/indi/codespace/ImagePortOpt/TS_Model/data/filtered_probs_{n}_{ws}D{pw}P.csv"
         )
         
         return filtered_returns, filtered_probs
@@ -288,7 +291,7 @@ def prepare_dataset(config: Dict[str, Any]) -> None:
         returns_df, probs_df = load_raw_data()
         
         # N 값 가져오기 (config에서 설정 필요)
-        n = config['DATA'].get('N_STOCKS', None)
+        n = str(config['DATA'].get('N_STOCKS', None))
         n_suffix = str(n) if n is not None else "all"
 
         # 2. SP500 종목 필터링
@@ -321,9 +324,9 @@ def prepare_dataset(config: Dict[str, Any]) -> None:
         save_dir = Path("/home/indi/codespace/ImagePortOpt/TS_Model/data")
         save_dir.mkdir(parents=True, exist_ok=True)
         
-        with open(save_dir / f"dataset_top{n_suffix}.pkl", "wb") as f:
+        with open(save_dir / f"dataset_{n_suffix}_{ws}D{pw}P.pkl", "wb") as f:
             pickle.dump(dataset, f)
-        with open(save_dir / f"dates_top{n_suffix}.pkl", "wb") as f:
+        with open(save_dir / f"dates_{n_suffix}_{ws}D{pw}P.pkl", "wb") as f:
             pickle.dump(dates, f)
             
         logging.info("데이터셋 준비 완료")

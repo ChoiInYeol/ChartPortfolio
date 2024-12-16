@@ -159,131 +159,136 @@ class OptimizationManager:
                                   up_prob: pd.DataFrame,
                                   returns: pd.DataFrame,
                                   N: int = None,
-                                  result_dir: str = 'results') -> Dict[str, pd.DataFrame]:
-        """벤치마크 포트폴리오들을 생성합니다."""
+                                  result_dir: str = 'results',
+                                  rebalance_dates: pd.DatetimeIndex = None) -> Dict[str, pd.DataFrame]:
+        """
+        벤치마크 포트폴리오들을 생성합니다.
+        
+        Args:
+            up_prob (pd.DataFrame): 상승확률 데이터
+            returns (pd.DataFrame): 수익률 데이터
+            N (int, optional): 선택할 종목 수
+            result_dir (str): 결과 저장 경로
+            rebalance_dates (pd.DatetimeIndex): 리밸런싱 날짜
+        
+        Returns:
+            Dict[str, pd.DataFrame]: 포트폴리오별 가중치
+        """
         benchmark_weights = {}
-        lookback_period = 60  # 최적화에 사용할 lookback period
+        lookback_period = 60
         
         # N개 종목 선택
         top_N_columns = returns.columns[:N] if N else returns.columns
         
-        # 첫 번째 가능한 날짜 계산 (충분한 lookback period 확보)
+        # 첫 번째 가능한 날짜 계산
         first_valid_date = returns.index[lookback_period]
         
-        # 각 월별로 처리
-        for date in tqdm(up_prob[up_prob.index >= first_valid_date].index, 
+        # 리밸런싱 날짜가 제공되지 않은 경우
+        if rebalance_dates is None:
+            rebalance_dates = pd.date_range(
+                start=first_valid_date,
+                end=returns.index[-1],
+                freq='ME'
+            )
+        
+        # 각 리밸런싱 날짜에 대해 처리
+        for date in tqdm(rebalance_dates[rebalance_dates >= first_valid_date],
                         desc="Creating benchmark portfolios"):
-            # 해당 월의 마지막 거래일 확인
-            current_month = pd.Timestamp(date).to_period('M')
-            month_data = up_prob[up_prob.index.to_period('M') == current_month]
+            # 해당 월의 상승확률 데이터 선택
+            month_probs = up_prob.loc[date]
+            if N is not None:
+                month_probs = month_probs[top_N_columns]
             
-            if len(month_data) == 0:
+            # 상위 50% 종목 선택
+            threshold = month_probs.median()
+            up_stocks = month_probs[month_probs >= threshold].index
+            
+            # CNN Top 포트폴리오 초기화
+            if 'CNN Top' not in benchmark_weights:
+                benchmark_weights['CNN Top'] = pd.DataFrame(
+                    0.0,
+                    index=rebalance_dates,
+                    columns=returns.columns,
+                    dtype=np.float64
+                )
+            
+            # 상승예측 종목이 없는 경우 처리
+            if len(up_stocks) == 0:
+                # 이전 달의 가중치를 유지
+                prev_date = benchmark_weights['CNN Top'].index[
+                    benchmark_weights['CNN Top'].index < date
+                ][-1]
+                for portfolio_name in benchmark_weights:
+                    benchmark_weights[portfolio_name].loc[date] = \
+                        benchmark_weights[portfolio_name].loc[prev_date]
                 continue
             
-            last_day = month_data.index[-1]
+            # CNN Top (상승예측 종목 동일가중)
+            equal_weight = np.float64(1.0/len(up_stocks))
+            benchmark_weights['CNN Top'].loc[date, up_stocks] = equal_weight
             
-            # 해당 월의 마지막 거래일에만 처리
-            if date == last_day:
-                # 최근 60일 수익률 데이터 사용
-                period_returns = returns.loc[:date].tail(lookback_period)
-                if N is not None:
-                    period_returns = period_returns[top_N_columns]
+            # 최적화 포트폴리오 생성
+            for method in ['max_sharpe', 'min_variance', 'min_cvar']:
+                method_name = method.replace('_', ' ').title()
+                if method == 'min_cvar':
+                    method_name = 'Min CVaR'
                 
-                # 해당 월의 상승확률 정규화
-                month_probs = up_prob.loc[month_data.index[-1]]
-                if N is not None:
-                    month_probs = month_probs[top_N_columns]
-                
-                # 상위 50% 종목 선택
-                threshold = month_probs.median()
-                up_stocks = month_probs[month_probs >= threshold].index
-                
-                # CNN Top 포트폴리오 초기화
-                if 'CNN Top' not in benchmark_weights:
-                    benchmark_weights['CNN Top'] = pd.DataFrame(
+                # 기본 포트폴리오 초기화
+                if method_name not in benchmark_weights:
+                    benchmark_weights[method_name] = pd.DataFrame(
                         0.0,
-                        index=up_prob[up_prob.index >= first_valid_date].index,
+                        index=rebalance_dates,
                         columns=returns.columns,
                         dtype=np.float64
                     )
                 
-                # 상승예측 종목이 없는 경우 처리
-                if len(up_stocks) == 0:
-                    # 이전 달의 가중치를 유지
-                    prev_date = benchmark_weights['CNN Top'].index[
-                        benchmark_weights['CNN Top'].index < date
+                try:
+                    # 전체 종목에 대한 최적화
+                    weights = self.optimize_portfolio_with_torch(
+                        returns.loc[:date].tail(lookback_period), 
+                        method=method,
+                        show_progress=False
+                    )
+                    weights = np.array(weights, dtype=np.float64)
+                    
+                    if N is not None:
+                        benchmark_weights[method_name].loc[date, top_N_columns] = weights
+                    else:
+                        benchmark_weights[method_name].loc[date] = weights
+                    
+                except Exception as e:
+                    self.logger.error(f"Error optimizing {method_name} for date {date}: {str(e)}")
+                    # 최적화 실패 시 이전 가중치 유지
+                    prev_date = benchmark_weights[method_name].index[
+                        benchmark_weights[method_name].index < date
                     ][-1]
-                    for portfolio_name in benchmark_weights:
-                        benchmark_weights[portfolio_name].loc[date] = \
-                            benchmark_weights[portfolio_name].loc[prev_date]
-                    continue
+                    benchmark_weights[method_name].loc[date] = \
+                        benchmark_weights[method_name].loc[prev_date]
                 
-                # CNN Top (상승예측 종목 동일가중)
-                equal_weight = np.float64(1.0/len(up_stocks))
-                benchmark_weights['CNN Top'].loc[date, up_stocks] = equal_weight
+                # CNN Top + 최적화 포트폴리오
+                portfolio_name = f'CNN Top + {method_name}'
+                if portfolio_name not in benchmark_weights:
+                    benchmark_weights[portfolio_name] = pd.DataFrame(
+                        0.0,
+                        index=rebalance_dates,
+                        columns=returns.columns,
+                        dtype=np.float64
+                    )
                 
-                # 최적화 포트폴리오 생성
-                for method in ['max_sharpe', 'min_variance', 'min_cvar']:
-                    method_name = method.replace('_', ' ').title()
-                    if method == 'min_cvar':
-                        method_name = 'Min CVaR'
+                try:
+                    # CNN이 선택한 종목들에 대해서만 최적화
+                    up_returns = returns.loc[:date].tail(lookback_period)[up_stocks]
+                    weights = self.optimize_portfolio_with_torch(
+                        up_returns,
+                        method=method,
+                        show_progress=False
+                    )
+                    weights = np.array(weights, dtype=np.float64)
+                    benchmark_weights[portfolio_name].loc[date, up_stocks] = weights
                     
-                    # 기본 포트폴리오 초기화
-                    if method_name not in benchmark_weights:
-                        benchmark_weights[method_name] = pd.DataFrame(
-                            0.0,
-                            index=up_prob[up_prob.index >= first_valid_date].index,
-                            columns=returns.columns,
-                            dtype=np.float64
-                        )
-                    
-                    try:
-                        # 전체 종목에 대한 최적화
-                        weights = self.optimize_portfolio_with_torch(
-                            period_returns, 
-                            method=method,
-                            show_progress=False
-                        )
-                        weights = np.array(weights, dtype=np.float64)
-                        
-                        if N is not None:
-                            benchmark_weights[method_name].loc[date, top_N_columns] = weights
-                        else:
-                            benchmark_weights[method_name].loc[date] = weights
-                        
-                    except Exception as e:
-                        self.logger.error(f"Error optimizing {method_name} for date {date}: {str(e)}")
-                        # 최적화 실패 시 이전 가중치 유지
-                        prev_date = benchmark_weights[method_name].index[
-                            benchmark_weights[method_name].index < date
-                        ][-1]
-                        benchmark_weights[method_name].loc[date] = \
-                            benchmark_weights[method_name].loc[prev_date]
-                    
-                    # CNN Top + 최적화 포트폴리오
-                    portfolio_name = f'CNN Top + {method_name}'
-                    if portfolio_name not in benchmark_weights:
-                        benchmark_weights[portfolio_name] = pd.DataFrame(
-                            0.0,
-                            index=up_prob[up_prob.index >= first_valid_date].index,
-                            columns=returns.columns,
-                            dtype=np.float64
-                        )
-                    
-                    try:
-                        # CNN이 선택한 종목들에 대해서만 최적화
-                        up_returns = period_returns[up_stocks]
-                        weights = self.optimize_portfolio_with_torch(
-                            up_returns,
-                            method=method,
-                            show_progress=False
-                        )
-                        weights = np.array(weights, dtype=np.float64)
-                        benchmark_weights[portfolio_name].loc[date, up_stocks] = weights
-                        
-                    except Exception as e:
-                        self.logger.error(f"Error optimizing {portfolio_name} for date {date}: {str(e)}")
-                        # 최적화 실패 시 동일가중
-                        benchmark_weights[portfolio_name].loc[date, up_stocks] = equal_weight
+                except Exception as e:
+                    self.logger.error(f"Error optimizing {portfolio_name} for date {date}: {str(e)}")
+                    # 최적화 실패 시 동일가중
+                    benchmark_weights[portfolio_name].loc[date, up_stocks] = equal_weight
         
         return benchmark_weights

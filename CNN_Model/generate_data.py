@@ -32,7 +32,7 @@ def generate_training_data(year_list, ws_list, freq="month", chart_type="bar", c
             print(f"\nGenerating data for {ws}D {freq} {chart_type} {year}")
             start_time = time.time()
             
-            ma_lags = [20]  # 이동평균선 기간 설정
+            ma_lags = [60]  # 이동평균선 기간 설정
             vb = True  # 거래량 바 포함
             
             try:
@@ -87,8 +87,8 @@ if __name__ == "__main__":
     # 테스트가 성공하면 전체 데이터 생성
     print("\nGenerating full dataset...")
     generate_training_data(
-        year_list=cf.IS_YEARS,
-        ws_list=[20],
-        freq='day',
+        year_list=cf.IS_YEARS + cf.OOS_YEARS,
+        ws_list=[60],
+        freq='month',
         chart_type='bar',
     )
