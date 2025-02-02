@@ -98,6 +98,8 @@ class DataLoader:
             project_root = "/home/indi/codespace/ImagePortOpt"
             ts_model_dir = os.path.join(project_root, 'TS_Model')
             
+            self.logger.info(f"\n{'='*50}")
+            self.logger.info(f"Loading weights for model: {model_name}")
             self.logger.info(f"Current working directory: {os.getcwd()}")
             self.logger.info(f"Base folder: {self.base_folder}")
             self.logger.info(f"Project root: {project_root}")
@@ -119,33 +121,45 @@ class DataLoader:
                 f'portfolio_weights_{model_name}_top{self.data_size}_prob_maxsharpe.csv'
             )
             
-            self.logger.info(f"Checking file existence:")
+            self.logger.info(f"\nFile patterns:")
+            self.logger.info(f"noprob pattern: {noprob_pattern}")
+            self.logger.info(f"prob pattern: {prob_pattern}")
+            
+            self.logger.info(f"\nFile existence:")
             self.logger.info(f"noprob exists: {os.path.exists(noprob_pattern)}")
             self.logger.info(f"prob exists: {os.path.exists(prob_pattern)}")
             
             # noprob 가중치 로드
             if os.path.exists(noprob_pattern):
-                self.logger.info(f"Loading noprob weights from: {noprob_pattern}")
+                self.logger.info(f"\nLoading noprob weights...")
                 weights = pd.read_csv(noprob_pattern, index_col=0, parse_dates=True)
+                self.logger.info(f"Original shape: {weights.shape}")
                 weights = weights[(weights.index >= self.train_date) & 
                                 (weights.index <= self.end_date)].fillna(0)
+                self.logger.info(f"Filtered shape: {weights.shape}")
                 weights_dict[model_name] = weights
                 self.logger.info(f"Successfully loaded {model_name} weights")
             
             # prob 가중치 로드
             if os.path.exists(prob_pattern):
-                self.logger.info(f"Loading prob weights from: {prob_pattern}")
+                self.logger.info(f"\nLoading prob weights...")
                 weights = pd.read_csv(prob_pattern, index_col=0, parse_dates=True)
+                self.logger.info(f"Original shape: {weights.shape}")
                 weights = weights[(weights.index >= self.train_date) & 
                                 (weights.index <= self.end_date)].fillna(0)
-                weights_dict[f'CNN{model_name}'] = weights
-                self.logger.info(f"Successfully loaded CNN{model_name} weights")
+                self.logger.info(f"Filtered shape: {weights.shape}")
+                weights_dict[f'CNN + {model_name}'] = weights
+                self.logger.info(f"Successfully loaded CNN + {model_name} weights")
             
             if not weights_dict:
-                self.logger.warning(f"No weight files found for {model_name}")
+                self.logger.warning(f"\nNo weight files found for {model_name}")
                 self.logger.warning(f"Tried paths:")
                 self.logger.warning(f"noprob: {noprob_pattern}")
                 self.logger.warning(f"prob: {prob_pattern}")
+            else:
+                self.logger.info(f"\nLoaded portfolios: {list(weights_dict.keys())}")
+            
+            self.logger.info(f"{'='*50}\n")
             
         except Exception as e:
             self.logger.error(f"Error loading weights for {model_name}: {str(e)}")

@@ -15,12 +15,12 @@ DATA:
   
   # 시퀀스 설정
   WINDOW_SIZE: 60  # 입력 시퀀스 길이 (이전 TRAIN_LEN)
-  PRED_WINDOW: 60  # 예측 기간 (이전 PRED_LEN)
+  PRED_WINDOW: 20  # 예측 기간 (이전 PRED_LEN)
   
   # 데이터 처리
   N_STOCKS: 500  # 처리할 종목 수
   PROB_NORMALIZE: 'standardize'  # 확률값 정규화 방법 ['standardize', 'minmax']
-  SCALING_FACTOR: 60  # 스케일링 팩터
+  SCALING_FACTOR: 20  # 스케일링 팩터
 USE_CUDA: true
 
 MODEL:
@@ -56,7 +56,7 @@ MODEL:
 TRAINING:
   # 학습 파라미터
   BATCH_SIZE: 64
-  EPOCHS: 1
+  EPOCHS: 500
   EARLY_STOPPING: 50
   LEARNING_RATE: 0.005
   MOMENTUM: 0.9
@@ -88,7 +88,7 @@ PORTFOLIO:
 
 BACKTEST:
   REBALANCING_FREQUENCY: 'quarterly'  # ['daily', 'weekly', 'monthly', 'quarterly']
-  WINDOW_SIZE: 60
+  WINDOW_SIZE: 20
   INCLUDE_TRANSACTION_COSTS: true
   RISK_METRICS: ['volatility', 'sharpe', 'sortino', 'max_drawdown']
 

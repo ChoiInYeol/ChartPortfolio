@@ -16,6 +16,8 @@ import pandas as pd
 import seaborn as sns
 from scipy.stats import spearmanr
 
+import scienceplots
+plt.style.use(['science', 'no-latex'])
 
 class PortfolioBacktest:
     """포트폴리오 백테스팅 클래스"""
@@ -339,7 +341,7 @@ class PortfolioBacktest:
         return results
     
     def plot_ic_distribution(self, results: Dict[str, pd.DataFrame], save_dir: str = "./processed") -> None:
-        """IC 분포를 시각화합니다."""
+        """IC 분포와 시계열을 시각화합니다."""
         prob_df = self.prob_df.copy()
         ret_df = self.ret_df.copy()
         
@@ -351,63 +353,103 @@ class PortfolioBacktest:
             probs = prob_df.loc[date].dropna()
             if probs.empty:
                 continue
-                
+            
             next_date = self.get_trading_day_offset(date, 1)
             if next_date is None or next_date not in ret_df.index:
                 continue
-                
+            
             rets = ret_df.loc[next_date]
             
             common_stocks = list(set(probs.index) & set(rets.index))
             if not common_stocks:
                 continue
-                
+            
             probs = probs[common_stocks]
             rets = rets[common_stocks]
             
             ic = np.corrcoef(probs, rets)[0, 1]
             rank_ic = spearmanr(probs, rets)[0]
             
-            ic_data.append(ic)
-            rank_ic_data.append(rank_ic)
-            dates.append(date)
+            if not np.isnan(ic) and not np.isnan(rank_ic):
+                ic_data.append(ic)
+                rank_ic_data.append(rank_ic)
+                dates.append(date)
         
-        # IC 시계열 플롯
-        plt.figure(figsize=(12, 6))
-        plt.plot(dates, ic_data, label='IC', alpha=0.7)
-        plt.plot(dates, rank_ic_data, label='Rank IC', alpha=0.7)
-        plt.axhline(y=0, color='k', linestyle='--', alpha=0.3)
-        plt.title('Information Coefficient Time Series')
-        plt.xlabel('Date')
-        plt.ylabel('Correlation')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.xticks(rotation=45)
+        # 2x2 서브플롯 생성
+        fig = plt.figure(figsize=(12, 10))
+        gs = fig.add_gridspec(2, 2, hspace=0.3, wspace=0.3)
+        
+        # (a) IC Mean by Delay
+        ax1 = fig.add_subplot(gs[0, 0])
+        is_values = []
+        oos_values = []
+        delays = []
+        for col in results["IS"].columns:
+            if col[1] == "High":
+                delays.append(col[0])
+                is_values.append(results["IS"].loc["IC (Mean)", col])
+                oos_values.append(results["OOS"].loc["IC (Mean)", col])
+        
+        ax1.plot(delays, is_values, "b-o", label="In-Sample", markersize=4)
+        ax1.plot(delays, oos_values, "r-o", label="Out-of-Sample", markersize=4)
+        ax1.set_title("(a) Information Coefficient (Mean)", fontsize=10)
+        ax1.set_xlabel("Delay (Trading Days)", fontsize=9)
+        ax1.set_ylabel("IC Mean", fontsize=9)
+        ax1.legend(fontsize=8)
+        ax1.grid(True, alpha=0.3)
+        ax1.tick_params(labelsize=8)
+        
+        # delay 축을 정수로 설정
+        ax1.set_xticks(delays)
+        ax1.set_xticklabels([int(d) for d in delays])  # 정수로 변환
+        
+        # (b) Rank IC Mean by Delay
+        ax2 = fig.add_subplot(gs[0, 1])
+        is_values = []
+        oos_values = []
+        for col in results["IS"].columns:
+            if col[1] == "High":
+                is_values.append(results["IS"].loc["Rank IC (Mean)", col])
+                oos_values.append(results["OOS"].loc["Rank IC (Mean)", col])
+        
+        ax2.plot(delays, is_values, "b-o", label="In-Sample", markersize=4)
+        ax2.plot(delays, oos_values, "r-o", label="Out-of-Sample", markersize=4)
+        ax2.set_title("(b) Rank Information Coefficient (Mean)", fontsize=10)
+        ax2.set_xlabel("Delay (Trading Days)", fontsize=9)
+        ax2.set_ylabel("Rank IC Mean", fontsize=9)
+        ax2.legend(fontsize=8)
+        ax2.grid(True, alpha=0.3)
+        ax2.tick_params(labelsize=8)
+        
+        # delay 축을 정수로 설정
+        ax2.set_xticks(delays)
+        ax2.set_xticklabels([int(d) for d in delays])  # 정수로 변환
+        
+        # (c) IC Distribution
+        ax3 = fig.add_subplot(gs[1, 0])
+        sns.histplot(ic_data, kde=True, ax=ax3)
+        ax3.axvline(np.mean(ic_data), color='r', linestyle='--', 
+                    label=f'Mean: {np.mean(ic_data):.3f}')
+        ax3.set_title("(c) Information Coefficient Distribution", fontsize=10)
+        ax3.set_xlabel("IC", fontsize=9)
+        ax3.set_ylabel("Frequency", fontsize=9)
+        ax3.legend(fontsize=8)
+        ax3.tick_params(labelsize=8)
+        
+        # (d) IC Time Series
+        ax4 = fig.add_subplot(gs[1, 1])
+        ax4.plot(dates, ic_data, label='IC', alpha=0.7, linewidth=1)
+        ax4.plot(dates, rank_ic_data, label='Rank IC', alpha=0.7, linewidth=1)
+        ax4.axhline(y=0, color='k', linestyle='--', alpha=0.3)
+        ax4.set_title("(d) Information Coefficient Time Series", fontsize=10)
+        ax4.set_xlabel("Date", fontsize=9)
+        ax4.set_ylabel("Correlation", fontsize=9)
+        ax4.legend(fontsize=8)
+        ax4.grid(True, alpha=0.3)
+        ax4.tick_params(labelsize=8, rotation=45)
+        
         plt.tight_layout()
-        
-        save_path = os.path.join(save_dir, "ic_timeseries.png")
-        plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        plt.close()
-        
-        # IC 히스토그램
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
-        
-        # IC 히스토그램
-        sns.histplot(ic_data, kde=True, ax=ax1)
-        ax1.axvline(np.mean(ic_data), color='r', linestyle='--', label=f'Mean: {np.mean(ic_data):.3f}')
-        ax1.set_title('IC Distribution')
-        ax1.set_xlabel('IC')
-        ax1.legend()
-        
-        # Rank IC 히스토그램
-        sns.histplot(rank_ic_data, kde=True, ax=ax2)
-        ax2.axvline(np.mean(rank_ic_data), color='r', linestyle='--', label=f'Mean: {np.mean(rank_ic_data):.3f}')
-        ax2.set_title('Rank IC Distribution')
-        ax2.set_xlabel('Rank IC')
-        ax2.legend()
-        
-        plt.tight_layout()
-        save_path = os.path.join(save_dir, "ic_distribution.png")
+        save_path = os.path.join(save_dir, "ic_analysis.png")
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
         plt.close()
 
@@ -453,139 +495,64 @@ class PortfolioBacktest:
 
         return pd.DataFrame(best_delays)
 
-    def plot_delay_comparison(self, results: Dict[str, pd.DataFrame], metrics: List[str] = None) -> None:
-        """각 delay별 IS/OOS 성과 비교 플롯"""
-        # 기본 성과 지표
-        performance_metrics = ["Annual Return", "Sharpe Ratio", "Win Rate", "Max Drawdown"]
-        # IC 관련 지표 (High 포트폴리오만)
-        ic_metrics = ["IC (Mean)", "Rank IC (Mean)"]
+    def plot_delay_comparison(self, results: Dict[str, pd.DataFrame]) -> None:
+        """각 delay별 IS/OOS 성과를 3x4 그리드로 플롯"""
+        metrics = ["Annual Return", "Sharpe Ratio", "Max Drawdown", "Win Rate"]
+        portfolios = ["High", "Low", "H-L"]
         
-        # 성과 지표 플롯
-        for metric in performance_metrics:
-            fig, axes = plt.subplots(3, 1, figsize=(12, 18))
-            portfolios = ["High", "Low", "H-L"]
-
-            for idx, portfolio in enumerate(portfolios):
-                ax = axes[idx]
-                find_max = portfolio != "Low"  # Low 포트폴리오는 최소값을 찾습니다
-
-                # 데이터 추출
-                is_df = results["IS"]
-                oos_df = results["OOS"]
+        fig = plt.figure(figsize=(20, 15))
+        gs = fig.add_gridspec(3, 4, hspace=0.3, wspace=0.3)
+        
+        for port_idx, portfolio in enumerate(portfolios):
+            for met_idx, metric in enumerate(metrics):
+                ax = fig.add_subplot(gs[port_idx, met_idx])
                 
+                # 데이터 추출
                 is_values = []
                 oos_values = []
                 delays = []
                 
-                for col in is_df.columns:
+                for col in results["IS"].columns:
                     if col[1] == portfolio:
                         delays.append(col[0])
-                        is_values.append(is_df.loc[metric, col])
-                        oos_values.append(oos_df.loc[metric, col])
+                        is_values.append(results["IS"].loc[metric, col])
+                        oos_values.append(results["OOS"].loc[metric, col])
                 
                 is_values = np.array(is_values)
                 oos_values = np.array(oos_values)
-
+                
                 # 데이터 플롯
-                ax.plot(delays, is_values, "b-o", label="In-Sample")
-                ax.plot(delays, oos_values, "r-o", label="Out-of-Sample")
-
-                # 최적 포인트 표시
-                if len(is_values) > 0:
-                    best_is_idx = is_values.argmax() if find_max else is_values.argmin()
-                    ax.plot(
-                        delays[best_is_idx],
-                        is_values[best_is_idx],
-                        "b*",
-                        markersize=15,
-                        label=f"Best IS: {delays[best_is_idx]}",
-                    )
-
-                if len(oos_values) > 0:
-                    best_oos_idx = oos_values.argmax() if find_max else oos_values.argmin()
-                    ax.plot(
-                        delays[best_oos_idx],
-                        oos_values[best_oos_idx],
-                        "r*",
-                        markersize=15,
-                        label=f"Best OOS: {delays[best_oos_idx]}",
-                    )
-
-                ax.axhline(y=0, color="k", linestyle="--", alpha=0.3)
-                ax.axvline(x=0, color="k", linestyle="--", alpha=0.3)
+                ax.plot(delays, is_values, "b-o", label="In-Sample", markersize=4)
+                ax.plot(delays, oos_values, "r-o", label="Out-of-Sample", markersize=4)
                 
+                # 최 설정
                 ax.set_xticks(delays)
-                ax.set_xticklabels(delays)
+                ax.set_xticklabels([int(d) for d in delays], rotation=45)
+                ax.set_xlabel("Delay (Trading Days)", fontsize=9)
+                ax.set_ylabel(metric, fontsize=9)
                 
-                ax.set_xlabel("Delay (Trading Days)")
-                ax.set_title(f"{metric} by Delay - {portfolio} Portfolio")
-                ax.set_ylabel(metric)
-                ax.legend()
+                # 첫 번째 행에만 지표 이름 표시
+                if port_idx == 0:
+                    ax.set_title(f"({chr(97 + met_idx)}) {metric}", fontsize=10)
+                
+                # 왼쪽 끝에 포트폴리오 이름 표시
+                if met_idx == 0:
+                    ax.text(-0.2, 0.5, portfolio, rotation=90, 
+                           transform=ax.transAxes, fontsize=10, 
+                           verticalalignment='center')
+                
+                # 그리드 및 범례
                 ax.grid(True, alpha=0.3)
-
-            plt.tight_layout()
-            save_path = f"./processed/delay_comparison_{metric.lower().replace(' ', '_')}.png"
-            plt.savefig(save_path, dpi=300, bbox_inches="tight")
-            plt.close()
-
-        # IC 관련 지표 플롯 (High 포트폴리오만)
-        for metric in ic_metrics:
-            plt.figure(figsize=(12, 6))
-            
-            # High 포트폴리오 데이터만 추출
-            is_values = []
-            oos_values = []
-            delays = []
-            
-            for col in results["IS"].columns:
-                if col[1] == "High":
-                    delays.append(col[0])
-                    is_values.append(results["IS"].loc[metric, col])
-                    oos_values.append(results["OOS"].loc[metric, col])
-            
-            is_values = np.array(is_values)
-            oos_values = np.array(oos_values)
-
-            # 데이터 플롯
-            plt.plot(delays, is_values, "b-o", label="In-Sample")
-            plt.plot(delays, oos_values, "r-o", label="Out-of-Sample")
-
-            # 최적 포인트 표시
-            if len(is_values) > 0:
-                best_is_idx = is_values.argmax()
-                plt.plot(
-                    delays[best_is_idx],
-                    is_values[best_is_idx],
-                    "b*",
-                    markersize=15,
-                    label=f"Best IS: {delays[best_is_idx]}",
-                )
-
-            if len(oos_values) > 0:
-                best_oos_idx = oos_values.argmax()
-                plt.plot(
-                    delays[best_oos_idx],
-                    oos_values[best_oos_idx],
-                    "r*",
-                    markersize=15,
-                    label=f"Best OOS: {delays[best_oos_idx]}",
-                )
-
-            plt.axhline(y=0, color="k", linestyle="--", alpha=0.3)
-            plt.axvline(x=0, color="k", linestyle="--", alpha=0.3)
-            
-            plt.xticks(delays, delays)
-            
-            plt.xlabel("Delay (Trading Days)")
-            plt.title(f"{metric} by Delay - High Portfolio")
-            plt.ylabel(metric)
-            plt.legend()
-            plt.grid(True, alpha=0.3)
-            plt.tight_layout()
-            
-            save_path = f"./processed/delay_comparison_{metric.lower().replace(' ', '_')}.png"
-            plt.savefig(save_path, dpi=300, bbox_inches="tight")
-            plt.close()
+                ax.legend(fontsize=8)
+                ax.tick_params(labelsize=8)
+                
+                # y=0 기준선
+                ax.axhline(y=0, color='k', linestyle='--', alpha=0.3)
+        
+        plt.tight_layout()
+        save_path = "./processed/delay_comparison_metrics.png"
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        plt.close()
 
     def plot_cumulative_returns(self, portfolio_rets: pd.DataFrame, title: str) -> None:
         """누적 수익률 플롯"""
@@ -608,7 +575,7 @@ class PortfolioBacktest:
 
 
 # 데이터 로드
-prob_df = pd.read_csv("./processed/ensem_res_60D60P.csv")
+prob_df = pd.read_csv("./processed/ensem_res_20D20P.csv")
 ret_df = pd.read_csv("./processed/return_df.csv")
 
 # 날짜를 datetime으로 변환하고 인덱스로 설정
@@ -627,8 +594,7 @@ results = backtest.compare_delays_with_periods(
 )
 
 # 비교 플롯 생성
-for metric in ["Annual Return", "Sharpe Ratio", "Win Rate"]:
-    backtest.plot_delay_comparison(results, metric)
+backtest.plot_delay_comparison(results)
 
 # 특정 delay에 대한 누적 수익률 플롯 (예: delay = -20)
 portfolio_rets = backtest.generate_portfolio_with_delay(delay=0, cut=10)
