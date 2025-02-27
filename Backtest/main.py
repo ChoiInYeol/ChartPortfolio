@@ -10,11 +10,13 @@ from typing import Dict
 import pandas as pd
 import numpy as np
 import yaml
+from tqdm import tqdm
+import argparse
 
 from data_loader import DataLoader
 from utils.metrics import PerformanceMetrics
 from utils.visualization import PortfolioVisualizer
-from optimization.optimizer import OptimizationManager
+from optimization.optimizer import OptimizationManager  # 팩터 타이밍 기능이 통합된 매니저 사용
 
 def setup_logging(base_folder: str) -> logging.Logger:
     """로깅 설정을 초기화합니다."""
@@ -26,7 +28,10 @@ def setup_logging(base_folder: str) -> logging.Logger:
     
     logger.setLevel(logging.INFO)
     
+    # 로그 디렉토리 생성
+    os.makedirs(base_folder, exist_ok=True)
     log_file = os.path.join(base_folder, 'backtest.log')
+    
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.INFO)
     
@@ -43,610 +48,281 @@ def setup_logging(base_folder: str) -> logging.Logger:
     return logger
 
 class PortfolioBacktest:
+    """포트폴리오 백테스트를 수행하는 클래스입니다."""
+    
     def __init__(self,
                  base_folder: str,
                  data_size: int,
-                 selections: Dict,
-                 train_date: str = '2017-12-31',
-                 end_date: str = '2024-07-05'):
+                 result_dir: str = 'results',
+                 use_cache: bool = True) -> None:
         """
-        백테스트 초기화
+        PortfolioBacktest를 초기화합니다.
         
         Args:
-            base_folder (str): 기본 폴더 경로
-            data_size (int): 데이터 크기 (50, 370, 500, 2055)
-            selections (Dict): 사용자 선택 옵션
-            train_date (str): 학습 시작 날짜
-            end_date (str): 투자 종료 날짜
+            base_folder (str): 데이터가 저장된 기본 폴더 경로
+            data_size (int): 데이터 크기
+            result_dir (str): 결과를 저장할 디렉토리 경로
+            use_cache (bool): 캐시 사용 여부
         """
         self.base_folder = base_folder
         self.data_size = data_size
-        self.models = selections['models']
-        self.train_date = train_date
-        self.end_date = end_date
-        self.use_cache = selections.get('use_cache', True)  # 캐시 사용 여부
-        
-        # 설정 파일 로드
-        with open(os.path.join(base_folder, 'weight.yaml'), 'r') as f:
-            self.config = yaml.safe_load(f)
-        
-        # 파일명과 표시명 매핑
-        self.name_mapping = self.config['portfolios']['names']
+        self.result_dir = result_dir
+        self.use_cache = use_cache
         
         # 로깅 설정
-        self.logger = setup_logging(base_folder)
+        self.logger = setup_logging(result_dir)
         
-        # 결과 디렉토리 설정
-        self.result_dir = os.path.join(base_folder, 'results', f'size_{data_size}')
-        os.makedirs(self.result_dir, exist_ok=True)
-        
-        # figures 디렉토리 생성
-        figures_dir = os.path.join(self.result_dir, 'figures')
-        os.makedirs(figures_dir, exist_ok=True)
-        
-        # weights 디렉토리 생성
-        weights_dir = os.path.join(self.result_dir, 'weights')
-        os.makedirs(weights_dir, exist_ok=True)
-        
-        # 데이터 로더 초기화
-        self.data_loader = DataLoader(
-            base_folder=base_folder,
-            data_size=data_size,
-            train_date=train_date,
-            end_date=end_date
-        )
-        
-        # 컴포넌트 초기화
+        # 성능 측정 및 시각화 객체 초기화
         self.metrics = PerformanceMetrics()
         self.visualizer = PortfolioVisualizer()
-        self.optimizer = OptimizationManager()
+        self.optimizer = OptimizationManager(result_dir=self.result_dir)
+        
+        # 리밸런싱 날짜 초기화
+        self.rebalance_dates = None
 
     def _determine_rebalancing_freq(self) -> str:
-        """
-        리밸런싱 주기를 결정합니다.
-        
-        Returns:
-            str: 리밸런싱 주기 ('ME': 월말)
-        """
+        """리밸런싱 주기를 결정합니다."""
         return 'ME'  # 월말 리밸런싱으로 고정
+
+    def _get_rebalancing_dates(self, returns: pd.DataFrame, freq: str = 'ME') -> pd.DatetimeIndex:
+        """
+        리밸런싱 날짜를 계산합니다.
+        
+        Args:
+            returns (pd.DataFrame): 수익률 데이터
+            freq (str): 리밸런싱 주기 (예: 'ME' - 월말)
+            
+        Returns:
+            pd.DatetimeIndex: 리밸런싱 날짜
+        """
+        # 리밸런싱 날짜 계산 (월말 기준)
+        rebalance_dates = pd.date_range(
+            start=returns.index[0],
+            end=returns.index[-1],
+            freq=freq
+        )
+        
+        # 실제 거래일에 맞춰 리밸런싱 날짜 조정
+        adjusted_dates = []
+        for date in rebalance_dates:
+            month_end = date
+            available_dates = returns.index[returns.index <= month_end]
+            if len(available_dates) > 0:
+                adjusted_dates.append(available_dates[-1])
+        
+        return pd.DatetimeIndex(sorted(set(adjusted_dates)))
+
+    def create_benchmark_portfolios(self, up_prob: pd.DataFrame, returns: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+        """벤치마크 포트폴리오들을 생성합니다."""
+        # 기존 벤치마크 포트폴리오 생성
+        benchmark_weights = self.optimizer.create_benchmark_portfolios(
+            up_prob=up_prob,
+            returns=returns,
+            rebalance_dates=self.rebalance_dates,
+            use_cache=True
+        )
+        
+        # Target Return 포트폴리오 추가
+        target_returns = [0.06, 0.08, 0.10, 0.12]  # 연간 목표 수익률
+        for target in target_returns:
+            try:
+                # 일반 Target Return 포트폴리오
+                weights_df = pd.DataFrame(0.0, index=self.rebalance_dates, columns=returns.columns)
+                
+                for date in self.rebalance_dates:
+                    try:
+                        # 과거 60일 수익률 데이터 사용
+                        historical_returns = returns.loc[:date].tail(60)
+                        
+                        # Target Return 최적화
+                        weights = self.optimizer.optimize_portfolio_with_gurobi(
+                            returns=historical_returns,
+                            method='target_return',
+                            target_return=target,
+                            show_progress=False
+                        )
+                        weights_df.loc[date] = weights
+                        
+                    except Exception as e:
+                        self.logger.error(f"Error in Target Return {target*100:.0f}% at {date}: {str(e)}")
+                        # 이전 가중치 사용 또는 동일가중
+                        prev_dates = weights_df.index[weights_df.index < date]
+                        if len(prev_dates) > 0:
+                            weights_df.loc[date] = weights_df.loc[prev_dates[-1]]
+                        else:
+                            weights_df.loc[date] = 1.0 / len(returns.columns)
+                
+                benchmark_weights[f'Target {target*100:.0f}%'] = weights_df
+                
+                # CNN Top + Target Return 포트폴리오
+                cnn_weights_df = pd.DataFrame(0.0, index=self.rebalance_dates, columns=returns.columns)
+                
+                for date in self.rebalance_dates:
+                    try:
+                        # CNN이 선택한 종목들 찾기
+                        prob_dates = up_prob.index[up_prob.index <= date]
+                        if len(prob_dates) == 0:
+                            continue
+                        
+                        prob_date = prob_dates[-1]
+                        month_probs = up_prob.loc[prob_date]
+                        threshold = month_probs.median()
+                        up_stocks = month_probs[month_probs >= threshold].index
+                        
+                        if len(up_stocks) == 0:
+                            continue
+                        
+                        # CNN이 선택한 종목들에 대해서만 Target Return 최적화
+                        historical_returns = returns.loc[:date].tail(60)[up_stocks]
+                        
+                        weights = self.optimizer.optimize_portfolio_with_gurobi(
+                            returns=historical_returns,
+                            method='target_return',
+                            target_return=target,
+                            show_progress=False
+                        )
+                        cnn_weights_df.loc[date, up_stocks] = weights
+                        
+                    except Exception as e:
+                        self.logger.error(f"Error in CNN Top + Target {target*100:.0f}% at {date}: {str(e)}")
+                        # 이전 가중치 사용 또는 동일가중
+                        prev_dates = cnn_weights_df.index[cnn_weights_df.index < date]
+                        if len(prev_dates) > 0:
+                            cnn_weights_df.loc[date] = cnn_weights_df.loc[prev_dates[-1]]
+                        else:
+                            cnn_weights_df.loc[date, up_stocks] = 1.0 / len(up_stocks)
+                
+                benchmark_weights[f'CNN Top + Target {target*100:.0f}%'] = cnn_weights_df
+                
+            except Exception as e:
+                self.logger.error(f"Error creating Target Return {target*100:.0f}% portfolios: {str(e)}")
+        
+        return benchmark_weights
 
     def run(self) -> None:
         """백테스트를 실행합니다."""
         try:
             # 1. 데이터 로드
-            data = self.data_loader.load_data()
-            returns = data['returns']
-            probs = data['probs']
-            benchmark_returns = self.data_loader.load_benchmark()
-            self.logger.info(f"Data loaded - Returns: {returns.shape}, Up prob: {probs.shape}")
+            print("Loading data...")
+            loader = DataLoader(base_folder=self.base_folder, data_size=self.data_size)
+            returns = loader.load_returns()
+            probs = loader.load_probabilities()
             
-            # 2. 포트폴리오 구성
+            # 2. 리밸런싱 날짜 설정
+            rebalance_freq = self._determine_rebalancing_freq()
+            self.rebalance_dates = self._get_rebalancing_dates(returns, rebalance_freq)
+            
+            # 3. 포트폴리오 생성
             portfolio_weights = {}
             
-            # 리밸런싱 날짜 계산 (월말 기준)
-            rebalance_dates = pd.date_range(
-                start=returns.index[0],
-                end=returns.index[-1],
-                freq='ME'  # 월말 리밸런싱
-            )
+            # 3.1 팩터 타이밍 포트폴리오 생성
+            print("Creating factor timing portfolios...")
+            try:
+                factor_scores = {
+                    'rising_prob': probs,
+                    'momentum': returns.rolling(window=60).mean()
+                }
+                factor_timing_weights = self.optimizer.create_factor_timing_portfolios(
+                    returns=returns,
+                    factor_scores=factor_scores,
+                    rebalance_freq=rebalance_freq,
+                    top_pct=0.3,
+                    fm_window=12,
+                    lookback_period=60,
+                    min_history_months=6,
+                    use_cache=self.use_cache
+                )
+                portfolio_weights.update(factor_timing_weights)
+                
+            except Exception as e:
+                self.logger.error(f"Error creating factor timing portfolios: {str(e)}")
             
-            # 2.1 Naive 포트폴리오 (1/N)
-            naive_weights = pd.DataFrame(
-                index=rebalance_dates,
-                columns=returns.columns,
-                data=1.0/len(returns.columns),
-                dtype=np.float64
-            )
-            portfolio_weights['Naive'] = naive_weights
-            
-            # 2.2 CNN 기반 벤치마크 포트폴리오
-            print("Creating CNN benchmark portfolios...")
-            N = 500
-            result_dir = os.path.join(self.base_folder, 'results')
-            benchmark_weights = self.optimizer.create_benchmark_portfolios(
-                probs, 
-                returns, 
-                N=N,
-                result_dir=result_dir,
-                rebalance_dates=rebalance_dates,  # 리밸런싱 날짜 전달
-                use_cache=self.use_cache  # 캐시 사용 여부 전달
-            )
+            # 3.2 벤치마크 포트폴리오 생성
+            print("Creating benchmark portfolios...")
+            benchmark_weights = self.create_benchmark_portfolios(probs, returns)
             portfolio_weights.update(benchmark_weights)
-            print("Completed creating CNN benchmark portfolios.")
             
-            # 2.3 시계열 모델 트트폴리오
-            print(f"Loading weights for {self.models} models...")
-            for model in self.models:
-                try:
-                    model_weights = self.data_loader.load_ts_model_weights(model)
-                    if model_weights:  # 빈 딕셔너리가 아닌 경우에만 업데이트
-                        portfolio_weights.update(model_weights)
-                        print(f"{model} weights updated")
-                except Exception as e:
-                    self.logger.warning(f"Failed to load weights for {model}: {str(e)}")
-                    continue
-            print(f"Completed loading weights for {len(portfolio_weights)} portfolios.")
-            
-            # 2.4 포트폴리오 가중치 저장
-            weights_dir = os.path.join(self.result_dir, 'weights')
-            os.makedirs(weights_dir, exist_ok=True)
-            
-            for name, weights in portfolio_weights.items():
-                # weight.yaml의 매핑에서 파일명 찾기
-                file_name = None
-                for fname, display_name in self.name_mapping.items():
-                    if display_name == name:
-                        file_name = fname
-                        break
-                
-                if file_name is None:
-                    file_name = "".join(x for x in name if x.isalnum() or x in ['-', '_'])
-                
-                save_path = os.path.join(weights_dir, f'{file_name}_weights.csv')
-                weights.to_csv(save_path)
-                self.logger.info(f"Saved {name} weights to {save_path}")
-            
-            # 3. 수익률 계산
+            # 4. 포트폴리오 수익률 계산
+            print("Calculating portfolio returns...")
             portfolio_returns = {}
             for name, weights in portfolio_weights.items():
-                # 리밸런싱 주기를 고려한 수익률 계산
-                returns_series = self.metrics.calculate_portfolio_returns(
-                    returns=returns,
-                    weights=weights,
-                    rebalancing_freq='ME'  # 월말 리밸런싱
-                )
-                returns_series.name = name  # 시리즈에 이름 부여
-                portfolio_returns[name] = returns_series
+                try:
+                    returns_series = self.metrics.calculate_portfolio_returns(returns, weights)
+                    returns_series.name = name
+                    portfolio_returns[name] = returns_series
+                except Exception as e:
+                    self.logger.error(f"Error calculating returns for {name}: {str(e)}")
             
-            # 4. 성과 지표 계산 및 저장
-            metrics_results = {}
-            for name, rets in portfolio_returns.items():
-                metrics = self.metrics.calculate_portfolio_metrics(
-                    returns=rets,
-                    weights=portfolio_weights[name],
-                    benchmark_returns=benchmark_returns,
-                    result_dir=None  # 개별 메트릭스 저장 제거
-                )
-                metrics_results[name] = metrics
-            
-            # 결과를 DataFrame으로 변환
-            metrics_df = pd.DataFrame(metrics_results).T
-            
-            # 5. 결과 저장 및 시각화
-            # 5.1 성과 지표 저장 (CSV, LaTeX)
-            metrics_dir = os.path.join(self.result_dir, 'metrics')
-            os.makedirs(metrics_dir, exist_ok=True)
-            
-            # 전체 메트릭스만 저장
-            metrics_df.to_csv(os.path.join(metrics_dir, 'all_portfolios_metrics.csv'), float_format='%.4g')
-            
-            # LaTeX 형식으로도 저장
-            latex_path = os.path.join(metrics_dir, 'all_portfolios_metrics.tex')
-            with open(latex_path, 'w') as f:
-                f.write("\\begin{table}[htbp]\n")
-                f.write("\\centering\n")
-                f.write("\\caption{Portfolio Performance Metrics}\n")
-                f.write("\\begin{tabular}{l" + "r" * len(metrics_df.columns) + "}\n")
-                f.write("\\hline\n")
-                f.write("Portfolio & " + " & ".join(metrics_df.columns) + " \\\\\n")
-                f.write("\\hline\n")
+            # 5. 성과 측정
+            print("Calculating performance metrics...")
+            try:
+                metrics_df = self.metrics.calculate_portfolio_metrics(portfolio_returns)
                 
-                for idx in metrics_df.index:
-                    row = [idx]
-                    for col in metrics_df.columns:
-                        value = metrics_df.loc[idx, col]
-                        if col in ['Sharpe Ratio', 'Sortino Ratio', 'Turnover', 'Beta']:
-                            fmt = f"{value:.4f}".rstrip('0').rstrip('.')
-                        else:
-                            fmt = f"{value:.4%}".rstrip('0').rstrip('.')
-                        row.append(fmt)
-                    f.write(" & ".join(row) + " \\\\\n")
+                # 5.1 성과 지표 저장
+                metrics_dir = os.path.join(self.result_dir, 'metrics')
+                os.makedirs(metrics_dir, exist_ok=True)
                 
-                f.write("\\hline\n")
-                f.write("\\end{tabular}\n")
-                f.write("\\end{table}")
+                metrics_path = os.path.join(metrics_dir, 'portfolio_metrics.csv')
+                metrics_df.to_csv(metrics_path)
+                self.logger.info(f"Performance metrics saved to {metrics_path}")
+                
+                latex_path = os.path.join(metrics_dir, 'portfolio_metrics.tex')
+                self.metrics.save_metrics_to_latex(metrics_df, latex_path)
+                self.logger.info(f"LaTeX metrics saved to {latex_path}")
+                
+            except Exception as e:
+                self.logger.error(f"Error calculating metrics: {str(e)}")
             
-            # 5.2 수익률 그래프 저장
-            returns_df = pd.DataFrame(portfolio_returns)
+            # 6. 시각화
+            print("Creating visualizations...")
+            try:
+                plots_dir = os.path.join(self.result_dir, 'plots')
+                os.makedirs(plots_dir, exist_ok=True)
+                
+                # 누적 수익률 플롯
+                cum_returns_path = os.path.join(plots_dir, 'cumulative_returns.png')
+                self.visualizer.plot_cumulative_returns(portfolio_returns, cum_returns_path)
+                self.logger.info(f"Cumulative returns plot saved to {cum_returns_path}")
+                
+            except Exception as e:
+                self.logger.error(f"Error creating visualizations: {str(e)}")
             
-            # 실제 컬럼명 확인을 위한 로깅 추가
-            self.logger.info(f"Available portfolios: {returns_df.columns.tolist()}")
-
-            selected_portfolios = [
-                'Naive',
-                'CNN Top',
-                
-                # 전통적 벤치마크 전략
-                'MOM',
-                'STR',
-                'WSTR',
-                'TREND',
-                
-                # 최적화 전략
-                'Max Sharpe',
-                'Min Variance',
-                'Min CVaR',
-                
-                # CNN + 최적화 전략
-                'CNN Top + Max Sharpe',
-                'CNN Top + Min Variance',
-                'CNN Top + Min CVaR',
-                
-                # 시계열 모델
-                'GRU',
-                'TCN',
-                'TRANSFORMER',
-                
-                # CNN + 시계열 모델
-                'CNN + GRU',
-                'CNN + TCN',
-                'CNN + TRANSFORMER'
-            ]
-
-            # 선택된 포트폴리오 존재 여부 확인
-            missing_portfolios = [p for p in selected_portfolios if p not in returns_df.columns]
-            if missing_portfolios:
-                self.logger.warning(f"Missing portfolios: {missing_portfolios}")
-                # 존재하는 포트폴리오만 선택
-                selected_portfolios = [p for p in selected_portfolios if p in returns_df.columns]
-
-            # 선택된 포트폴리오만 필터
-            selected_returns = returns_df[selected_portfolios]
-
-            # 수익률 그래프 저장
-            self.visualizer.plot_portfolio_comparison(
-                returns_dict=selected_returns,
-                title="Portfolio Performance Comparison",
-                result_dir=self.result_dir,
-                selected_portfolios=selected_portfolios
-            )
-            
-            # 5.3 포트폴리오 가중치 저장
-            for name, weights in portfolio_weights.items():
-                safe_name = "".join(x for x in name if x.isalnum() or x in ['-', '_'])
-                self.visualizer.plot_weights(
-                    weights=weights,
-                    save_path=os.path.join(self.result_dir, 'figures', f'{safe_name}_weights_plot.png'),
-                    title=f"{name} Portfolio Weights"
-                )
-            
-            # 5.3 전략 비교 그래프 저장
-            self.visualizer.plot_strategy_comparison(
-                metrics_df=metrics_df,
-                result_dir=self.result_dir,
-                title="Strategy Performance Comparison"
-            )
-            
-            self.logger.info("Backtest completed successfully")
+            print("Backtest completed successfully!")
             
         except Exception as e:
-            self.logger.error(f"Error during backtest: {str(e)}", exc_info=True)
+            self.logger.error(f"Error in backtest: {str(e)}")
             raise
 
 def main():
-    """메인 실행 함수"""
-    base_folder = os.path.dirname(os.path.abspath(__file__))
+    """메인 함수"""
+    parser = argparse.ArgumentParser(description='Portfolio Backtest')
+    parser.add_argument('--mode', type=str, default='Full Process',
+                       help='Process mode (Full Process or Analysis Only)')
+    parser.add_argument('--size', type=int, default=500,
+                       help='Data size (number of stocks)')
+    parser.add_argument('--no-cache', action='store_true',
+                       help='Disable optimization cache')
     
-    # 로깅 설정
-    logger = setup_logging(base_folder)
+    args = parser.parse_args()
     
-    # 설정 파일 로드
-    with open(os.path.join(base_folder, 'weight.yaml'), 'r') as f:
-        config = yaml.safe_load(f)
+    # 설정 로깅
+    logger = logging.getLogger(__name__)
+    logger.info(f"Selected mode: {args.mode}")
+    logger.info(f"Selected data size: {args.size}")
+    logger.info(f"Using optimization cache: {not args.no_cache}")
     
-    # 경로 설정 수정
-    paths = config['paths']
-    paths['results'] = os.path.join(base_folder, 'results')  # Backtest/results로 수정
-    paths['ts_model_data'] = os.path.join(base_folder, '..', 'TS_Model', 'data')  # 상대 경로 수정
-    portfolio_config = config['portfolios']
-    
-    # 사용자 선택 옵션
-    questions = [
-        inquirer.List('mode',
-                     message="Select operation mode",
-                     choices=['Full Process', 'Visualization Only'],
-                     default='Full Process'),
-        inquirer.List('data_size',
-                     message="Select data size",
-                     choices=config['base_settings']['data_sizes']),
-        inquirer.List('window_size',
-                     message="Select window size",
-                     choices=[20, 60, 120],
-                     default=60),
-        inquirer.List('prediction_window',
-                     message="Select prediction window",
-                     choices=[20, 60, 120],
-                     default=60),
-        inquirer.Checkbox('models',
-                         message="Select model type(s)",
-                         choices=['GRU', 'TCN', 'TRANSFORMER'],
-                         default=['GRU']),
-        inquirer.Confirm('use_cache',
-                        message="Use optimization cache?",
-                        default=True)
-    ]
-    
-    selections = inquirer.prompt(questions)
-    
-    if selections['mode'] == 'Visualization Only':
-        # 시각화만 실행
-        logger.info("Starting Visualization Only mode...")
-        
-        # 파일명 -> 표시명 매핑 먼저 정의
-        name_mapping = portfolio_config['names']
-        
-        data_loader = DataLoader(
-            base_folder=base_folder,
-            data_size=selections['data_size'],
-            train_date=config['base_settings']['train_date'],
-            end_date=config['base_settings']['end_date'],
-            ws=selections['window_size'],
-            pw=selections['prediction_window']
-        )
-        result_dir = data_loader.result_dir
-        logger.info(f"Result directory: {result_dir}")
-        
-        # 필요한 데이터 로드
-        try:
-            data = data_loader.load_data()
-            returns_df = data['returns']
-            up_prob = data['probs']
-            logger.info(f"Data loaded - Returns shape: {returns_df.shape}, Probs shape: {up_prob.shape}")
-        except Exception as e:
-            logger.error(f"Error loading data: {str(e)}")
-            return
-        
-        # 포트폴리오 가중치 저장할 딕셔너리
-        portfolio_weights = {}
-        
-        # 1. TS_Model weights 로드
-        logger.info(f"Loading weights for {selections['models']} models...")
-        for model in selections['models']:
-            try:
-                model_weights = data_loader.load_ts_model_weights(model)
-                if model_weights:  # 빈 딕셔너리가 아닌 경우에만 업데이트
-                    portfolio_weights.update(model_weights)
-                    # 가중치 파일 저장
-                    weights_dir = os.path.join(result_dir, 'weights')
-                    os.makedirs(weights_dir, exist_ok=True)
-                    for name, weights in model_weights.items():
-                        safe_name = "".join(x for x in name if x.isalnum() or x in ['-', '_'])
-                        save_path = os.path.join(weights_dir, f'{safe_name}_weights.csv')
-                        weights.to_csv(save_path)
-                        logger.info(f"Saved {name} weights to {save_path}")
-                    logger.info(f"{model} weights loaded and saved")
-            except Exception as e:
-                logger.warning(f"Failed to load weights for {model}: {str(e)}")
-                continue
-        
-        # 2. 저장된 가중치 데이터 로드
-        weights_dir = os.path.join(result_dir, paths['weights'])
-        if os.path.exists(weights_dir):
-            weight_files = os.listdir(weights_dir)
-            logger.info(f"Found {len(weight_files)} weight files in {weights_dir}")
-            
-            for file in weight_files:
-                if file.endswith('_weights.csv'):
-                    file_name = file.replace('_weights.csv', '')
-                    if file_name in name_mapping:
-                        display_name = name_mapping[file_name]
-                        weights_df = pd.read_csv(os.path.join(weights_dir, file), index_col=0)
-                        weights_df.index = pd.to_datetime(weights_df.index)
-                        portfolio_weights[display_name] = weights_df
-                        logger.info(f"Loaded saved weights for {display_name}")
-        
-        if not portfolio_weights:
-            logger.error("No portfolio weights loaded")
-            return
-        
-        # 과 디렉토리 설정 (window_size와 prediction_window 반영)
-        result_dir = os.path.join(
-            paths['results'],
-            f'Result_{selections["data_size"]}_{selections["window_size"]}D{selections["prediction_window"]}P'
-        )
-        os.makedirs(os.path.join(result_dir, paths['figures']), exist_ok=True)
-        logger.info(f"Created figures directory: {os.path.join(result_dir, paths['figures'])}")
-        
-        # 저장된 가중치 데이터 로드
-        weights_dir = os.path.join(result_dir, paths['weights'])
-        if not os.path.exists(weights_dir):
-            logger.error(f"Weights directory not found: {weights_dir}")
-            return
-        
-        portfolio_weights = {}
-        
-        # 파일명 -> 표시명 매핑
-        name_mapping = portfolio_config['names']
-        
-        # 가중치 파일 로드
-        weight_files = os.listdir(weights_dir)
-        logger.info(f"Found {len(weight_files)} weight files in {weights_dir}")
-        
-        for file in weight_files:
-            if file.endswith('_weights.csv'):
-                file_name = file.replace('_weights.csv', '')
-                if file_name in name_mapping:
-                    display_name = name_mapping[file_name]
-                    weights_df = pd.read_csv(os.path.join(weights_dir, file), index_col=0)
-                    weights_df.index = pd.to_datetime(weights_df.index)
-                    portfolio_weights[display_name] = weights_df
-                    logger.info(f"Loaded weights for {display_name}")
-        
-        if not portfolio_weights:
-            logger.error("No portfolio weights loaded")
-            return
-        
-        # 시각화 옵션 선택
-        viz_questions = [
-            inquirer.List('viz_type',
-                         message="Select visualization type",
-                         choices=['Portfolio Comparison', 'Weight Distribution', 'Both'],
-                         default='Portfolio Comparison'),
-        ]
-        
-        if 'Portfolio Comparison' in viz_questions[0].choices:
-            available_portfolios = sorted(portfolio_weights.keys())
-            logger.info(f"Available portfolios: {available_portfolios}")
-            viz_questions.append(
-                inquirer.Checkbox('portfolios',
-                                message="Select portfolios to compare",
-                                choices=available_portfolios,
-                                default=portfolio_config['default_selection'])
-            )
-        
-        viz_selections = inquirer.prompt(viz_questions)
-        if not viz_selections:
-            logger.error("No visualization selections made")
-            return
-        
-        logger.info(f"Selected visualization type: {viz_selections['viz_type']}")
-        if 'portfolios' in viz_selections:
-            logger.info(f"Selected portfolios: {viz_selections['portfolios']}")
-        
-        # Out of Sample 시작 시점 (모든 시각화에서 공통으로 사용)
-        investment_start = pd.to_datetime('2018-04-01')
-        logger.info(f"Investment start date: {investment_start}")
-        
-        # 시각화 실행
-        visualizer = PortfolioVisualizer()
-        
-        if viz_selections['viz_type'] in ['Portfolio Comparison', 'Both']:
-            # 벤치마크 데이터 로드
-            try:
-                benchmark_returns = data_loader.load_benchmark()
-                benchmark_returns = benchmark_returns[benchmark_returns.index >= investment_start]
-                logger.info("Benchmark data loaded successfully")
-            except Exception as e:
-                logger.warning(f"Failed to load benchmark data: {str(e)}")
-                benchmark_returns = None
-            
-            # 포트폴리오 수익률 계산
-            portfolio_returns = {}
-            metrics_results = {}
-            metrics = PerformanceMetrics()
-            
-            for portfolio_name, weights in portfolio_weights.items():
-                if portfolio_name in viz_selections.get('portfolios', []):
-                    try:
-                        returns_oos = returns_df[returns_df.index >= investment_start].copy()
-                        portfolio_weights_oos = weights.reindex(returns_oos.index).ffill()
-                        
-                        # 일별 포트폴리오 수익률 계산
-                        returns_series = (returns_oos * portfolio_weights_oos).sum(axis=1)
-                        returns_series.name = portfolio_name
-                        portfolio_returns[portfolio_name] = returns_series
-                        
-                        # 성과지표 계산 (벤치마크 추가)
-                        metrics_results[portfolio_name] = metrics.calculate_portfolio_metrics(
-                            returns=returns_series,
-                            weights=portfolio_weights_oos,
-                            benchmark_returns=benchmark_returns,  # 벤치마크 추가
-                            result_dir=result_dir
-                        )
-                        
-                        logger.info(f"Calculated returns and metrics for {portfolio_name}")
-                        
-                    except Exception as e:
-                        logger.error(f"Error calculating returns for {portfolio_name}: {str(e)}")
-                        continue
-            
-            if not portfolio_returns:
-                logger.error("No portfolio returns calculated")
-                return
-            
-            portfolio_returns_df = pd.DataFrame(portfolio_returns)
-            metrics_df = pd.DataFrame(metrics_results).T
-            
-            # 소수점 4자리로 포맷
-            metrics_df = metrics_df.round(4)
-            
-            # 성과지표 저장 (CSV, LaTeX)
-            metrics_dir = os.path.join(result_dir, 'metrics')
-            os.makedirs(metrics_dir, exist_ok=True)
-            
-            metrics_df.to_csv(os.path.join(metrics_dir, 'all_portfolios_metrics.csv'), float_format='%.4f')
-            metrics_df.to_latex(os.path.join(metrics_dir, 'all_portfolios_metrics.tex'))
-            
-            # 수익률 그래프 저장
-            try:
-                visualizer.plot_portfolio_comparison(
-                    returns_dict=portfolio_returns_df,
-                    title="Portfolio Performance Comparison",
-                    result_dir=result_dir,
-                    selected_portfolios=viz_selections.get('portfolios')
-                )
-                logger.info("Successfully created portfolio comparison plot")
-                
-                # 전략 비교 그래프 저장
-                visualizer.plot_strategy_comparison(
-                    metrics_df=metrics_df,
-                    result_dir=result_dir,
-                    title="Strategy Performance Comparison"
-                )
-                logger.info("Successfully created strategy comparison plot")
-                
-            except Exception as e:
-                logger.error(f"Error creating visualization: {str(e)}", exc_info=True)
-        
-        if viz_selections['viz_type'] in ['Weight Distribution', 'Both']:
-            logger.info("Creating weight distribution plots...")
-            
-            for portfolio_name, weights in portfolio_weights.items():
-                if portfolio_name in viz_selections.get('portfolios', []):
-                    try:
-                        # 파일명에 사용할 수 없는 문자 제거
-                        safe_name = "".join(x for x in portfolio_name if x.isalnum() or x in ['-', '_'])
-                        
-                        # 가중치 분포 플롯 생성
-                        visualizer.plot_weights(
-                            weights=weights,
-                            save_path=os.path.join(result_dir, 'figures', f'{safe_name}_weights_plot.png'),
-                            title=f"{portfolio_name} Portfolio Weights",
-                        )
-                        logger.info(f"Created weight distribution plot for {portfolio_name}")
-                        
-                    except Exception as e:
-                        logger.error(f"Error creating weight plots for {portfolio_name}: {str(e)}")
-                        continue
-
-            logger.info("Visualization process completed")
-        
-        # 상위 수익률 종목 비중 비교 그래프
-        try:
-            visualizer.plot_top_returns_weights_comparison(
-                returns=returns_df,
-                portfolio_weights=portfolio_weights,
-                investment_start=investment_start,
-                top_n=100,
-                save_path=os.path.join(result_dir, 'figures', 'top_returns_weights_comparison.png'),
-                title='Portfolio Weight Comparison in Top 100 Return Stocks'
-            )
-            logger.info("Created top returns weights comparison plot")
-        except Exception as e:
-            logger.error(f"Error creating top returns weights comparison plot: {str(e)}")
-        
-        return
-    
-    # Full Process 실행
-    if not selections['models']:
-        print("At least one model must be selected")
-        return
-    
-    # 선택 항 출력
-    logger.info(f"Selected mode: {selections['mode']}")
-    logger.info(f"Selected data size: {selections['data_size']}")
-    logger.info(f"Selected models: {selections['models']}")
-    logger.info(f"Using optimization cache: {selections['use_cache']}")
+    # 기본 폴더 설정
+    base_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    result_dir = os.path.join(base_folder, 'Backtest', 'results', f'size_{args.size}')
     
     # 백테스트 실행
     backtest = PortfolioBacktest(
         base_folder=base_folder,
-        data_size=selections['data_size'],
-        selections=selections,
-        train_date='2017-12-31',
-        end_date='2024-07-05'
+        data_size=args.size,
+        result_dir=result_dir,
+        use_cache=not args.no_cache
     )
     backtest.run()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

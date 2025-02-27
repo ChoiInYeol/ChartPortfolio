@@ -21,41 +21,45 @@ class PortfolioVisualizer:
         # 포트폴리오 그룹별 색상 스키마
         self.color_scheme = {
             # 벤치마크 (빨간색 계열)
-            'Naive': '#FF0000',
             'CNN Top': '#FF6B6B',
             
-            # 전통적 벤치마크 전략 (갈색 계열)
-            'MOM': '#8B4513',  # 새들 브라운
-            'STR': '#A0522D',  # 시에나
-            'WSTR': '#CD853F', # 페루
-            'TREND': '#DEB887', # 버블우드
+            # 팩터 타이밍 (파란색 계열)
+            'Factor Timing ND': '#0000FF',
+            'Factor Timing FM': '#4169E1',
+            'Factor Timing 1M': '#1E90FF',
+            'Factor Timing 1MOpt': '#00BFFF',
             
-            # 최적화 (파란색 계열)
-            'Max Sharpe': '#0000FF',
-            'Min Variance': '#4169E1',
-            'Min CVaR': '#1E90FF',
+            # 전통적 전략 (갈색 계열)
+            'MOM': '#8B4513',
+            'STR': '#A0522D',
+            'WSTR': '#CD853F',
+            'TREND': '#DEB887',
             
-            # CNN + 최적화 (초록색 계열)
-            'CNN Top + Max Sharpe': '#008000',
-            'CNN Top + Min Variance': '#32CD32',
-            'CNN Top + Min CVaR': '#90EE90',
+            # 최적화 (초록색 계열)
+            'Max Sharpe': '#006400',
+            'Min Variance': '#228B22',
+            'Min CVaR': '#32CD32',
+            'Target 6%': '#90EE90',
+            'Target 8%': '#98FB98',
+            'Target 10%': '#7CCD7C',
+            'Target 12%': '#2E8B57',
             
-            # 시계열 모델 (보라색 계열)
-            'GRU': '#800080',
-            'TCN': '#BA55D3',
-            'TRANSFORMER': '#DDA0DD',
-            
-            # CNN + 시계열 모델 (주황색 계열)
-            'CNN + GRU': '#FFA500',
-            'CNN + TCN': '#FFB84D',
-            'CNN + TRANSFORMER': '#FFD700'
+            # CNN + 최적화 (보라색 계열)
+            'CNN Top + Max Sharpe': '#800080',
+            'CNN Top + Min Variance': '#BA55D3',
+            'CNN Top + Min CVaR': '#9370DB',
+            'CNN Top + Target 6%': '#DDA0DD',
+            'CNN Top + Target 8%': '#EE82EE',
+            'CNN Top + Target 10%': '#FF00FF',
+            'CNN Top + Target 12%': '#DA70D6'
         }
         
         # 포트폴리오 표시 순서
         self.portfolio_order = [
             # 벤치마크
-            'Naive',
             'CNN Top',
+            # 팩터 타이밍
+            'Factor Timing ND', 'Factor Timing FM', 'Factor Timing 1M', 'Factor Timing 1MOpt',
             # 전통적 벤치마크 전략
             'MOM',
             'STR',
@@ -65,18 +69,14 @@ class PortfolioVisualizer:
             'Max Sharpe',
             'Min Variance',
             'Min CVaR',
+            # 타겟 리턴
+            'Target 6%', 'Target 8%', 'Target 10%', 'Target 12%',
             # CNN + 최적화
             'CNN Top + Max Sharpe',
             'CNN Top + Min Variance',
             'CNN Top + Min CVaR',
-            # 시계열 모델
-            'GRU',
-            'TCN',
-            'TRANSFORMER',
-            # CNN + 시계열 모델
-            'CNN + GRU',
-            'CNN + TCN',
-            'CNN + TRANSFORMER'
+            # 타겟 리턴 + CNN + 최적화
+            'CNN Top + Target 6%', 'CNN Top + Target 8%', 'CNN Top + Target 10%', 'CNN Top + Target 12%'
         ]
 
     def plot_portfolio_comparison(self,
@@ -84,24 +84,34 @@ class PortfolioVisualizer:
                                 title: str = "Portfolio Performance Comparison",
                                 result_dir: str = None,
                                 selected_portfolios: List[str] = None):
-        """Portfolio performance visualization."""
+        """포트폴리오 성과를 비교하는 그래프를 생성합니다."""
         plt.figure(figsize=(15, 8), dpi=300)
         
         # 누적 수익률 계산
         cumulative_returns = (1 + returns_dict).cumprod()
         
-        # 포트폴리오 순서대로 플롯
-        plotted_portfolios = []
-        for portfolio_name in selected_portfolios:
-            if portfolio_name in cumulative_returns.columns:
-                plotted_portfolios.append(portfolio_name)
-                color = self.color_scheme.get(portfolio_name, '#333333')
-                plt.plot(cumulative_returns.index, 
-                        cumulative_returns[portfolio_name], 
-                        label=portfolio_name,
-                        color=color,
-                        linewidth=1,
-                        alpha=0.8)
+        # 포트폴리오 그룹 정의
+        portfolio_groups = {
+            'Benchmark': ['CNN Top'],
+            'Factor Timing': ['Factor Timing ND', 'Factor Timing FM', 'Factor Timing 1M', 'Factor Timing 1MOpt'],
+            'Traditional': ['MOM', 'STR', 'WSTR', 'TREND'],
+            'Optimization': ['Max Sharpe', 'Min Variance', 'Min CVaR', 
+                           'Target 6%', 'Target 8%', 'Target 10%', 'Target 12%'],
+            'CNN + Optimization': ['CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR',
+                                 'CNN Top + Target 6%', 'CNN Top + Target 8%', 'CNN Top + Target 10%', 'CNN Top + Target 12%']
+        }
+        
+        # 각 그룹별로 플롯
+        for group_name, portfolios in portfolio_groups.items():
+            for portfolio in portfolios:
+                if portfolio in cumulative_returns.columns:
+                    color = self.color_scheme.get(portfolio, '#333333')
+                    plt.plot(cumulative_returns.index,
+                            cumulative_returns[portfolio],
+                            label=f"{portfolio}",
+                            color=color,
+                            linewidth=1.5,
+                            alpha=0.8)
         
         # 그래프 스타일링
         plt.title(title, fontsize=14, pad=20)
@@ -110,18 +120,32 @@ class PortfolioVisualizer:
         plt.grid(True, alpha=0.3)
         plt.xticks(rotation=45)
         
-        # 범례 추가
-        if plotted_portfolios:
-            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10)
+        # 범례 추가 (그룹별로 정리)
+        handles, labels = plt.gca().get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        
+        # 그룹별 범례 생성
+        legend_groups = []
+        for group_name, portfolios in portfolio_groups.items():
+            group_handles = [by_label[p] for p in portfolios if p in by_label]
+            if group_handles:
+                legend = plt.legend(group_handles,
+                                  [p for p in portfolios if p in by_label],
+                                  title=group_name,
+                                  bbox_to_anchor=(1.05, 1),
+                                  loc='upper left',
+                                  fontsize=10)
+                plt.gca().add_artist(legend)
+                legend_groups.append(legend)
         
         plt.tight_layout()
         
         # 저장
-        save_path = os.path.join(result_dir, 'figures', 'portfolio_comparison.png')
-        plt.savefig(save_path, bbox_inches='tight')
-        plt.close()
-        
-        self.logger.info(f"Portfolio comparison plot saved to {save_path}")
+        if result_dir:
+            save_path = os.path.join(result_dir, 'figures', 'portfolio_comparison.png')
+            plt.savefig(save_path, bbox_inches='tight', dpi=300)
+            plt.close()
+            self.logger.info(f"Portfolio comparison plot saved to {save_path}")
 
     def plot_weights(self,
                     weights: pd.DataFrame,
@@ -189,18 +213,19 @@ class PortfolioVisualizer:
                                metrics_df: pd.DataFrame,
                                result_dir: str,
                                title: str = "Strategy Performance Comparison"):
-        """
-        단일 전략과 복합 전략의 성과를 비교하는 bar plot을 생성하고 저장합니다.
-        
-        Args:
-            metrics_df (pd.DataFrame): 성과 지표가 담긴 DataFrame
-            result_dir (str): 결과 저장 경로
-            title (str): 그래프 제목
-        """
+        """전략 성과를 비교하는 그래프를 생성합니다."""
         # 전략 그룹 정의
-        single_stage = ['Max Sharpe', 'Min Variance', 'Min CVaR', 'GRU', 'TCN', 'TRANSFORMER']
-        two_stage = ['CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR',
-                     'CNN + GRU', 'CNN + TCN', 'CNN + TRANSFORMER']
+        single_stage = [
+            'CNN Top',
+            'Factor Timing ND', 'Factor Timing FM', 'Factor Timing 1M',
+            'Max Sharpe', 'Min Variance', 'Min CVaR',
+            'Target 6%', 'Target 8%', 'Target 10%', 'Target 12%'
+        ]
+        two_stage = [
+            'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR',
+            'CNN Top + Target 6%', 'CNN Top + Target 8%', 'CNN Top + Target 10%', 'CNN Top + Target 12%',
+            'Factor Timing 1MOpt'
+        ]
         
         # 실제 존재하는 포트폴리오만 필터링
         available_single = [p for p in single_stage if p in metrics_df.index]
@@ -238,7 +263,7 @@ class PortfolioVisualizer:
             
             # Single Stage 바 그리기
             if not single_data.empty:
-                ax.bar(x[:len(single_data)] - width/2, single_data.values, 
+                ax.bar(x[:len(single_data)] - width/2, single_data.values,
                       width, label='Single Stage', color='lightblue', alpha=0.8)
                 # 값 표시
                 for i, v in enumerate(single_data):
@@ -248,7 +273,7 @@ class PortfolioVisualizer:
             
             # Two Stage 바 그리기
             if not two_stage_data.empty:
-                ax.bar(x[:len(two_stage_data)] + width/2, two_stage_data.values, 
+                ax.bar(x[:len(two_stage_data)] + width/2, two_stage_data.values,
                       width, label='Two Stage', color='lightcoral', alpha=0.8)
                 # 값 표시
                 for i, v in enumerate(two_stage_data):
@@ -259,68 +284,28 @@ class PortfolioVisualizer:
             # 축 설정
             ax.set_title(metric, fontsize=12, pad=10)
             ax.set_xticks(x)
-            
-            # x축 레이블 설정
-            if not single_data.empty:
-                labels = single_data.index
-            elif not two_stage_data.empty:
-                labels = two_stage_data.index
-            else:
-                labels = []
-            
-            ax.set_xticklabels(labels, rotation=45, ha='right')
+            ax.set_xticklabels(available_single if available_single else available_two,
+                             rotation=45, ha='right')
             ax.grid(True, alpha=0.3)
         
-        # 전체 타이틀 추가
-        fig.suptitle(title, fontsize=14, y=1.02)
-        
-        # 범례 추가 (존재하는 그룹만)
-        legend_labels = []
-        if available_single:
-            legend_labels.append('Single Stage')
-        if available_two:
-            legend_labels.append('Two Stage')
-        
-        if legend_labels:
-            fig.legend(legend_labels, 
-                      loc='upper right', 
-                      bbox_to_anchor=(0.99, 1.01),
-                      ncol=len(legend_labels))
-        
+        plt.suptitle(title, fontsize=14, y=1.02)
         plt.tight_layout()
         
-        # 저장 경로 설정
-        figures_dir = os.path.join(result_dir, 'figures')
-        os.makedirs(figures_dir, exist_ok=True)
-        save_path = os.path.join(figures_dir, 'strategy_comparison.png')
-        
-        # 그래프 저장
+        # 저장
+        save_path = os.path.join(result_dir, 'figures', 'strategy_comparison.png')
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
         plt.close()
         
         self.logger.info(f"Strategy comparison plot saved to {save_path}")
         
-        # 지표 데이터도 CSV로 저장
-        metrics_dir = os.path.join(result_dir, 'metrics')
-        os.makedirs(metrics_dir, exist_ok=True)
-        
-        metrics_path = os.path.join(metrics_dir, 'strategy_comparison_metrics.csv')
+        # 지표 데이터 저장 (CSV)
+        metrics_path = os.path.join(result_dir, 'metrics', 'strategy_comparison_metrics.csv')
         metrics_df.to_csv(metrics_path, float_format='%.4f')
         self.logger.info(f"Strategy comparison metrics saved to {metrics_path}")
         
-        # LaTeX 형식으로도 저장
-        latex_path = os.path.join(metrics_dir, 'strategy_comparison_metrics.tex')
-        metrics_df.style.format({
-            'E(R)': '{:.4%}',
-            'Std(R)': '{:.4%}',
-            'Sharpe Ratio': '{:.4f}',
-            'DD(R)': '{:.4%}',
-            'Sortino Ratio': '{:.4f}',
-            'Max Drawdown': '{:.4%}',
-            '% of +Ret': '{:.4%}',
-            'Turnover': '{:.4f}',
-            'Beta': '{:.4f}'
-        }).to_latex(latex_path)
+        # 지표 데이터 저장 (LaTeX)
+        latex_path = os.path.join(result_dir, 'metrics', 'strategy_comparison_metrics.tex')
+        metrics_df.to_latex(latex_path, float_format='%.4f')
         self.logger.info(f"Strategy comparison LaTeX metrics saved to {latex_path}")
         
     def plot_top_returns_weights_comparison(self,
@@ -409,5 +394,73 @@ class PortfolioVisualizer:
             plt.savefig(save_path, bbox_inches='tight', dpi=300)
             plt.close()
             self.logger.info(f"Top returns weights comparison plot saved to {save_path}")
+        
+    def plot_cumulative_returns(self, portfolio_returns: Dict[str, pd.Series], save_path: str = None):
+        """포트폴리오별 누적 수익률을 플롯합니다."""
+        plt.figure(figsize=(15, 10))
+        
+        # 포트폴리오 그룹 정의
+        portfolio_groups = {
+            'Single Stage': [
+                'CNN Top', 'MOM', 'STR', 'WSTR', 'TREND',
+                'Factor Timing ND', 'Factor Timing FM', 'Factor Timing 1M',
+                'Max Sharpe', 'Min Variance', 'Min CVaR',
+                'Target 6%', 'Target 8%', 'Target 10%', 'Target 12%'
+            ],
+            'Two Stage': [
+                'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR',
+                'CNN Top + Target 6%', 'CNN Top + Target 8%', 'CNN Top + Target 10%', 'CNN Top + Target 12%',
+                'Factor Timing 1MOpt'
+            ]
+        }
+        
+        # 색상 설정
+        colors = {
+            'Single Stage': [
+                '#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',  # Traditional
+                '#d62728', '#ff9896', '#9467bd',  # Factor Timing
+                '#8c564b', '#c49c94', '#e377c2',  # Optimization
+                '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d'  # Target Return
+            ],
+            'Two Stage': [
+                '#17becf', '#9edae5', '#393b79', '#5254a3',  # CNN + Optimization
+                '#637939', '#8ca252', '#b5cf6b', '#cedb9c',  # CNN + Target
+                '#bd9e39'  # Factor Timing 1MOpt
+            ]
+        }
+        
+        # 각 그룹별로 플롯
+        for group_name, portfolios in portfolio_groups.items():
+            for i, portfolio in enumerate(portfolios):
+                if portfolio in portfolio_returns:
+                    cum_returns = (1 + portfolio_returns[portfolio]).cumprod()
+                    plt.plot(cum_returns.index, cum_returns.values,
+                            label=f'{portfolio}',
+                            color=colors[group_name][i],
+                            alpha=0.8)
+        
+        plt.grid(True, alpha=0.3)
+        plt.xlabel('Date')
+        plt.ylabel('Cumulative Returns')
+        plt.title('Portfolio Cumulative Returns')
+        
+        # 범례를 그룹별로 정리
+        handles, labels = plt.gca().get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        
+        # 그룹별로 범례 배치
+        legend_groups = []
+        for group_name, portfolios in portfolio_groups.items():
+            group_handles = [by_label[p] for p in portfolios if p in by_label]
+            if group_handles:
+                legend_groups.append(plt.legend(group_handles, [p for p in portfolios if p in by_label],
+                                             title=group_name, bbox_to_anchor=(1.05, 1), loc='upper left'))
+                plt.gca().add_artist(legend_groups[-1])
+        
+        plt.tight_layout()
+        
+        if save_path:
+            plt.savefig(save_path, bbox_inches='tight', dpi=300)
+        plt.close()
         
         

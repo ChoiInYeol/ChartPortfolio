@@ -3984,3 +3984,305 @@ ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mism
 2024-12-23 14:24:44,453 - INFO - Available portfolios: ['Naive', 'CNN Top', 'MOM', 'STR', 'WSTR', 'TREND', 'Max Sharpe', 'CNN Top + Max Sharpe', 'Min Variance', 'CNN Top + Min Variance', 'Min CVaR', 'CNN Top + Min CVaR', 'GRU', 'TCN', 'CNN + TCN', 'TRANSFORMER', 'CNN + TRANSFORMER']
 2024-12-23 14:24:44,453 - WARNING - Missing portfolios: ['CNN + GRU']
 2024-12-23 14:28:20,686 - INFO - Backtest completed successfully
+2025-02-03 09:21:05,434 - INFO - Selected mode: Full Process
+2025-02-03 09:21:05,434 - INFO - Selected data size: 500
+2025-02-03 09:21:05,434 - INFO - Selected models: ['GRU']
+2025-02-03 09:21:05,434 - INFO - Using optimization cache: True
+2025-02-03 09:21:05,614 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-03 09:21:07,762 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Naive_weights.csv
+2025-02-03 09:21:07,770 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTop_weights.csv
+2025-02-03 09:21:07,777 - INFO - Saved MOM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MOM_weights.csv
+2025-02-03 09:21:07,784 - INFO - Saved STR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/STR_weights.csv
+2025-02-03 09:21:07,792 - INFO - Saved WSTR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/WSTR_weights.csv
+2025-02-03 09:21:07,800 - INFO - Saved TREND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/TREND_weights.csv
+2025-02-03 09:21:07,807 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MaxSharpe_weights.csv
+2025-02-03 09:21:07,815 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMaxSharpe_weights.csv
+2025-02-03 09:21:07,821 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinVariance_weights.csv
+2025-02-03 09:21:07,828 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinVariance_weights.csv
+2025-02-03 09:21:07,835 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinCVaR_weights.csv
+2025-02-03 09:21:07,841 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinCVaR_weights.csv
+2025-02-03 09:21:07,853 - INFO - Saved Factor Timing ND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingND_weights.csv
+2025-02-03 09:21:07,863 - INFO - Saved Factor Timing FM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingFM_weights.csv
+2025-02-03 09:21:07,872 - INFO - Saved Factor Timing 1M weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1M_weights.csv
+2025-02-03 09:21:07,881 - INFO - Saved Factor Timing 1MOpt weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1MOpt_weights.csv
+2025-02-03 09:21:08,042 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/GRU_weights.csv
+2025-02-03 09:21:08,687 - WARNING - Missing portfolios: ['TCN', 'TRANSFORMER', 'CNN + GRU', 'CNN + TCN', 'CNN + TRANSFORMER']
+2025-02-03 09:21:10,280 - INFO - 백테스트 완료.
+2025-02-03 09:24:45,054 - INFO - Selected mode: Full Process
+2025-02-03 09:24:45,055 - INFO - Selected data size: 500
+2025-02-03 09:24:45,055 - INFO - Selected models: ['GRU']
+2025-02-03 09:24:45,055 - INFO - Using optimization cache: False
+2025-02-03 09:24:45,233 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-03 09:37:13,844 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Naive_weights.csv
+2025-02-03 09:37:13,852 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTop_weights.csv
+2025-02-03 09:37:13,860 - INFO - Saved MOM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MOM_weights.csv
+2025-02-03 09:37:13,868 - INFO - Saved STR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/STR_weights.csv
+2025-02-03 09:37:13,877 - INFO - Saved WSTR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/WSTR_weights.csv
+2025-02-03 09:37:13,888 - INFO - Saved TREND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/TREND_weights.csv
+2025-02-03 09:37:13,895 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MaxSharpe_weights.csv
+2025-02-03 09:37:13,902 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMaxSharpe_weights.csv
+2025-02-03 09:37:13,909 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinVariance_weights.csv
+2025-02-03 09:37:13,918 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinVariance_weights.csv
+2025-02-03 09:37:13,925 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinCVaR_weights.csv
+2025-02-03 09:37:13,931 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinCVaR_weights.csv
+2025-02-03 09:37:13,943 - INFO - Saved Factor Timing ND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingND_weights.csv
+2025-02-03 09:37:13,954 - INFO - Saved Factor Timing FM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingFM_weights.csv
+2025-02-03 09:37:13,962 - INFO - Saved Factor Timing 1M weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1M_weights.csv
+2025-02-03 09:37:13,971 - INFO - Saved Factor Timing 1MOpt weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1MOpt_weights.csv
+2025-02-03 09:37:14,114 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/GRU_weights.csv
+2025-02-03 09:37:14,727 - WARNING - Missing portfolios: ['TCN', 'TRANSFORMER', 'CNN + GRU', 'CNN + TCN', 'CNN + TRANSFORMER']
+2025-02-03 09:37:15,665 - INFO - 백테스트 완료.
+2025-02-03 09:38:55,209 - INFO - Selected mode: Full Process
+2025-02-03 09:38:55,210 - INFO - Selected data size: 500
+2025-02-03 09:38:55,210 - INFO - Selected models: ['GRU']
+2025-02-03 09:38:55,210 - INFO - Using optimization cache: False
+2025-02-03 09:38:55,376 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-03 09:39:13,476 - INFO - Selected mode: Full Process
+2025-02-03 09:39:13,476 - INFO - Selected data size: 500
+2025-02-03 09:39:13,476 - INFO - Selected models: ['GRU']
+2025-02-03 09:39:13,476 - INFO - Using optimization cache: True
+2025-02-03 09:39:13,639 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-03 09:39:15,526 - WARNING - Missing CNN + GRU weights
+2025-02-03 09:39:15,526 - INFO - Loaded portfolios:
+2025-02-03 09:39:15,526 - INFO - - Naive
+2025-02-03 09:39:15,526 - INFO - - CNN Top
+2025-02-03 09:39:15,526 - INFO - - MOM
+2025-02-03 09:39:15,526 - INFO - - STR
+2025-02-03 09:39:15,527 - INFO - - WSTR
+2025-02-03 09:39:15,527 - INFO - - TREND
+2025-02-03 09:39:15,527 - INFO - - Max Sharpe
+2025-02-03 09:39:15,527 - INFO - - CNN Top + Max Sharpe
+2025-02-03 09:39:15,527 - INFO - - Min Variance
+2025-02-03 09:39:15,527 - INFO - - CNN Top + Min Variance
+2025-02-03 09:39:15,527 - INFO - - Min CVaR
+2025-02-03 09:39:15,527 - INFO - - CNN Top + Min CVaR
+2025-02-03 09:39:15,527 - INFO - - Factor Timing ND
+2025-02-03 09:39:15,527 - INFO - - Factor Timing FM
+2025-02-03 09:39:15,527 - INFO - - Factor Timing 1M
+2025-02-03 09:39:15,527 - INFO - - Factor Timing 1MOpt
+2025-02-03 09:39:15,527 - INFO - - GRU
+2025-02-03 09:39:15,539 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Naive_weights.csv
+2025-02-03 09:39:15,548 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTop_weights.csv
+2025-02-03 09:39:15,557 - INFO - Saved MOM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MOM_weights.csv
+2025-02-03 09:39:15,565 - INFO - Saved STR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/STR_weights.csv
+2025-02-03 09:39:15,572 - INFO - Saved WSTR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/WSTR_weights.csv
+2025-02-03 09:39:15,580 - INFO - Saved TREND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/TREND_weights.csv
+2025-02-03 09:39:15,586 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MaxSharpe_weights.csv
+2025-02-03 09:39:15,593 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMaxSharpe_weights.csv
+2025-02-03 09:39:15,599 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinVariance_weights.csv
+2025-02-03 09:39:15,606 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinVariance_weights.csv
+2025-02-03 09:39:15,613 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinCVaR_weights.csv
+2025-02-03 09:39:15,619 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinCVaR_weights.csv
+2025-02-03 09:39:15,630 - INFO - Saved Factor Timing ND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingND_weights.csv
+2025-02-03 09:39:15,641 - INFO - Saved Factor Timing FM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingFM_weights.csv
+2025-02-03 09:39:15,650 - INFO - Saved Factor Timing 1M weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1M_weights.csv
+2025-02-03 09:39:15,659 - INFO - Saved Factor Timing 1MOpt weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1MOpt_weights.csv
+2025-02-03 09:39:15,816 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/GRU_weights.csv
+2025-02-03 09:39:16,413 - WARNING - Missing portfolios: ['TCN', 'TRANSFORMER', 'CNN + GRU', 'CNN + TCN', 'CNN + TRANSFORMER']
+2025-02-03 09:39:17,195 - INFO - 백테스트 완료.
+2025-02-03 09:44:34,883 - INFO - Selected mode: Full Process
+2025-02-03 09:44:34,883 - INFO - Selected data size: 500
+2025-02-03 09:44:34,883 - INFO - Selected models: ['GRU']
+2025-02-03 09:44:34,883 - INFO - Using optimization cache: True
+2025-02-03 09:44:35,040 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-03 09:44:36,810 - WARNING - Missing CNN + GRU weights
+2025-02-03 09:44:36,810 - INFO - Loaded portfolios:
+2025-02-03 09:44:36,810 - INFO - - Naive
+2025-02-03 09:44:36,811 - INFO - - CNN Top
+2025-02-03 09:44:36,811 - INFO - - MOM
+2025-02-03 09:44:36,811 - INFO - - STR
+2025-02-03 09:44:36,811 - INFO - - WSTR
+2025-02-03 09:44:36,811 - INFO - - TREND
+2025-02-03 09:44:36,811 - INFO - - Max Sharpe
+2025-02-03 09:44:36,811 - INFO - - CNN Top + Max Sharpe
+2025-02-03 09:44:36,811 - INFO - - Min Variance
+2025-02-03 09:44:36,811 - INFO - - CNN Top + Min Variance
+2025-02-03 09:44:36,811 - INFO - - Min CVaR
+2025-02-03 09:44:36,811 - INFO - - CNN Top + Min CVaR
+2025-02-03 09:44:36,811 - INFO - - Factor Timing ND
+2025-02-03 09:44:36,811 - INFO - - Factor Timing FM
+2025-02-03 09:44:36,811 - INFO - - Factor Timing 1M
+2025-02-03 09:44:36,811 - INFO - - Factor Timing 1MOpt
+2025-02-03 09:44:36,811 - INFO - - GRU
+2025-02-03 09:44:36,824 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Naive_weights.csv
+2025-02-03 09:44:36,831 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTop_weights.csv
+2025-02-03 09:44:36,839 - INFO - Saved MOM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MOM_weights.csv
+2025-02-03 09:44:36,846 - INFO - Saved STR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/STR_weights.csv
+2025-02-03 09:44:36,853 - INFO - Saved WSTR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/WSTR_weights.csv
+2025-02-03 09:44:36,860 - INFO - Saved TREND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/TREND_weights.csv
+2025-02-03 09:44:36,867 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MaxSharpe_weights.csv
+2025-02-03 09:44:36,873 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMaxSharpe_weights.csv
+2025-02-03 09:44:36,879 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinVariance_weights.csv
+2025-02-03 09:44:36,885 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinVariance_weights.csv
+2025-02-03 09:44:36,892 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinCVaR_weights.csv
+2025-02-03 09:44:36,898 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinCVaR_weights.csv
+2025-02-03 09:44:36,909 - INFO - Saved Factor Timing ND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingND_weights.csv
+2025-02-03 09:44:36,919 - INFO - Saved Factor Timing FM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingFM_weights.csv
+2025-02-03 09:44:36,928 - INFO - Saved Factor Timing 1M weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1M_weights.csv
+2025-02-03 09:44:36,938 - INFO - Saved Factor Timing 1MOpt weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1MOpt_weights.csv
+2025-02-03 09:44:37,093 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/GRU_weights.csv
+2025-02-03 09:44:37,700 - WARNING - Missing portfolios: ['TCN', 'TRANSFORMER', 'CNN + GRU', 'CNN + TCN', 'CNN + TRANSFORMER']
+2025-02-03 09:44:38,467 - INFO - 백테스트 완료.
+2025-02-04 15:05:57,303 - INFO - Selected mode: Full Process
+2025-02-04 15:05:57,303 - INFO - Selected data size: 500
+2025-02-04 15:05:57,303 - INFO - Selected models: ['GRU']
+2025-02-04 15:05:57,303 - INFO - Using optimization cache: False
+2025-02-04 15:05:57,478 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:05:58,203 - ERROR - Error in backtest: Timestamp('2018-03-31 00:00:00')
+2025-02-04 15:09:52,677 - INFO - Selected mode: Full Process
+2025-02-04 15:09:52,678 - INFO - Selected data size: 500
+2025-02-04 15:09:52,678 - INFO - Selected models: ['GRU']
+2025-02-04 15:09:52,678 - INFO - Using optimization cache: False
+2025-02-04 15:09:52,862 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:12:45,513 - ERROR - Error in backtest: Timestamp('2018-06-29 00:00:00')
+2025-02-04 15:14:34,988 - INFO - Selected mode: Full Process
+2025-02-04 15:14:34,989 - INFO - Selected data size: 500
+2025-02-04 15:14:34,989 - INFO - Selected models: ['GRU']
+2025-02-04 15:14:34,989 - INFO - Using optimization cache: True
+2025-02-04 15:14:35,163 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:17:20,188 - WARNING - Missing CNN + GRU weights
+2025-02-04 15:17:20,188 - INFO - Loaded portfolios:
+2025-02-04 15:17:20,188 - INFO - - Naive
+2025-02-04 15:17:20,188 - INFO - - Factor Timing ND
+2025-02-04 15:17:20,188 - INFO - - Factor Timing FM
+2025-02-04 15:17:20,188 - INFO - - Factor Timing 1M
+2025-02-04 15:17:20,189 - INFO - - Factor Timing 1MOpt
+2025-02-04 15:17:20,189 - INFO - - GRU
+2025-02-04 15:17:20,199 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Naive_weights.csv
+2025-02-04 15:17:20,206 - INFO - Saved Factor Timing ND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingND_weights.csv
+2025-02-04 15:17:20,212 - INFO - Saved Factor Timing FM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingFM_weights.csv
+2025-02-04 15:17:20,223 - INFO - Saved Factor Timing 1M weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1M_weights.csv
+2025-02-04 15:17:20,234 - INFO - Saved Factor Timing 1MOpt weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1MOpt_weights.csv
+2025-02-04 15:17:20,412 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/GRU_weights.csv
+2025-02-04 15:17:20,629 - WARNING - Missing portfolios: ['CNN Top', 'MOM', 'STR', 'WSTR', 'TREND', 'Max Sharpe', 'Min Variance', 'Min CVaR', 'Target Return', 'CNN Top + Max Sharpe', 'CNN Top + Min Variance', 'CNN Top + Min CVaR', 'CNN Top + Target Return', 'TCN', 'TRANSFORMER', 'CNN + GRU', 'CNN + TCN', 'CNN + TRANSFORMER']
+2025-02-04 15:17:21,429 - INFO - 백테스트 완료.
+2025-02-04 15:27:47,690 - INFO - Selected mode: Full Process
+2025-02-04 15:27:47,691 - INFO - Selected data size: 500
+2025-02-04 15:27:47,691 - INFO - Selected models: ['GRU']
+2025-02-04 15:27:47,691 - INFO - Using optimization cache: True
+2025-02-04 15:27:47,866 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:31:21,946 - INFO - Selected mode: Full Process
+2025-02-04 15:31:21,947 - INFO - Selected data size: 500
+2025-02-04 15:31:21,947 - INFO - Selected models: ['GRU']
+2025-02-04 15:31:21,947 - INFO - Using optimization cache: True
+2025-02-04 15:31:22,122 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:35:55,503 - INFO - Loaded portfolios:
+2025-02-04 15:35:55,503 - INFO - - Naive
+2025-02-04 15:35:55,503 - INFO - - CNN Top
+2025-02-04 15:35:55,503 - INFO - - MOM
+2025-02-04 15:35:55,503 - INFO - - STR
+2025-02-04 15:35:55,503 - INFO - - WSTR
+2025-02-04 15:35:55,503 - INFO - - TREND
+2025-02-04 15:35:55,503 - INFO - - Max Sharpe
+2025-02-04 15:35:55,503 - INFO - - CNN Top + Max Sharpe
+2025-02-04 15:35:55,503 - INFO - - Min Variance
+2025-02-04 15:35:55,503 - INFO - - CNN Top + Min Variance
+2025-02-04 15:35:55,503 - INFO - - Min CVaR
+2025-02-04 15:35:55,503 - INFO - - CNN Top + Min CVaR
+2025-02-04 15:35:55,503 - INFO - - Factor Timing ND
+2025-02-04 15:35:55,503 - INFO - - Factor Timing FM
+2025-02-04 15:35:55,503 - INFO - - Factor Timing 1M
+2025-02-04 15:35:55,503 - INFO - - Factor Timing 1MOpt
+2025-02-04 15:35:55,503 - INFO - - GRU
+2025-02-04 15:35:55,516 - INFO - Saved Naive weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Naive_weights.csv
+2025-02-04 15:35:55,524 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTop_weights.csv
+2025-02-04 15:35:55,532 - INFO - Saved MOM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MOM_weights.csv
+2025-02-04 15:35:55,539 - INFO - Saved STR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/STR_weights.csv
+2025-02-04 15:35:55,547 - INFO - Saved WSTR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/WSTR_weights.csv
+2025-02-04 15:35:55,555 - INFO - Saved TREND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/TREND_weights.csv
+2025-02-04 15:35:55,576 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MaxSharpe_weights.csv
+2025-02-04 15:35:55,590 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMaxSharpe_weights.csv
+2025-02-04 15:35:55,609 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinVariance_weights.csv
+2025-02-04 15:35:55,623 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinVariance_weights.csv
+2025-02-04 15:35:55,631 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinCVaR_weights.csv
+2025-02-04 15:35:55,638 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinCVaR_weights.csv
+2025-02-04 15:35:55,644 - INFO - Saved Factor Timing ND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingND_weights.csv
+2025-02-04 15:35:55,657 - INFO - Saved Factor Timing FM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingFM_weights.csv
+2025-02-04 15:35:55,669 - INFO - Saved Factor Timing 1M weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1M_weights.csv
+2025-02-04 15:35:55,679 - INFO - Saved Factor Timing 1MOpt weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1MOpt_weights.csv
+2025-02-04 15:35:55,855 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/GRU_weights.csv
+2025-02-04 15:35:57,583 - INFO - 백테스트 완료.
+2025-02-04 15:41:11,754 - INFO - Selected mode: Full Process
+2025-02-04 15:41:11,754 - INFO - Selected data size: 500
+2025-02-04 15:41:11,754 - INFO - Selected models: ['GRU']
+2025-02-04 15:41:11,754 - INFO - Using optimization cache: True
+2025-02-04 15:41:11,924 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:41:11,925 - ERROR - Error in backtest: 'PortfolioBacktest' object has no attribute 'rebalance_dates'
+2025-02-04 15:41:21,951 - INFO - Selected mode: Full Process
+2025-02-04 15:41:21,951 - INFO - Selected data size: 500
+2025-02-04 15:41:21,951 - INFO - Selected models: ['GRU']
+2025-02-04 15:41:21,951 - INFO - Using optimization cache: False
+2025-02-04 15:41:22,101 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:41:22,102 - ERROR - Error in backtest: 'PortfolioBacktest' object has no attribute 'rebalance_dates'
+2025-02-04 15:42:22,482 - INFO - Selected mode: Full Process
+2025-02-04 15:42:22,482 - INFO - Selected data size: 500
+2025-02-04 15:42:22,482 - INFO - Selected models: ['GRU']
+2025-02-04 15:42:22,482 - INFO - Using optimization cache: True
+2025-02-04 15:42:22,638 - INFO - Data loaded - Returns: (1637, 500), Up prob: (79, 500)
+2025-02-04 15:47:22,989 - INFO - Loaded portfolios:
+2025-02-04 15:47:22,989 - INFO - - Factor Timing ND
+2025-02-04 15:47:22,989 - INFO - - Factor Timing FM
+2025-02-04 15:47:22,989 - INFO - - Factor Timing 1M
+2025-02-04 15:47:22,989 - INFO - - Factor Timing 1MOpt
+2025-02-04 15:47:22,989 - INFO - - CNN Top
+2025-02-04 15:47:22,989 - INFO - - MOM
+2025-02-04 15:47:22,989 - INFO - - STR
+2025-02-04 15:47:22,989 - INFO - - WSTR
+2025-02-04 15:47:22,989 - INFO - - TREND
+2025-02-04 15:47:22,989 - INFO - - Max Sharpe
+2025-02-04 15:47:22,989 - INFO - - CNN Top + Max Sharpe
+2025-02-04 15:47:22,989 - INFO - - Min Variance
+2025-02-04 15:47:22,989 - INFO - - CNN Top + Min Variance
+2025-02-04 15:47:22,989 - INFO - - Min CVaR
+2025-02-04 15:47:22,989 - INFO - - CNN Top + Min CVaR
+2025-02-04 15:47:22,989 - INFO - - Target 6%
+2025-02-04 15:47:22,989 - INFO - - Target 8%
+2025-02-04 15:47:22,989 - INFO - - Target 10%
+2025-02-04 15:47:22,989 - INFO - - Target 12%
+2025-02-04 15:47:22,990 - INFO - - GRU
+2025-02-04 15:47:22,998 - INFO - Saved Factor Timing ND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingND_weights.csv
+2025-02-04 15:47:23,010 - INFO - Saved Factor Timing FM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTimingFM_weights.csv
+2025-02-04 15:47:23,034 - INFO - Saved Factor Timing 1M weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1M_weights.csv
+2025-02-04 15:47:23,050 - INFO - Saved Factor Timing 1MOpt weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/FactorTiming1MOpt_weights.csv
+2025-02-04 15:47:23,062 - INFO - Saved CNN Top weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTop_weights.csv
+2025-02-04 15:47:23,071 - INFO - Saved MOM weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MOM_weights.csv
+2025-02-04 15:47:23,080 - INFO - Saved STR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/STR_weights.csv
+2025-02-04 15:47:23,089 - INFO - Saved WSTR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/WSTR_weights.csv
+2025-02-04 15:47:23,097 - INFO - Saved TREND weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/TREND_weights.csv
+2025-02-04 15:47:23,123 - INFO - Saved Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MaxSharpe_weights.csv
+2025-02-04 15:47:23,142 - INFO - Saved CNN Top + Max Sharpe weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMaxSharpe_weights.csv
+2025-02-04 15:47:23,168 - INFO - Saved Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinVariance_weights.csv
+2025-02-04 15:47:23,187 - INFO - Saved CNN Top + Min Variance weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinVariance_weights.csv
+2025-02-04 15:47:23,195 - INFO - Saved Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/MinCVaR_weights.csv
+2025-02-04 15:47:23,203 - INFO - Saved CNN Top + Min CVaR weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/CNNTopMinCVaR_weights.csv
+2025-02-04 15:47:23,229 - INFO - Saved Target 6% weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Target6_weights.csv
+2025-02-04 15:47:23,254 - INFO - Saved Target 8% weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Target8_weights.csv
+2025-02-04 15:47:23,278 - INFO - Saved Target 10% weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Target10_weights.csv
+2025-02-04 15:47:23,302 - INFO - Saved Target 12% weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/Target12_weights.csv
+2025-02-04 15:47:23,464 - INFO - Saved GRU weights to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/weights/GRU_weights.csv
+2025-02-04 15:47:23,499 - ERROR - Error calculating metrics for Factor Timing ND: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,531 - ERROR - Error calculating metrics for Factor Timing FM: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,607 - ERROR - Error calculating metrics for Factor Timing 1M: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,639 - ERROR - Error calculating metrics for Factor Timing 1MOpt: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,673 - ERROR - Error calculating metrics for CNN Top: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,706 - ERROR - Error calculating metrics for MOM: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,739 - ERROR - Error calculating metrics for STR: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,772 - ERROR - Error calculating metrics for WSTR: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,806 - ERROR - Error calculating metrics for TREND: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,838 - ERROR - Error calculating metrics for Max Sharpe: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,872 - ERROR - Error calculating metrics for CNN Top + Max Sharpe: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,907 - ERROR - Error calculating metrics for Min Variance: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,943 - ERROR - Error calculating metrics for CNN Top + Min Variance: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:23,976 - ERROR - Error calculating metrics for Min CVaR: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:24,009 - ERROR - Error calculating metrics for CNN Top + Min CVaR: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:24,041 - ERROR - Error calculating metrics for Target 6%: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:24,074 - ERROR - Error calculating metrics for Target 8%: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:24,107 - ERROR - Error calculating metrics for Target 10%: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:24,139 - ERROR - Error calculating metrics for Target 12%: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:24,173 - ERROR - Error calculating metrics for GRU: PerformanceMetrics.calculate_portfolio_metrics() got an unexpected keyword argument 'returns'
+2025-02-04 15:47:24,907 - INFO - 백테스트 완료.
+2025-02-04 15:58:13,358 - INFO - Selected mode: Full Process
+2025-02-04 15:58:13,359 - INFO - Selected data size: 500
+2025-02-04 15:58:13,359 - INFO - Selected models: ['GRU']
+2025-02-04 15:58:13,359 - INFO - Using optimization cache: True
+2025-02-04 15:58:13,361 - ERROR - Error in backtest: DataLoader.__init__() missing 2 required positional arguments: 'base_folder' and 'data_size'

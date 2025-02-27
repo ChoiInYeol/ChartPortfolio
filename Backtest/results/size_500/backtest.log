@@ -1,0 +1,18 @@
+2025-02-04 16:00:30,724 - ERROR - Error in backtest: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/weight.yaml'
+2025-02-04 16:00:49,394 - ERROR - Error in backtest: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/weight.yaml'
+2025-02-04 16:01:20,666 - ERROR - Error in backtest: [Errno 2] No such file or directory: '/home/indi/codespace/ImagePortOpt/Data/processed/returns_500.csv'
+2025-02-04 16:10:08,797 - INFO - Performance metrics saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/metrics/portfolio_metrics.csv
+2025-02-04 16:10:08,797 - ERROR - Error calculating metrics: 'PerformanceMetrics' object has no attribute 'save_metrics_to_latex'
+2025-02-04 16:10:11,238 - INFO - Cumulative returns plot saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/plots/cumulative_returns.png
+2025-02-04 16:15:54,998 - INFO - Performance metrics saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/metrics/portfolio_metrics.csv
+2025-02-04 16:15:54,999 - ERROR - Error calculating metrics: 'PerformanceMetrics' object has no attribute 'save_metrics_to_latex'
+2025-02-04 16:15:55,961 - INFO - Cumulative returns plot saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/plots/cumulative_returns.png
+2025-02-04 16:17:51,976 - INFO - Performance metrics saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/metrics/portfolio_metrics.csv
+2025-02-04 16:17:51,977 - ERROR - Error calculating metrics: 'PerformanceMetrics' object has no attribute 'save_metrics_to_latex'
+2025-02-04 16:17:52,913 - INFO - Cumulative returns plot saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/plots/cumulative_returns.png
+2025-02-04 16:21:35,574 - INFO - Performance metrics saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/metrics/portfolio_metrics.csv
+2025-02-04 16:21:35,615 - INFO - LaTeX metrics saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/metrics/portfolio_metrics.tex
+2025-02-04 16:21:36,567 - INFO - Cumulative returns plot saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/plots/cumulative_returns.png
+2025-02-04 16:30:57,296 - INFO - Performance metrics saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/metrics/portfolio_metrics.csv
+2025-02-04 16:30:57,326 - INFO - LaTeX metrics saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/metrics/portfolio_metrics.tex
+2025-02-04 16:30:58,268 - INFO - Cumulative returns plot saved to /home/indi/codespace/ImagePortOpt/Backtest/results/size_500/plots/cumulative_returns.png
