@@ -1,0 +1,75 @@
+model_0:
+  train:
+    best: null
+    final: null
+  validate:
+    best:
+      FN: 21865
+      FP: 33358
+      TN: 24344
+      TP: 46672
+    final:
+      FN: 11716
+      FP: 42957
+      TN: 14745
+      TP: 56821
+model_1:
+  train:
+    best: null
+    final: null
+  validate:
+    best:
+      FN: 15462
+      FP: 39280
+      TN: 18252
+      TP: 53245
+    final:
+      FN: 31286
+      FP: 25162
+      TN: 32370
+      TP: 37421
+model_2:
+  train:
+    best: null
+    final: null
+  validate:
+    best:
+      FN: 19064
+      FP: 35492
+      TN: 22001
+      TP: 49682
+    final:
+      FN: 11578
+      FP: 42841
+      TN: 14652
+      TP: 57168
+model_3:
+  train:
+    best: null
+    final: null
+  validate:
+    best:
+      FN: 20111
+      FP: 34773
+      TN: 22877
+      TP: 48478
+    final:
+      FN: 16650
+      FP: 37951
+      TN: 19699
+      TP: 51939
+model_4:
+  train:
+    best: null
+    final: null
+  validate:
+    best:
+      FN: 14686
+      FP: 39895
+      TN: 17690
+      TP: 53968
+    final:
+      FN: 8087
+      FP: 46500
+      TN: 11085
+      TP: 60567

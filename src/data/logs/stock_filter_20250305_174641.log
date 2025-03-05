@@ -1,0 +1,9 @@
+2025-03-05 17:46:41,397 - StockDataProcessor - INFO - Logging initialized
+2025-03-05 17:48:15,816 - StockDataProcessor - INFO - Starting stock data filtering process
+2025-03-05 17:48:22,098 - StockDataProcessor - INFO - Stocks with sufficient trading days: 2128
+2025-03-05 17:48:31,988 - StockDataProcessor - INFO - Removed 0 stocks based on mean_ret
+2025-03-05 17:48:31,989 - StockDataProcessor - INFO - Removed 0 stocks based on std_ret
+2025-03-05 17:48:31,989 - StockDataProcessor - INFO - Removed 0 stocks based on skew_ret
+2025-03-05 17:48:31,990 - StockDataProcessor - INFO - Removed 0 stocks based on kurt_ret
+2025-03-05 17:48:57,666 - StockDataProcessor - INFO - Filtering complete. Remaining stocks: 2128
+2025-03-05 17:48:57,666 - StockDataProcessor - INFO - Filtered data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/Data_filtered.csv

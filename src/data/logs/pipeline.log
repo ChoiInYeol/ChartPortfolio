@@ -1,0 +1,209 @@
+2025-03-05 17:07:32,061 - DataPipeline - INFO - Starting pipeline validation...
+2025-03-05 17:07:32,064 - DataPipeline - INFO - Found 2128 stock files. Skipping download.
+2025-03-05 17:07:32,064 - DataPipeline - WARNING - No S&P 500 list found. Will create during pipeline run.
+2025-03-05 17:07:32,064 - DataPipeline - INFO - 
+=== Pipeline Status ===
+Total Symbols: 0
+Downloaded Symbols: 2128
+Downloaded Files Count: 2128
+
+Required Steps:
+- Stock Download: No
+- SP500 Check: Yes
+- Data Processing: Yes
+
+Missing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/raw/Data.csv
+- /home/indi/codespace/ChartPortfolio/src/data/processed/processed_data.csv
+- /home/indi/codespace/ChartPortfolio/src/data/raw/sp500_20180101.csv
+
+Existing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/raw/symbol_permno.csv
+2025-03-05 17:07:32,064 - DataPipeline - INFO - Step 1: Stock data already exists, skipping download...
+2025-03-05 17:07:32,069 - DataPipeline - INFO - Step 2: Checking S&P 500 stocks...
+2025-03-05 17:07:32,070 - DataPipeline - INFO - Step 3: Processing final dataset...
+2025-03-05 17:07:32,070 - DataPipeline - INFO - Processing final dataset...
+2025-03-05 17:07:32,070 - DataPipeline - ERROR - Data file not found: /home/indi/codespace/ChartPortfolio/src/data/raw/Data.csv
+2025-03-05 17:07:32,070 - DataPipeline - ERROR - Pipeline failed: Data file not found: /home/indi/codespace/ChartPortfolio/src/data/raw/Data.csv
+2025-03-05 17:07:32,070 - DataPipeline - ERROR - Traceback (most recent call last):
+  File "/home/indi/codespace/ChartPortfolio/src/data/data_pipeline.py", line 319, in run_pipeline
+    self._process_data(target_date)
+  File "/home/indi/codespace/ChartPortfolio/src/data/data_pipeline.py", line 345, in _process_data
+    raise FileNotFoundError(f"Data file not found: {data_path}")
+FileNotFoundError: Data file not found: /home/indi/codespace/ChartPortfolio/src/data/raw/Data.csv
+
+2025-03-05 17:11:57,026 - DataPipeline - INFO - Starting pipeline validation...
+2025-03-05 17:11:57,028 - DataPipeline - INFO - Found 2129 stock files. Skipping download.
+2025-03-05 17:11:57,028 - DataPipeline - WARNING - No S&P 500 list found. Will create during pipeline run.
+2025-03-05 17:11:57,028 - DataPipeline - INFO - 
+=== Pipeline Status ===
+Total Symbols: 0
+Downloaded Symbols: 2129
+Downloaded Files Count: 2129
+
+Required Steps:
+- Stock Download: No
+- SP500 Check: Yes
+- Data Processing: Yes
+
+Missing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+- /home/indi/codespace/ChartPortfolio/src/data/processed/processed_data.csv
+- /home/indi/codespace/ChartPortfolio/src/data/processed/sp500_20180101.csv
+- /home/indi/codespace/ChartPortfolio/src/data/processed/symbol_permno.csv
+
+Existing Files:
+2025-03-05 17:11:57,028 - DataPipeline - INFO - Step 1: Stock data already exists, skipping download...
+2025-03-05 17:11:57,028 - DataPipeline - WARNING - symbol_permno.csv not found, creating empty DataFrame
+2025-03-05 17:11:57,030 - DataPipeline - INFO - Step 2: Checking S&P 500 stocks...
+2025-03-05 17:11:57,030 - DataPipeline - INFO - Step 3: Processing final dataset...
+2025-03-05 17:11:57,030 - DataPipeline - INFO - Processing final dataset...
+2025-03-05 17:11:57,030 - DataPipeline - WARNING - symbol_permno.csv not found, creating empty mapping
+2025-03-05 17:11:57,213 - DataPipeline - INFO - Created symbol_permno.csv with 2129 symbols
+2025-03-05 17:11:57,213 - DataPipeline - INFO - Combining individual stock files into Data.csv...
+2025-03-05 17:11:57,215 - DataPipeline - INFO - Processing 2129 ticker files
+2025-03-05 17:12:12,867 - DataPipeline - WARNING - Skipping symbol_permno: missing required columns
+2025-03-05 17:13:05,971 - DataPipeline - INFO - Combined data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+2025-03-05 17:13:05,973 - DataPipeline - INFO - Updated symbol_permno.csv with 2129 symbols
+2025-03-05 17:13:05,973 - DataPipeline - INFO - Creating final processed dataset...
+2025-03-05 17:30:25,250 - DataPipeline - INFO - Processed data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/processed_data.csv
+2025-03-05 17:30:25,251 - DataPipeline - INFO - Final dataset shape: (17616857, 3)
+2025-03-05 17:30:26,521 - DataPipeline - INFO - Pipeline completed successfully!
+2025-03-05 17:42:46,204 - DataPipeline - INFO - Starting pipeline validation...
+2025-03-05 17:42:46,207 - DataPipeline - INFO - Found 2129 stock files. Skipping download.
+2025-03-05 17:42:52,514 - DataPipeline - WARNING - No S&P 500 list found. Will create during pipeline run.
+2025-03-05 17:42:52,546 - DataPipeline - INFO - 
+=== Pipeline Status ===
+Total Symbols: 0
+Downloaded Symbols: 2128
+Downloaded Files Count: 2129
+
+Required Steps:
+- Stock Download: No
+- SP500 Check: Yes
+- Data Processing: No
+
+Missing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/processed/sp500_20180101.csv
+
+Existing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+- /home/indi/codespace/ChartPortfolio/src/data/processed/symbol_permno.csv
+2025-03-05 17:42:52,546 - DataPipeline - INFO - Step 1: Stock data already exists, skipping download...
+2025-03-05 17:42:52,548 - DataPipeline - INFO - Step 2: Checking S&P 500 stocks...
+2025-03-05 17:42:52,548 - DataPipeline - INFO - Step 3: Processing final dataset...
+2025-03-05 17:42:52,548 - DataPipeline - INFO - Processing final dataset...
+2025-03-05 17:42:52,549 - DataPipeline - INFO - Combining individual stock files into Data.csv...
+2025-03-05 17:42:52,551 - DataPipeline - INFO - Processing 2129 ticker files
+2025-03-05 17:43:06,129 - DataPipeline - WARNING - Skipping symbol_permno: missing required columns
+2025-03-05 17:43:40,938 - DataPipeline - INFO - Combined data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+2025-03-05 17:43:40,938 - DataPipeline - INFO - Applied rounding to reduce file size
+2025-03-05 17:43:40,940 - DataPipeline - INFO - Updated symbol_permno.csv with 2129 symbols
+2025-03-05 17:43:40,940 - DataPipeline - INFO - Applying t-statistic filtering...
+2025-03-05 17:43:40,947 - DataPipeline - INFO - Calculating returns from price data...
+2025-03-05 17:44:19,475 - DataPipeline - INFO - Updated Data.csv with calculated returns
+2025-03-05 17:44:24,304 - DataPipeline - ERROR - Error processing data: time data "1994-04-05" doesn't match format "%Y%m%d", at position 0. You might want to try:
+    - passing `format` if your strings have a consistent format;
+    - passing `format='ISO8601'` if your strings are all ISO8601 but not necessarily in exactly the same format;
+    - passing `format='mixed'`, and the format will be inferred for each element individually. You might want to use `dayfirst` alongside this.
+2025-03-05 17:44:24,304 - DataPipeline - ERROR - Pipeline failed: time data "1994-04-05" doesn't match format "%Y%m%d", at position 0. You might want to try:
+    - passing `format` if your strings have a consistent format;
+    - passing `format='ISO8601'` if your strings are all ISO8601 but not necessarily in exactly the same format;
+    - passing `format='mixed'`, and the format will be inferred for each element individually. You might want to use `dayfirst` alongside this.
+2025-03-05 17:44:24,306 - DataPipeline - ERROR - Traceback (most recent call last):
+  File "/home/indi/codespace/ChartPortfolio/src/data/data_pipeline.py", line 334, in run_pipeline
+    self._process_data(target_date, apply_tstat_filter, confidence_level, min_trading_days)
+  File "/home/indi/codespace/ChartPortfolio/src/data/data_pipeline.py", line 489, in _process_data
+    filtered_data = self.processor.filter_stocks(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/codespace/ChartPortfolio/src/data/data_ready.py", line 136, in filter_stocks
+    df['date'] = pd.to_datetime(df['date'], format='%Y%m%d')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/tools/datetimes.py", line 1067, in to_datetime
+    values = convert_listlike(arg._values, format)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/tools/datetimes.py", line 433, in _convert_listlike_datetimes
+    return _array_strptime_with_fallback(arg, name, utc, format, exact, errors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/indi/anaconda3/envs/imagedpo2/lib/python3.11/site-packages/pandas/core/tools/datetimes.py", line 467, in _array_strptime_with_fallback
+    result, tz_out = array_strptime(arg, fmt, exact=exact, errors=errors, utc=utc)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "strptime.pyx", line 501, in pandas._libs.tslibs.strptime.array_strptime
+  File "strptime.pyx", line 451, in pandas._libs.tslibs.strptime.array_strptime
+  File "strptime.pyx", line 583, in pandas._libs.tslibs.strptime._parse_with_format
+ValueError: time data "1994-04-05" doesn't match format "%Y%m%d", at position 0. You might want to try:
+    - passing `format` if your strings have a consistent format;
+    - passing `format='ISO8601'` if your strings are all ISO8601 but not necessarily in exactly the same format;
+    - passing `format='mixed'`, and the format will be inferred for each element individually. You might want to use `dayfirst` alongside this.
+
+2025-03-05 17:46:41,397 - DataPipeline - INFO - Starting pipeline validation...
+2025-03-05 17:46:41,400 - DataPipeline - INFO - Found 2128 stock files. Skipping download.
+2025-03-05 17:46:46,186 - DataPipeline - WARNING - No S&P 500 list found. Will create during pipeline run.
+2025-03-05 17:46:46,222 - DataPipeline - INFO - 
+=== Pipeline Status ===
+Total Symbols: 0
+Downloaded Symbols: 2128
+Downloaded Files Count: 2128
+
+Required Steps:
+- Stock Download: No
+- SP500 Check: Yes
+- Data Processing: No
+
+Missing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/processed/sp500_20180101.csv
+
+Existing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+- /home/indi/codespace/ChartPortfolio/src/data/processed/symbol_permno.csv
+2025-03-05 17:46:46,222 - DataPipeline - INFO - Step 1: Stock data already exists, skipping download...
+2025-03-05 17:46:46,223 - DataPipeline - INFO - Step 2: Checking S&P 500 stocks...
+2025-03-05 17:46:46,224 - DataPipeline - INFO - Step 3: Processing final dataset...
+2025-03-05 17:46:46,224 - DataPipeline - INFO - Processing final dataset...
+2025-03-05 17:46:46,225 - DataPipeline - INFO - Combining individual stock files into Data.csv...
+2025-03-05 17:46:46,227 - DataPipeline - INFO - Processing 2128 ticker files
+2025-03-05 17:47:38,101 - DataPipeline - INFO - Combined data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+2025-03-05 17:47:38,101 - DataPipeline - INFO - Applied rounding to reduce file size
+2025-03-05 17:47:38,102 - DataPipeline - INFO - Updated symbol_permno.csv with 2129 symbols
+2025-03-05 17:47:38,103 - DataPipeline - INFO - Applying t-statistic filtering...
+2025-03-05 17:47:38,113 - DataPipeline - INFO - Calculating returns from price data...
+2025-03-05 17:48:15,815 - DataPipeline - INFO - Updated Data.csv with calculated returns
+2025-03-05 17:49:23,945 - DataPipeline - INFO - T-statistic filtered data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/Data_filtered.csv
+2025-03-05 17:49:24,018 - DataPipeline - INFO - Original stocks: 2128, Filtered stocks: 2128
+2025-03-05 17:49:24,332 - DataPipeline - INFO - Pipeline completed successfully!
+2025-03-05 18:35:33,539 - DataPipeline - INFO - Starting pipeline validation...
+2025-03-05 18:35:33,542 - DataPipeline - INFO - Found 2128 stock files. Skipping download.
+2025-03-05 18:35:38,918 - DataPipeline - WARNING - No S&P 500 list found. Will create during pipeline run.
+2025-03-05 18:35:38,950 - DataPipeline - INFO - 
+=== Pipeline Status ===
+Total Symbols: 0
+Downloaded Symbols: 2128
+Downloaded Files Count: 2128
+
+Required Steps:
+- Stock Download: No
+- SP500 Check: Yes
+- Data Processing: No
+
+Missing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/processed/sp500_20180101.csv
+
+Existing Files:
+- /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+- /home/indi/codespace/ChartPortfolio/src/data/processed/symbol_permno.csv
+2025-03-05 18:35:38,950 - DataPipeline - INFO - Step 1: Stock data already exists, skipping download...
+2025-03-05 18:35:38,952 - DataPipeline - INFO - Step 2: Checking S&P 500 stocks...
+2025-03-05 18:35:38,953 - DataPipeline - INFO - Step 3: Processing final dataset...
+2025-03-05 18:35:38,953 - DataPipeline - INFO - S&P 500 인덱스 데이터 다운로드 중...
+2025-03-05 18:35:42,168 - DataPipeline - INFO - S&P 500 인덱스 데이터가 저장되었습니다: /home/indi/codespace/ChartPortfolio/src/data/processed/snp500_index.csv
+2025-03-05 18:35:42,169 - DataPipeline - INFO - Combining individual stock files into Data.csv...
+2025-03-05 18:35:42,171 - DataPipeline - INFO - Processing 2128 ticker files
+2025-03-05 18:36:37,007 - DataPipeline - INFO - Combined data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/Data.csv
+2025-03-05 18:36:37,007 - DataPipeline - INFO - Applied rounding to reduce file size
+2025-03-05 18:36:37,008 - DataPipeline - INFO - Updated symbol_permno.csv with 2129 symbols
+2025-03-05 18:36:37,008 - DataPipeline - INFO - Applying t-statistic filtering...
+2025-03-05 18:36:37,016 - DataPipeline - INFO - Calculating returns from price data...
+2025-03-05 18:37:16,048 - DataPipeline - INFO - Updated Data.csv with calculated returns
+2025-03-05 18:38:23,604 - DataPipeline - INFO - T-statistic filtered data saved to /home/indi/codespace/ChartPortfolio/src/data/processed/Data_filtered.csv
+2025-03-05 18:38:23,667 - DataPipeline - INFO - Original stocks: 2128, Filtered stocks: 2128
+2025-03-05 18:38:24,097 - DataPipeline - INFO - Pipeline completed successfully!
